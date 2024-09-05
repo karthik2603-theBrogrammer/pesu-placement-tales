@@ -108,7 +108,7 @@ export default function Home() {
             </DropdownMenu>
           ) : (
             <DropdownMenu aria-label="Company Selection">
-              {companies.map((company) => (
+              {companies?.map((company) => (
                 <DropdownItem
                   key={company.id}
                   className="text-success"
