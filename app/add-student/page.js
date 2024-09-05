@@ -33,7 +33,7 @@ export default function Home() {
   });
 
   const [remarkState, setRemarkState] = useState(`Hello, **world!**`);
-  const [companies, setCompanies] = useState([]);
+  const [companies, setCompanies] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function Home() {
             </Button>
           </DropdownTrigger>
 
-          {companies.length === 0 ? (
+          {companies === null ? (
             <DropdownMenu aria-label="Static Actions">
               <DropdownItem key="fetching" className="text-danger" color="danger">
                 Fetching Companies... Hold On
