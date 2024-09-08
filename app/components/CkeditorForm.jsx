@@ -149,7 +149,8 @@ export default function App({ remarkState, setRemarkState }) {
         </code>
       </div>
       {/* <div>Rendered Output:</div> */}
-      <div className="">
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-sm text-green-600">Rendered output 👀</p>
         <BlockNoteView editor={editor} editable={false} theme="light" >
           <SideMenuController
             sideMenu={(props) => (
