@@ -41,7 +41,7 @@ export default function App({ remarkState, setRemarkState }) {
   ## **Interview and Offer Details at {Company}!**
 
   ### A Brief description about yourself :)
-#### You can (not necessarily answer all the below questions)
+#### You may (not necessarily) answer all the below questions
   - What are your technical interests?
   - Your Branch/ CGPA/ Clubs, etc
   - Hobbies 
