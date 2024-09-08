@@ -19,7 +19,6 @@ export default async function handler(req, res) {
     // Validate the input and find missing fields
     const requiredFields = [
       'first_name',
-      'middle_name',
       'last_name',
       'company_placed_id',
       'year_placed',
@@ -33,6 +32,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ 
         error: 'Missing fields', 
         missingFields 
+      });
+    }
+    if (!company_placed_id) {
+      return res.status(400).json({ 
+        error: 'Invalid company_placed_id',
       });
     }
 
