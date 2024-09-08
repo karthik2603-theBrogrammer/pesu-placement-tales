@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button, Input } from "@nextui-org/react";
@@ -7,12 +7,17 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from "@nextui-org/react";
 import dynamic from "next/dynamic";
-import H from "../components/Heading"
-import P from "../components/Paragraph"
-
-import { Toaster, toast } from 'sonner'
+import H from "../components/Heading";
+import P from "../components/Paragraph";
+import { Toaster, toast } from "sonner";
 
 // Dynamically import CkeditorForm to avoid server-side rendering issues
 const CustomEditor = dynamic(() => import("../components/CkeditorForm"), {
@@ -33,8 +38,10 @@ export default function Home() {
   });
 
   const [remarkState, setRemarkState] = useState(`Hello, **world!**`);
-  const [companies, setCompanies] = useState(null);
+  const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [backdrop, setBackdrop] = useState('blur');
 
   useEffect(() => {
     async function fetchCompanies() {
@@ -42,7 +49,6 @@ export default function Home() {
         const response = await fetch("/api/get-companies");
         const data = await response.json();
         setCompanies(data.result);
-        // console.log(data.result);
       } catch (error) {
         console.error("Error fetching companies:", error);
       }
@@ -58,15 +64,54 @@ export default function Home() {
   const handleCompanyChange = (company) => {
     setFormData((prevData) => ({ ...prevData, company_placed_id: company.id }));
     setSelectedCompany(company);
-  }
+    onClose(); // Close the modal after selection
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Check for required fields
+    const {
+      first_name,
+      last_name,
+      year_placed,
+      linkedin_url,
+      company_placed_id,
+      phone_number,
+    } = formData;
+  
+    if (
+      !first_name ||
+      !last_name ||
+      !year_placed ||
+      !linkedin_url ||
+      !company_placed_id
+    ) {
+      toast.error(
+        "Please fill out all mandatory fields: Company ID, First Name, Last Name, Year Placed, and LinkedIn URL."
+      );
+      return;
+    }
+  
+    // Validate LinkedIn URL
+    const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
+    if (!linkedinRegex.test(linkedin_url)) {
+      toast.error("Please enter a valid LinkedIn URL.");
+      return;
+    }
+  
+    // Validate Phone Number
+    const phoneRegex = /^[+]?[0-9]{10,15}$/; // Adjust the regex according to your phone number format requirements
+    if (!phoneRegex.test(phone_number)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+  
     const updatedFormData = {
       ...formData,
       remarks_markdown: remarkState,
     };
-
+  
     try {
       const response = await fetch("/api/add-student-placed", {
         method: "POST",
@@ -74,14 +119,19 @@ export default function Home() {
         body: JSON.stringify(updatedFormData),
       });
       const result = await response.json();
-      toast.success('Student Data Registered Successfully!')
+      toast.success("Student data registered successfully!");
+      toast.success(
+        "Thank you for your contribution! You can review your work after a quick admin check :)"
+      );
     } catch (error) {
       console.error("Error submitting form:", error);
+      toast.error("Failed to register student data. Please try again later.");
     }
   };
+  
 
   return (
-    <div className="h-fit flex flex-col items-center justify-center p-6 m-4">
+    <div className="h-fit flex flex-col items-center justify-center md:p-6 p-1 m-2">
       <Toaster />
       <H text={"Add Your Experience!"} />
       <P
@@ -89,38 +139,53 @@ export default function Home() {
           "Welcome Student to this page! Wishing you a warm congratulations on securing your offer. Make your contribution by sharing your experience with everyone in the PES community. Your words and experience will help students/ juniors for years to come {':)'}"
         }
       />
+
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-2 place-items-center md:grid-cols-4 gap-4 "
+        className="grid grid-cols-2 place-items-center md:grid-cols-4 gap-4"
       >
-        <Dropdown>
-          <DropdownTrigger>
-            <Button variant="bordered">
-              {selectedCompany ? selectedCompany.company_name : "Select Company"}
-            </Button>
-          </DropdownTrigger>
+        <Button  
+          variant="flat" 
+          color="warning" 
+          onPress={onOpen}
+          className="capitalize"
+        >
+          {selectedCompany ? selectedCompany.company_name : "Select Company"}
+        </Button>
+        <Modal backdrop={backdrop} isOpen={isOpen} onClose={onClose} className = " p-3">
+          <ModalContent>
+            <ModalHeader className="flex flex-col gap-1">Select a Company</ModalHeader>
+            <ModalBody>
+              {companies.length === 0 ? (
+                <p>Loading companies...</p>
+              ) : (
+                <div className="flex flex-row flex-wrap gap-1 items-center justify-center">
+                  {companies.map((company) => (
+                    <>
+                    
+                    <Button
+                      key={company.id}
+                      color="success"
+                      onPress={() => handleCompanyChange(company)}
+                      className = "w-fit"
+                      variant="light"
+                    >
+                      {company.company_name}
+                    </Button>
 
-          {companies === null ? (
-            <DropdownMenu aria-label="Static Actions">
-              <DropdownItem key="fetching" className="text-danger" color="danger">
-                Fetching Companies... Hold On
-              </DropdownItem>
-            </DropdownMenu>
-          ) : (
-            <DropdownMenu aria-label="Company Selection">
-              {companies?.map((company) => (
-                <DropdownItem
-                  key={company.id}
-                  className="text-success"
-                  color="success"
-                  onClick={() => handleCompanyChange(company)}
-                >
-                  {company.company_name}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          )}
-        </Dropdown>
+                    </>
+                  ))}
+                </div>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button color="success"  onPress={onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        
         <Input
           name="first_name"
           type="text"
@@ -130,6 +195,7 @@ export default function Home() {
           value={formData.first_name}
           onChange={handleInputChange}
           className="max-w-full"
+          required
         />
         <Input
           name="middle_name"
@@ -150,16 +216,18 @@ export default function Home() {
           value={formData.last_name}
           onChange={handleInputChange}
           className="max-w-full"
+          required
         />
         <Input
           name="year_placed"
-          type="text"
+          type="number"
           label="Year Placed"
           color="success"
           placeholder="Enter year placed"
           value={formData.year_placed}
           onChange={handleInputChange}
           className="max-w-full"
+          required
         />
         <Input
           name="linkedin_url"
@@ -170,6 +238,7 @@ export default function Home() {
           value={formData.linkedin_url}
           onChange={handleInputChange}
           className="max-w-full"
+          required
         />
         <Input
           name="phone_number"
@@ -181,12 +250,18 @@ export default function Home() {
           onChange={handleInputChange}
           className="max-w-full"
         />
+        <Button
+          type="submit"
+          color="success"
+          variant="shadow"
+          className="mt-4"
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
       </form>
 
       <CustomEditor remarkState={remarkState} setRemarkState={setRemarkState} />
-      <Button type="submit" className="mt-4" onClick={handleSubmit}>
-        Submit
-      </Button>
     </div>
   );
 }
