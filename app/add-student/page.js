@@ -136,9 +136,12 @@ export default function Home() {
       <H text={"Add Your Experience!"} />
       <P
         text={
-          "Welcome Student to this page! Wishing you a warm congratulations on securing your offer. Make your contribution by sharing your experience with everyone in the PES community. Your words and experience will help students/ juniors for years to come {':)'}"
+          "Congratulations on landing your new role! 🎉 We’re thrilled to have you here. As you embark on this exciting journey, we invite you to share your triumphs and experiences with the PES community. Your insights could be the beacon that guides other students and juniors to their own success."
         }
       />
+      
+
+
 
       <form
         onSubmit={handleSubmit}
