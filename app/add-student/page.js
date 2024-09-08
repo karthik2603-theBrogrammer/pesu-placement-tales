@@ -131,7 +131,7 @@ export default function Home() {
   
 
   return (
-    <div className="h-fit flex flex-col items-center justify-center md:p-6 p-1 m-2">
+    <div className="h-fit flex flex-col items-center justify-center md:p-6 p-1 m-2 ">
       <Toaster />
       <H text={"Add Your Experience!"} />
       <P
@@ -140,12 +140,9 @@ export default function Home() {
         }
       />
       
-
-
-
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-2 place-items-center md:grid-cols-4 gap-4"
+        className="grid grid-cols-2 place-items-center md:grid-cols-4 gap-4 p-[5px]"
       >
         <Button  
           variant="flat" 
