@@ -1,8 +1,27 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import {
+    Navbar,
+    NavbarBrand,
+    NavbarContent,
+    NavbarItem,
+    Link,
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    Dropdown,
+    DropdownTrigger,
+    DropdownMenu,
+    DropdownItem
+} from "@nextui-org/react";
 import OtpInput from 'react-otp-input';
+import { PiHamburger } from "react-icons/pi";
+
 
 import { AcmeLogo } from "./AcmeLogo.jsx";
 
@@ -10,11 +29,11 @@ export default function App() {
     const [otp, setOtp] = useState('');
     const [otpError, setOtpError] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [backdrop, setBackdrop] = useState('blur')
+    const [backdrop, setBackdrop] = useState('blur');
 
     const handleOpen = () => {
         onOpen();
-    }
+    };
 
     const handleOtpSubmit = () => {
         const correctOtp = process.env.NEXT_PUBLIC_ADMIN_OTP; // Ensure this is set in your .env file
@@ -25,22 +44,13 @@ export default function App() {
         }
     };
 
-    // const closeModal = () => {
-    //     setIsOtpModalOpen(false);
-    //     setOtp(''); // Clear OTP field
-    //     setOtpError('');
-    // };
-
     return (
         <div className="">
-
             <Navbar shouldHideOnScroll className="bg-transparent">
                 <NavbarBrand>
-                    {/* <AcmeLogo /> */}
                     <Button as={Link} color="warning" href="/" variant="light">
                         Placement Tales
                     </Button>
-                    {/* <p className="font-bold text-inherit text-sm">Placement Tales</p> */}
                 </NavbarBrand>
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
                     <NavbarItem>
@@ -62,16 +72,59 @@ export default function App() {
                         <Button as={Link} color="default" href="/" variant="light">
                             Feature Request
                         </Button>
+                    </NavbarItem>
+                    <NavbarItem>
                         <Button as={Link} color="default" href="/" variant="light">
                             Bug Report
                         </Button>
                     </NavbarItem>
+
                 </NavbarContent>
                 <NavbarContent justify="end">
-                    <NavbarItem>
+                    <NavbarItem className="hidden lg:flex">
                         <Button as={Link} color="success" href="#" variant="flat" onClick={() => handleOpen()}>
                             Admin
                         </Button>
+                    </NavbarItem>
+                    <NavbarItem className="sm:hidden">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                {/* <Button auto flat color="primary">
+                                    Menu
+                                </Button> */}
+                                <Button color="success" variant="flat" auto flat>
+                                    <PiHamburger size={15} />
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu aria-label="Navbar Menu">
+                                <DropdownItem>
+                                    <Button as={Link} color="default" href="/" variant="shadow">
+                                        Features 🚨
+                                    </Button>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <Button as={Link} color="success" href="add-student" variant="light">
+                                        Contribute! 🚀
+                                    </Button>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <Button as={Link} color="success" href="add-student" variant="light">
+                                        Browse
+                                    </Button>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <Button as={Link} color="default" href="/" variant="light">
+                                        Feature Request
+                                    </Button>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <Button as={Link} color="default" href="/" variant="light">
+                                        Bug Report
+                                    </Button>
+                                </DropdownItem>
+
+                            </DropdownMenu>
+                        </Dropdown>
                     </NavbarItem>
                 </NavbarContent>
             </Navbar>
@@ -86,8 +139,7 @@ export default function App() {
                                     value={otp}
                                     onChange={setOtp}
                                     numInputs={5}
-                                    // renderSeparator={<span className="separator">*</span>}
-                                    renderInput={(props) => <input {...props} className="otp-input mx-1" style={{width: 55}} />}
+                                    renderInput={(props) => <input {...props} className="otp-input mx-1" style={{ width: 55 }} />}
                                 />
                                 {otpError && <p className="text-danger">{otpError}</p>}
                             </ModalBody>
@@ -103,7 +155,6 @@ export default function App() {
                     )}
                 </ModalContent>
             </Modal>
-
         </div>
     );
 }
