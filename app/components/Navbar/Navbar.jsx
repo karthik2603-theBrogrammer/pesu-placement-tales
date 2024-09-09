@@ -123,6 +123,12 @@ export default function App() {
                                     </Button>
                                 </DropdownItem>
 
+                                <DropdownItem>
+                                    <Button as={Link} color="success" href="#" variant="flat" onClick={() => handleOpen()}>
+                                        Admin
+                                    </Button>
+                                </DropdownItem>
+
                             </DropdownMenu>
                         </Dropdown>
                     </NavbarItem>
