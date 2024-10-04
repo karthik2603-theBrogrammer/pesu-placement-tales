@@ -61,6 +61,8 @@ export default async function handler(req, res) {
         )
         RETURNING id;
       `;
+
+      
       const result = await sql(query, [
         first_name,
         middle_name,
