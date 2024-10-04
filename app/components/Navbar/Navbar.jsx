@@ -64,7 +64,7 @@ export default function App() {
                         </Button>
                     </NavbarItem>
                     <NavbarItem isActive>
-                        <Button as={Link} color="success" href="add-student" variant="light">
+                        <Button as={Link} color="success" href="browse" variant="light">
                             Browse
                         </Button>
                     </NavbarItem>
@@ -108,7 +108,7 @@ export default function App() {
                                     </Button>
                                 </DropdownItem>
                                 <DropdownItem>
-                                    <Button as={Link} color="success" href="add-student" variant="light">
+                                    <Button as={Link} color="success" href="browse" variant="light">
                                         Browse
                                     </Button>
                                 </DropdownItem>
