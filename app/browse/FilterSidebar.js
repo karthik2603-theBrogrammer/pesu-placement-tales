@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, Radio, RadioGroup, Select, SelectItem } from "@nextui-org/react";
+import { Checkbox, Radio, RadioGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 
 const FilterSidebar = ({ filters, setFilters }) => {
   const handleCheckboxChange = (category, value) => {
@@ -26,15 +26,22 @@ const FilterSidebar = ({ filters, setFilters }) => {
     }));
   };
 
+  const handleSliderChange = (category, value) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [category]: value,
+    }));
+  };
+
   const clearAllFilters = () => {
     setFilters({
       year: "",
       tier: {},
       jobType: "",
-      baseSalary: {},
-      ctc: {},
+      baseSalary: [0, 90],
+      ctc: [0, 90],
       onlyFemales: false,
-      internshipStipend: {},
+      internshipStipend: [0, 90],
       shortlistingCriteria: {},
       cgpa: "",
     });
@@ -44,8 +51,8 @@ const FilterSidebar = ({ filters, setFilters }) => {
   const years = Array.from({ length: currentYear - 2022 + 1 }, (_, i) => (currentYear - i).toString());
 
   return (
-    <div className="w-80 bg-white p-6 overflow-auto shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Filters</h2>
+    <div className="w-80 bg-white p-6 shadow-lg h-screen overflow-y-auto top-0">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2 top-0 bg-white z-10">Filters</h2>
 
       <FilterSection title="Year">
         <div className="">
@@ -92,34 +99,36 @@ const FilterSidebar = ({ filters, setFilters }) => {
       </FilterSection>
 
       <FilterSection title="Base Salary (LPA)">
-        <div className="flex flex-col space-y-2">
-          {["3-6", "6-10", "10-15", "15-20", "20+"].map((range) => (
-            <Checkbox
-              key={range}
-              size="sm"
-              color="primary"
-              isSelected={filters.baseSalary?.[range]}
-              onValueChange={() => handleCheckboxChange("baseSalary", range)}
-            >
-              {range}
-            </Checkbox>
-          ))}
+        <Slider
+          label="Base Salary Range"
+          step={1}
+          minValue={0}
+          maxValue={90}
+          value={filters.baseSalary}
+          onChange={(value) => handleSliderChange("baseSalary", value)}
+          className="max-w-md"
+          color="warning"
+        />
+        <div className="flex justify-between mt-2">
+          <span>{filters.baseSalary[0]} LPA</span>
+          <span>{filters.baseSalary[1]} LPA</span>
         </div>
       </FilterSection>
 
       <FilterSection title="CTC (LPA)">
-        <div className="flex flex-col space-y-2">
-          {["3-6", "6-10", "10-12", "12-15", "15-20", "20-30", "30-50", "50+"].map((range) => (
-            <Checkbox
-              key={range}
-              size="sm"
-              color="primary"
-              isSelected={filters.ctc?.[range]}
-              onValueChange={() => handleCheckboxChange("ctc", range)}
-            >
-              {range}
-            </Checkbox>
-          ))}
+        <Slider
+          label="CTC Range"
+          step={1}
+          minValue={0}
+          maxValue={90}
+          value={filters.ctc}
+          onChange={(value) => handleSliderChange("ctc", value)}
+          className="max-w-md"
+          color="warning"
+        />
+        <div className="flex justify-between mt-2">
+          <span>{filters.ctc[0]} LPA</span>
+          <span>{filters.ctc[1]} LPA</span>
         </div>
       </FilterSection>
 
@@ -135,18 +144,19 @@ const FilterSidebar = ({ filters, setFilters }) => {
       </FilterSection>
 
       <FilterSection title="Internship Stipend (K per month)">
-        <div className="flex flex-col space-y-2">
-          {["<10", "10-20", "20-30", "30-50", "50-100", "100+"].map((range) => (
-            <Checkbox
-              key={range}
-              size="sm"
-              color="primary"
-              isSelected={filters.internshipStipend?.[range]}
-              onValueChange={() => handleCheckboxChange("internshipStipend", range)}
-            >
-              {range}
-            </Checkbox>
-          ))}
+        <Slider
+          label="Stipend Range"
+          step={1}
+          minValue={0}
+          maxValue={90}
+          value={filters.internshipStipend}
+          onChange={(value) => handleSliderChange("internshipStipend", value)}
+          className="max-w-md"
+          color="warning"
+        />
+        <div className="flex justify-between mt-2">
+          <span>{filters.internshipStipend[0]}K</span>
+          <span>{filters.internshipStipend[1]}K</span>
         </div>
       </FilterSection>
 
@@ -179,7 +189,7 @@ const FilterSidebar = ({ filters, setFilters }) => {
 
       <div className="mt-8">
         <button
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+          className="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
           onClick={clearAllFilters}
         >
           Clear All Filters
