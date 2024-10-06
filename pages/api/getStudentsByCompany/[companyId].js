@@ -23,6 +23,8 @@ export default async function handler(req, res) {
           sp.linkedin_url,
           sp.phone_number,
           sp.remarks_markdown,
+          sp.upvote,
+          sp.downvote,
           cv.year AS visited_year,
           cv.base_salary,
           cv.ctc,
