@@ -4,7 +4,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 
-const MarkdownReviewRenderer = ({ remarks_markdown }) => {
+const MarkdownReviewRenderer = ({ remarks_markdown, theme }) => {
   const editor = useCreateBlockNote(); // Initialize the BlockNote editor
 
   useEffect(() => {
@@ -20,8 +20,8 @@ const MarkdownReviewRenderer = ({ remarks_markdown }) => {
   }, [remarks_markdown, editor]); // Dependencies: run when remarks_markdown or editor changes
 
   return (
-    <div>
-      <BlockNoteView editor={editor} editable={false} theme="light" />
+    <div className="">
+      <BlockNoteView editor={editor} editable={false} theme={theme ? theme : "light"} defaultValue="Hold On..."/>
     </div>
   );
 };

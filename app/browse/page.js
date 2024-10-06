@@ -12,10 +12,17 @@ import H from "../components/Heading";
 import P from "../components/Paragraph";
 import { Toaster } from "sonner";
 import { CiSearch, CiCircleInfo } from "react-icons/ci";
+import { FaLink } from "react-icons/fa";
+import Link from "next/link";
 
-const MarkdownReviewRenderer = dynamic(() => import("../components/MarkdownReviewRenderer"), {
-  ssr: false,
-});
+import { generateRandomToken } from "../../utils/index";
+
+const MarkdownReviewRenderer = dynamic(
+  () => import("../components/MarkdownReviewRenderer"),
+  {
+    ssr: false,
+  }
+);
 
 export default function Home() {
   const [companies, setCompanies] = useState([]);
@@ -158,9 +165,9 @@ export default function Home() {
                     <p className="md:text-sm text-xs font-medium text-gray-800">
                       {company.company_name}
                     </p>
-                    <p className=" text-xs md:flex w-full hidden text-center text-gray-500">
+                    {/* <p className=" text-xs md:flex w-full hidden text-center text-gray-500">
                       {company.company_description}
-                    </p>
+                    </p> */}
                   </div>
                 </Button>
               ))}
@@ -225,9 +232,20 @@ export default function Home() {
                 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                   {/* Modal header */}
                   <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                      {`${selectedStudent?.first_name} ${selectedStudent?.last_name}'s Experience`}
-                    </h3>
+                    <div className="flex flex-row items-center justify-center gap-2">
+                      <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                        {`${selectedStudent?.first_name} ${selectedStudent?.last_name}'s Experience`}
+                      </h3>
+                      {selectedStudent?.student_id && (
+                        <Link
+                          href={`/share?q=${
+                            selectedStudent?.student_id
+                          }&token=${generateRandomToken()}`}
+                        >
+                          <FaLink size={15} color = "green" />
+                        </Link>
+                      )}
+                    </div>
                     <Button
                       type="button"
                       className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -259,15 +277,21 @@ export default function Home() {
                       editable={false}
                       theme="light"
                     /> */}
-                    <MarkdownReviewRenderer remarks_markdown = {selectedStudent?.remarks_markdown}/>
+                    <MarkdownReviewRenderer
+                      remarks_markdown={selectedStudent?.remarks_markdown}
+                    />
                   </div>
 
                   {/* Modal footer */}
                   <div className="flex flex-row items-center justify-end p-4">
-                  <div className="flex flex-row gap-2 mx-4">
-                    <Button className="" variant="flat" color="success">{selectedStudent?.upvote}</Button>
-                    <Button className="" variant="flat" color="danger" >{selectedStudent?.downvote}</Button>
-                  </div> 
+                    <div className="flex flex-row gap-2 mx-4">
+                      <Button className="" variant="flat" color="success">
+                        {selectedStudent?.upvote}
+                      </Button>
+                      <Button className="" variant="flat" color="danger">
+                        {selectedStudent?.downvote}
+                      </Button>
+                    </div>
                     <Button
                       color="warning"
                       type="button"
