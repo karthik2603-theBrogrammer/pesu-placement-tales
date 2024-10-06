@@ -1,8 +1,10 @@
 "use client";
-import "@blocknote/core/fonts/inter.css";
-import { useCreateBlockNote } from "@blocknote/react";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
+// import "@blocknote/core/fonts/inter.css";
+// import { useCreateBlockNote } from "@blocknote/react";
+// import { BlockNoteView } from "@blocknote/mantine";
+// import "@blocknote/mantine/style.css";
+import dynamic from "next/dynamic";
+
 import { useState, useEffect } from "react";
 import { Modal, Tooltip, Spinner, Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
@@ -10,6 +12,10 @@ import H from "../components/Heading";
 import P from "../components/Paragraph";
 import { Toaster } from "sonner";
 import { CiSearch, CiCircleInfo } from "react-icons/ci";
+
+const MarkdownReviewRenderer = dynamic(() => import("../components/MarkdownReviewRenderer"), {
+  ssr: false,
+});
 
 export default function Home() {
   const [companies, setCompanies] = useState([]);
@@ -26,7 +32,7 @@ export default function Home() {
   };
 
   // Create BlockNote editor instance
-  const editor = useCreateBlockNote();
+  // const editor = useCreateBlockNote();
 
   useEffect(() => {
     async function fetchCompanies() {
@@ -83,10 +89,10 @@ export default function Home() {
   const handleSelectStudent = async (student) => {
     setSelectedStudent(student); // Set selected student data
     // Convert the student's markdown to blocks
-    const blocks = await editor.tryParseMarkdownToBlocks(
-      student.remarks_markdown
-    );
-    editor.replaceBlocks(editor.document, blocks); // Replace blocks in the editor
+    // const blocks = await editor.tryParseMarkdownToBlocks(
+    //   student.remarks_markdown
+    // );
+    // editor.replaceBlocks(editor.document, blocks); // Replace blocks in the editor
     setIsModalOpen(true);
   };
 
@@ -248,11 +254,12 @@ export default function Home() {
 
                   {/* Modal body */}
                   <div className="p-4 md:p-5 space-y-4 overflow-y-scroll max-h-[600px]">
-                    <BlockNoteView
+                    {/* <BlockNoteView
                       editor={editor}
                       editable={false}
                       theme="light"
-                    />
+                    /> */}
+                    <MarkdownReviewRenderer remarks_markdown = {selectedStudent?.remarks_markdown}/>
                   </div>
 
                   {/* Modal footer */}

@@ -52,7 +52,7 @@ export default function App() {
                         Placement Tales
                     </Button>
                 </NavbarBrand>
-                <NavbarContent className="hidden sm:flex gap-4" justify="center">
+                <NavbarContent className="hidden md:flex gap-4" justify="center">
                     <NavbarItem>
                         <Button as={Link} color="default" href="/" variant="shadow">
                             Features 🚨
@@ -139,7 +139,7 @@ export default function App() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Authenticate To Admin - Enter OTP</ModalHeader>
+                            <ModalHeader className="flex flex-col ">Authenticate To Admin - Enter OTP</ModalHeader>
                             <ModalBody className="flex flex-col items-center justify-center">
                                 <OtpInput
                                     value={otp}
