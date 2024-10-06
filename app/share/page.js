@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation'
@@ -19,7 +19,7 @@ const MarkdownReviewRenderer = dynamic(
   }
 );
 
-export default function StudentPlacedDetails() {
+const StudentPlacedDetails = () => {
   const searchParams = useSearchParams()
   const studentId = searchParams.get('q')
   // const { studentId } = router.query; // Fetch the studentPlacedId from the URL query
@@ -96,4 +96,12 @@ export default function StudentPlacedDetails() {
       </div>
     </div>
   );
+}
+
+export default function Main(){
+  return (
+    <Suspense>
+      <StudentPlacedDetails/>
+    </Suspense>
+  )
 }
