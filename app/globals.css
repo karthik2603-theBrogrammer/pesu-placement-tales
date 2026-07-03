@@ -39,21 +39,3 @@
   resize: none;
   width: 100%;
 }
-.otp-container {
-  display: flex;
-  gap: 8px; /* Adjust gap as needed */
-}
-
-.otp-input {
-  width: 100px;
-  height: 70px;
-  text-align: center;
-  border: 2px solid #ccc; /* Border color */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 16px;
-}
-
-.separator {
-  font-size: 20px; /* Adjust size of the separator */
-  line-height: 20px; /* Align separator with the boxes */
-}

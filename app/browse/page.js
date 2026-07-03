@@ -6,12 +6,12 @@
 import dynamic from "next/dynamic";
 
 import { useState, useEffect } from "react";
-import { Modal, Tooltip, Spinner, Input } from "@nextui-org/react";
+import { Spinner, Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import H from "../components/Heading";
 import P from "../components/Paragraph";
 import { Toaster } from "sonner";
-import { CiSearch, CiCircleInfo } from "react-icons/ci";
+import { CiSearch } from "react-icons/ci";
 import { FaLink } from "react-icons/fa";
 import Link from "next/link";
 
@@ -37,6 +37,12 @@ export default function Home() {
   const closeModal = () => {
     setIsModalOpen(false); // Close the modal
   };
+
+  const visibleCompanies = searchQuery.trim() ? suggestions : companies;
+  const companyGridClass =
+    visibleCompanies.length <= 6
+      ? "grid max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 max-h-[430px] overflow-y-auto pr-1";
 
   // Create BlockNote editor instance
   // const editor = useCreateBlockNote();
@@ -104,92 +110,83 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-gray-50 to-white flex">
       <div className="flex-grow overflow-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Toaster position="top-center" />
-          <div className="text-center mb-8">
-            <div className="flex flex-row items-center justify-center">
-              <H text={"Browse Companies 👀"} />
-              <Tooltip
-                content={
-                  "You can either search for a company below, or be picky with your choice over to your left (Coming Soon) (>..<)"
-                }
-                className="text-xs w-[400px]"
-              >
-                <div className="ml-3 mb-9">
-                  <CiCircleInfo />
-                </div>
-              </Tooltip>
+          <div className="mx-auto mb-8 max-w-3xl text-center">
+            <div className="mb-3 inline-flex rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+              Company directory
             </div>
+            <H text={"Browse Companies"} styles="text-gray-900" />
             <P
-              text={
-                "Explore all companies that visited campus over the years! Select your target and give it your best shot!"
-              }
-            />
-            <P
-              styles={"-mt-3"}
-              text={
-                "Browse companies, view interview experience and gain advice from students placed there."
-              }
+              styles={"mx-auto max-w-xl"}
+              text={"Choose a company to read placement stories from seniors."}
             />
           </div>
 
           {/* Display companies in a flexbox once they are loaded */}
           {loadingCompanies ? (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center rounded-3xl border border-amber-100 bg-white/70 p-10 shadow-sm">
               <Spinner color="warning" labelColor="warning" className="text-xs">
                 Loading companies...
               </Spinner>
-              <Tooltip
-                content={
-                  "We are currenty using a free suite of services. You may experience a delay due to heavy load on the server. Kindly wait or try later ;)"
-                }
-                className="text-xs w-[400px]"
-              >
-                <div className="ml-2">
-                  <CiCircleInfo color="green" />
-                </div>
-              </Tooltip>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              {companies.map((company) => (
-                <Button
-                  key={company.id}
-                  className="flex items-center justify-center p-4 cursor-pointer text-center"
-                  onClick={() => handleSelectCompany(company)}
-                  variant="flat"
-                >
-                  <div className="flex flex-col m-2 items-center justify-center">
-                    <p className="md:text-sm text-xs font-medium text-gray-800">
-                      {company.company_name}
-                    </p>
-                    {/* <p className=" text-xs md:flex w-full hidden text-center text-gray-500">
-                      {company.company_description}
-                    </p> */}
-                  </div>
-                </Button>
-              ))}
+            <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-4 shadow-sm backdrop-blur md:p-6">
+              <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">
+                    Companies
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    {visibleCompanies.length} shown of {companies.length}
+                  </p>
+                </div>
+                <Input
+                  aria-label="Search companies"
+                  className="w-full md:max-w-sm"
+                  placeholder="Search company..."
+                  startContent={<CiSearch className="text-gray-400" />}
+                  value={searchQuery}
+                  onValueChange={handleSearchChange}
+                  color="warning"
+                  variant="bordered"
+                />
+              </div>
+
+              {visibleCompanies.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 p-8 text-center text-sm text-gray-500">
+                  No companies found.
+                </div>
+              ) : (
+                <div className={companyGridClass}>
+                  {visibleCompanies.map((company) => (
+                    <button
+                      key={company.id}
+                      type="button"
+                      onClick={() => handleSelectCompany(company)}
+                      className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    >
+                      <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
+                        {company.company_name}
+                      </p>
+                      <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
+                        View stories
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {/* Display spinner while students are being fetched */}
           {loadingStudents && (
-            <div className="flex items-center justify-center my-4">
+            <div className="my-6 flex items-center justify-center rounded-2xl border border-amber-100 bg-white/70 p-5 shadow-sm">
               <Spinner color="warning" labelColor="warning" className="text-xs">
                 Loading students...
               </Spinner>
-              <Tooltip
-                content={
-                  "Fetching student data. Kindly wait while we retrieve the details."
-                }
-                className="text-xs w-[400px]"
-              >
-                <div className="ml-2">
-                  <CiCircleInfo color="green" />
-                </div>
-              </Tooltip>
             </div>
           )}
 
