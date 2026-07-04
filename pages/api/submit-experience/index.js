@@ -60,6 +60,7 @@ export default async function handler(req, res) {
     first_name,
     middle_name,
     last_name,
+    job_title,
     year_placed,
     linkedin_url,
     phone_number,
@@ -71,6 +72,10 @@ export default async function handler(req, res) {
 
   if (!trim(first_name) || !trim(last_name)) {
     return res.status(400).json({ error: "First and last name are required." });
+  }
+
+  if (!trim(job_title)) {
+    return res.status(400).json({ error: "Job title is required." });
   }
 
   const year = parseInt(year_placed, 10);
@@ -111,13 +116,13 @@ export default async function handler(req, res) {
 
     const inserted = await sql`
       INSERT INTO student_placed (
-        first_name, middle_name, last_name,
+        first_name, middle_name, last_name, job_title,
         company_placed_id, year_placed, linkedin_url,
         phone_number, remarks_markdown
       )
       VALUES (
-        ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)},
-        ${company.id}, ${year}, ${linkedin || null},
+        ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)}, ${trim(job_title)},
+        ${company.id}, ${year}, ${linkedin || ""},
         ${phone || null}, ${trim(remarks_markdown)}
       )
       RETURNING id;

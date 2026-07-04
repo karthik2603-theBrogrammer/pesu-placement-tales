@@ -14,7 +14,7 @@ export default async function handler(req, res) {
       const { limit, offset } = readPagination(req);
       const rows = await sql`
         SELECT
-          sp.id, sp.first_name, sp.middle_name, sp.last_name, sp.year_placed,
+          sp.id, sp.first_name, sp.middle_name, sp.last_name, sp.job_title, sp.year_placed,
           sp.linkedin_url, sp.phone_number, sp.remarks_markdown,
           sp.upvote, sp.downvote, sp.company_placed_id, sp.created_at,
           c.company_name
@@ -33,6 +33,7 @@ export default async function handler(req, res) {
         first_name,
         middle_name,
         last_name,
+        job_title,
         year_placed,
         company_placed_id,
         linkedin_url,
@@ -53,6 +54,7 @@ export default async function handler(req, res) {
           first_name = ${trim(first_name)},
           middle_name = ${trim(middle_name) || ""},
           last_name = ${trim(last_name)},
+          job_title = ${trim(job_title) || ""},
           year_placed = ${year},
           company_placed_id = ${companyId},
           linkedin_url = ${trim(linkedin_url) || ""},
@@ -60,7 +62,7 @@ export default async function handler(req, res) {
           remarks_markdown = ${trim(remarks_markdown)}
         WHERE id = ${id}
         RETURNING
-          id, first_name, middle_name, last_name, year_placed,
+          id, first_name, middle_name, last_name, job_title, year_placed,
           linkedin_url, phone_number, remarks_markdown,
           upvote, downvote, company_placed_id, created_at;
       `;

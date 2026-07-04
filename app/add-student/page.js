@@ -28,6 +28,7 @@ const INITIAL_DATA = {
     first_name: "",
     middle_name: "",
     last_name: "",
+    job_title: "",
     year_placed: "",
     linkedin_url: "",
     phone_number: "",
@@ -142,6 +143,7 @@ export default function ContributePage() {
         validate: () => {
           if (!p.first_name.trim() || !p.last_name.trim())
             return "First and last name are required.";
+          if (!p.job_title.trim()) return "Job title is required.";
           const year = parseInt(p.year_placed, 10);
           if (!year || Number.isNaN(year)) return "Enter a valid placement year.";
           if (!LINKEDIN_REGEX.test(p.linkedin_url.trim()))
@@ -170,6 +172,12 @@ export default function ContributePage() {
                 onChange={(v) => setSection("person", { last_name: v })}
               />
             </div>
+            <TextField
+              label="Job title"
+              placeholder="e.g. Software Engineer, SDE, Business Analyst"
+              value={p.job_title}
+              onChange={(v) => setSection("person", { job_title: v })}
+            />
             <TextField
               label="Year placed"
               type="number"
@@ -277,7 +285,7 @@ export default function ContributePage() {
         key: "offer",
         label: "The offer",
         title: "The offer",
-        subtitle: "Compensation and timeline. Share what you're comfortable with.",
+        subtitle: "Compensation and timeline. Share what you're comfortable with. Leave them blank if you dont remember.",
         mascot: "Numbers and dates are optional, but they set clear expectations.",
         optional: true,
         render: () => (
@@ -441,6 +449,7 @@ export default function ContributePage() {
         first_name: data.person.first_name,
         middle_name: data.person.middle_name,
         last_name: data.person.last_name,
+        job_title: data.person.job_title,
         year_placed: data.person.year_placed,
         linkedin_url: data.person.linkedin_url,
         phone_number: data.person.phone_number,

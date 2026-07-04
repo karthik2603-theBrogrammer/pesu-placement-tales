@@ -285,6 +285,11 @@ export default function Home() {
                   <p className="text-sm font-semibold text-gray-900">
                     {item.first_name} {item.middle_name} {item.last_name}
                   </p>
+                  {item.job_title && (
+                    <p className="mt-0.5 text-xs font-medium text-amber-700">
+                      {item.job_title}
+                    </p>
+                  )}
                   <div className="mt-2 flex items-center text-xs text-amber-600">
                     <span>Placed {item.year_placed}</span>
                     <span className="ml-auto flex items-center gap-2 font-medium">
@@ -314,7 +319,9 @@ export default function Home() {
                   <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <div className="flex flex-row items-center justify-center gap-2">
                       <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                        {`${selectedStudent?.first_name} ${selectedStudent?.last_name}'s Experience`}
+                        {selectedStudent?.job_title
+                          ? `${selectedStudent.first_name} ${selectedStudent.last_name} · ${selectedStudent.job_title}`
+                          : `${selectedStudent?.first_name} ${selectedStudent?.last_name}'s Experience`}
                       </h3>
                       {selectedStudent?.student_id && (
                         <Link

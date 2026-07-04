@@ -119,6 +119,7 @@ export default function PlacementStoryLogs({ token, companies }) {
       first_name: item.first_name ?? "",
       middle_name: item.middle_name ?? "",
       last_name: item.last_name ?? "",
+      job_title: item.job_title ?? "",
       year_placed: item.year_placed ?? "",
       company_placed_id: String(item.company_placed_id ?? ""),
       linkedin_url: item.linkedin_url ?? "",
@@ -208,6 +209,12 @@ export default function PlacementStoryLogs({ token, companies }) {
               >
                 <span className="min-w-0 flex-1 truncate text-sm font-medium text-amber-950">
                   {fullName(item)}
+                  {item.job_title && (
+                    <>
+                      <span className="mx-1.5 text-amber-300">·</span>
+                      <span className="text-amber-700">{item.job_title}</span>
+                    </>
+                  )}
                   <span className="mx-1.5 text-amber-300">·</span>
                   <span className="font-semibold text-amber-700">
                     {item.company_name}
@@ -285,6 +292,19 @@ export default function PlacementStoryLogs({ token, companies }) {
                               />
                             </label>
                           </div>
+                          <label className="block text-xs font-semibold text-amber-700">
+                            Job title
+                            <input
+                              value={editForm.job_title}
+                              onChange={(e) =>
+                                setEditForm((p) => ({
+                                  ...p,
+                                  job_title: e.target.value,
+                                }))
+                              }
+                              className={`${input} mt-1`}
+                            />
+                          </label>
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="text-xs font-semibold text-amber-700">
                               Year placed

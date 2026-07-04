@@ -118,17 +118,26 @@ function buildTips(tips) {
   return section("Tips For The Next Batch", `- ${trim(tips)}\n`);
 }
 
+function buildRole(jobTitle) {
+  if (!trim(jobTitle)) return "";
+  return section("Role", `- ${trim(jobTitle)}\n`);
+}
+
 /**
  * @param {object} answers - structured contribute answers
  * @param {string} companyName - resolved company name for the title
  * @returns {string} markdown document
  */
 export function buildExperienceMarkdown(answers = {}, companyName = "") {
+  const jobTitle = trim(answers.person?.job_title);
   const title = companyName
-    ? `# Interview & Offer — ${companyName}`
+    ? jobTitle
+      ? `# Interview & Offer — ${companyName} · ${jobTitle}`
+      : `# Interview & Offer — ${companyName}`
     : "# Interview & Offer Experience";
 
   const sections = [
+    buildRole(jobTitle),
     buildAbout(answers.about),
     buildOpinions(answers.opinions),
     buildSource(answers.source),

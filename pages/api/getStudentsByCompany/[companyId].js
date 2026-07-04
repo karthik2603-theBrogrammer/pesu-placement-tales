@@ -21,6 +21,7 @@ export default async function handler(req, res) {
           sp.first_name,
           sp.middle_name,
           sp.last_name,
+          sp.job_title,
           sp.year_placed,
           sp.linkedin_url,
           sp.phone_number,
