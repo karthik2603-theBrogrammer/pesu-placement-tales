@@ -68,6 +68,7 @@ export default async function handler(req, res) {
           cv.job_title, cv.cgpa_cutoff, cv.streams_allowed, cv.remarks,
           cv.base_salary, cv.ctc, cv.internship_stipend,
           cv.girls_only, cv.internship_only, cv.fte_only, cv.internship_fte,
+          cv.summer_internship,
           cv.total_hired, cv.males_hired, cv.females_hired
         FROM company_visited cv
         JOIN company c ON cv.company_id = c.id
@@ -105,6 +106,7 @@ export default async function handler(req, res) {
         internship_only: bool(body.internship_only),
         fte_only: bool(body.fte_only),
         internship_fte: bool(body.internship_fte),
+        summer_internship: bool(body.summer_internship),
         total_hired: num(body.total_hired),
         males_hired: num(body.males_hired),
         females_hired: num(body.females_hired),
@@ -130,6 +132,7 @@ export default async function handler(req, res) {
             internship_only = ${fields.internship_only},
             fte_only = ${fields.fte_only},
             internship_fte = ${fields.internship_fte},
+            summer_internship = ${fields.summer_internship},
             total_hired = ${fields.total_hired},
             males_hired = ${fields.males_hired},
             females_hired = ${fields.females_hired}
@@ -147,7 +150,7 @@ export default async function handler(req, res) {
         INSERT INTO company_visited (
           company_id, year, tier, streams_allowed, job_title, cgpa_cutoff, remarks,
           base_salary, ctc, internship_stipend,
-          girls_only, internship_only, fte_only, internship_fte,
+          girls_only, internship_only, fte_only, internship_fte, summer_internship,
           total_hired, males_hired, females_hired
         )
         VALUES (
@@ -155,6 +158,7 @@ export default async function handler(req, res) {
           ${fields.job_title}, ${fields.cgpa_cutoff}, ${fields.remarks},
           ${fields.base_salary}, ${fields.ctc}, ${fields.internship_stipend},
           ${fields.girls_only}, ${fields.internship_only}, ${fields.fte_only}, ${fields.internship_fte},
+          ${fields.summer_internship},
           ${fields.total_hired}, ${fields.males_hired}, ${fields.females_hired}
         )
         RETURNING id;

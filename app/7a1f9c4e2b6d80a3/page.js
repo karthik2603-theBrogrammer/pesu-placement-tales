@@ -48,6 +48,7 @@ const EMPTY_FORM = {
   internship_only: false,
   fte_only: false,
   internship_fte: false,
+  summer_internship: false,
 };
 
 const input =
@@ -69,6 +70,7 @@ const BOOLEAN_FIELDS = [
   ["internship_only", "Internship only"],
   ["fte_only", "FTE only"],
   ["internship_fte", "Internship + FTE"],
+  ["summer_internship", "Summer Internship"],
 ];
 
 const lakh = (v) => (v ? `${(Number(v) / 100000).toFixed(2)}L` : "—");
@@ -214,6 +216,7 @@ export default function AdminStatsPage() {
         internship_only: form.internship_only,
         fte_only: form.fte_only,
         internship_fte: form.internship_fte,
+        summer_internship: form.summer_internship,
         ...(form.mode === "existing"
           ? { company_id: form.company_id }
           : {
@@ -266,6 +269,7 @@ export default function AdminStatsPage() {
       internship_only: !!row.internship_only,
       fte_only: !!row.fte_only,
       internship_fte: !!row.internship_fte,
+      summer_internship: !!row.summer_internship,
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };

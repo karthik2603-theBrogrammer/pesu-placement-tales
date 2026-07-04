@@ -46,12 +46,12 @@ export default function Home() {
           >
             Browse
           </Link>
-          <Link
+          {/* <Link
             href="/stats"
             className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
           >
             View stats
-          </Link>
+          </Link> */}
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">

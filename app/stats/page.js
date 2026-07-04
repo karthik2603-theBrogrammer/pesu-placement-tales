@@ -23,6 +23,14 @@ const METRICS = {
   base_salary: { key: "base_salary", label: "Base salary", agg: "avg", unit: "lakh" },
 };
 
+const HIRING_TYPE_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "internship_only", label: "Intern only" },
+  { value: "fte_only", label: "FTE only" },
+  { value: "internship_fte", label: "Intern+FTE" },
+  { value: "summer_internship", label: "Summer Internship" },
+];
+
 const COLUMNS = [
   { key: "company_name", label: "Company", type: "text" },
   { key: "job_title", label: "Role", type: "text" },
@@ -38,6 +46,7 @@ const COLUMNS = [
   { key: "internship_only", label: "Intern only", type: "bool" },
   { key: "fte_only", label: "FTE only", type: "bool" },
   { key: "internship_fte", label: "Intern+FTE", type: "bool" },
+  { key: "summer_internship", label: "Summer Intern", type: "bool" },
   { key: "remarks", label: "Remarks", type: "note" },
 ];
 
@@ -67,6 +76,7 @@ export default function StatsPage() {
   const [year, setYear] = useState("all");
   const [tier, setTier] = useState("all");
   const [stream, setStream] = useState("all");
+  const [hiringType, setHiringType] = useState("all");
   const [metricKey, setMetricKey] = useState("total_hired");
   const [sort, setSort] = useState({ key: "company_name", dir: "asc" });
 
@@ -128,9 +138,10 @@ export default function StatsPage() {
           (company === "all" || String(r.company_id) === company) &&
           (year === "all" || String(r.year) === String(year)) &&
           (tier === "all" || String(r.tier) === String(tier)) &&
-          (stream === "all" || rowStreams(r).includes(stream))
+          (stream === "all" || rowStreams(r).includes(stream)) &&
+          (hiringType === "all" || !!r[hiringType])
       ),
-    [rows, company, year, tier, stream]
+    [rows, company, year, tier, stream, hiringType]
   );
 
   const kpis = useMemo(() => {
@@ -334,10 +345,25 @@ export default function StatsPage() {
                   ))}
                 </select>
               </label>
+              <label className="flex items-center gap-2 text-xs font-semibold text-amber-700">
+                Hiring type
+                <select
+                  value={hiringType}
+                  onChange={(e) => setHiringType(e.target.value)}
+                  className={selectClass}
+                >
+                  {HIRING_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {(company !== "all" ||
                 year !== "all" ||
                 tier !== "all" ||
-                stream !== "all") && (
+                stream !== "all" ||
+                hiringType !== "all") && (
                 <button
                   type="button"
                   onClick={() => {
@@ -345,6 +371,7 @@ export default function StatsPage() {
                     setYear("all");
                     setTier("all");
                     setStream("all");
+                    setHiringType("all");
                   }}
                   className="rounded-xl px-3 py-2 text-xs font-semibold text-amber-600 transition hover:bg-amber-100"
                 >

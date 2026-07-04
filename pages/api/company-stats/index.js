@@ -34,6 +34,7 @@ export default async function handler(req, res) {
         cv.internship_only,
         cv.fte_only,
         cv.internship_fte,
+        cv.summer_internship,
         cv.total_hired,
         cv.males_hired,
         cv.females_hired
