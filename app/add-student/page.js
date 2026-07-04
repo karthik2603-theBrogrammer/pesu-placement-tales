@@ -1,267 +1,636 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button, Input } from "@nextui-org/react";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import H from "../components/Heading";
-import P from "../components/Paragraph";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { Toaster, toast } from "sonner";
+import Mascot from "../components/contribute/Mascot";
+import {
+  ChoiceCards,
+  CompanyPicker,
+  RoundsEditor,
+  TextArea,
+  TextField,
+} from "../components/contribute/fields";
+import { buildExperienceMarkdown } from "../../utils/experienceMarkdown";
 
-// Dynamically import CkeditorForm to avoid server-side rendering issues
-const CustomEditor = dynamic(() => import("../components/CkeditorForm"), {
-  ssr: false,
-});
+const MarkdownReviewRenderer = dynamic(
+  () => import("../components/MarkdownReviewRenderer"),
+  { ssr: false }
+);
 
-export default function Home() {
-  const [formData, setFormData] = useState({
-    id: "",
+const INITIAL_DATA = {
+  company: { mode: null, company_id: null, company_name: "", new_company_description: "" },
+  person: {
     first_name: "",
     middle_name: "",
     last_name: "",
-    company_placed_id: "",
     year_placed: "",
     linkedin_url: "",
     phone_number: "",
-    remarks_markdown: "",
-  });
+  },
+  about: { technical_interests: "", background: "", hobbies: "" },
+  opinions: { dsa_view: "", skills_vs_dsa: "", good_cgpa: "" },
+  source: "",
+  rounds: [{ description: "", questions: "", duration: "", outcome: "" }],
+  compensation: {
+    internship_stipend: "",
+    base_salary: "",
+    total_ctc: "",
+    stocks: "",
+    bonuses: "",
+    other_benefits: "",
+  },
+  dates: { arrival: "", online_test: "", interview: "", placement: "" },
+  resources: { books: "", websites: "", courses: "", platforms: "", others: "" },
+  tips: "",
+};
 
-  const [remarkState, setRemarkState] = useState(`Hello, **world!**`);
+const LINKEDIN_REGEX = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
+const PHONE_REGEX = /^[+]?[0-9]{10,15}$/;
+
+// Mascot rotates between positions each step to keep the eye moving.
+const MASCOT_POSITIONS = ["flex-start", "center", "flex-end", "center"];
+
+const slideVariants = {
+  enter: (dir) => ({ opacity: 0, x: dir > 0 ? 60 : -60 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir) => ({ opacity: 0, x: dir > 0 ? -60 : 60 }),
+};
+
+function encouragement(pct) {
+  if (pct <= 0) return "Let's do this — it's quick!";
+  if (pct < 34) return "Great start, keep going!";
+  if (pct < 67) return "You're halfway there!";
+  if (pct < 100) return "Almost there, nearly done!";
+  return "All set — ready to submit!";
+}
+
+export default function ContributePage() {
   const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [backdrop, setBackdrop] = useState('blur');
+  const [data, setData] = useState(INITIAL_DATA);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
     async function fetchCompanies() {
       try {
         const response = await fetch("/api/get-companies");
-        const data = await response.json();
-        setCompanies(data.result);
+        const payload = await response.json();
+        setCompanies(payload.result || []);
       } catch (error) {
         console.error("Error fetching companies:", error);
+        toast.error("Could not load companies. You can still add a new one.");
       }
     }
     fetchCompanies();
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  const setSection = useCallback((key, patch) => {
+    setData((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  }, []);
 
-  const handleCompanyChange = (company) => {
-    setFormData((prevData) => ({ ...prevData, company_placed_id: company.id }));
-    setSelectedCompany(company);
-    onClose(); // Close the modal after selection
-  };
+  const setValue = useCallback((key, value) => {
+    setData((prev) => ({ ...prev, [key]: value }));
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Check for required fields
-    const {
-      first_name,
-      last_name,
-      year_placed,
-      linkedin_url,
-      company_placed_id,
-      phone_number,
-    } = formData;
-  
-    if (
-      !first_name ||
-      !last_name ||
-      !year_placed ||
-      !linkedin_url ||
-      !company_placed_id
-    ) {
-      toast.error(
-        "Please fill out all mandatory fields: Company ID, First Name, Last Name, Year Placed, and LinkedIn URL."
-      );
-      return;
+  const experienceMarkdown = useMemo(
+    () => buildExperienceMarkdown(data, data.company.company_name),
+    [data]
+  );
+
+  const steps = useMemo(() => {
+    const p = data.person;
+    return [
+      {
+        key: "company",
+        title: "Let's start with the company",
+        subtitle: "Pick an existing one, or type a new company to add it.",
+        mascot: "Hi! I'm Beacon. This is quick — just pick or add your company to begin.",
+        validate: () =>
+          data.company.mode && data.company.company_name.trim()
+            ? null
+            : "Please select or add a company.",
+        render: () => (
+          <CompanyPicker
+            companies={companies}
+            value={data.company}
+            onChange={(value) => setValue("company", value)}
+          />
+        ),
+      },
+      {
+        key: "identity",
+        title: "A bit about you",
+        subtitle: "Your name and how juniors can reach you.",
+        mascot: "Nice to meet you! Your LinkedIn helps juniors connect with you.",
+        validate: () => {
+          if (!p.first_name.trim() || !p.last_name.trim())
+            return "First and last name are required.";
+          const year = parseInt(p.year_placed, 10);
+          if (!year || Number.isNaN(year)) return "Enter a valid placement year.";
+          if (!LINKEDIN_REGEX.test(p.linkedin_url.trim()))
+            return "Enter a valid LinkedIn URL.";
+          if (p.phone_number.trim() && !PHONE_REGEX.test(p.phone_number.trim()))
+            return "Enter a valid phone number.";
+          return null;
+        },
+        render: () => (
+          <div className="grid gap-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <TextField
+                label="First name"
+                autoFocus
+                value={p.first_name}
+                onChange={(v) => setSection("person", { first_name: v })}
+              />
+              <TextField
+                label="Middle (optional)"
+                value={p.middle_name}
+                onChange={(v) => setSection("person", { middle_name: v })}
+              />
+              <TextField
+                label="Last name"
+                value={p.last_name}
+                onChange={(v) => setSection("person", { last_name: v })}
+              />
+            </div>
+            <TextField
+              label="Year placed"
+              type="number"
+              placeholder="e.g. 2025"
+              value={p.year_placed}
+              onChange={(v) => setSection("person", { year_placed: v })}
+            />
+            <TextField
+              label="LinkedIn URL"
+              placeholder="https://linkedin.com/in/your-handle"
+              value={p.linkedin_url}
+              onChange={(v) => setSection("person", { linkedin_url: v })}
+            />
+            <TextField
+              label="Phone number (optional)"
+              placeholder="10-15 digits"
+              value={p.phone_number}
+              onChange={(v) => setSection("person", { phone_number: v })}
+            />
+          </div>
+        ),
+      },
+      {
+        key: "story",
+        title: "Your story so far",
+        subtitle: "A quick intro and your honest takes. Skip anything you like.",
+        mascot: "Honest opinions here are gold for juniors — but feel free to skip.",
+        optional: true,
+        render: () => (
+          <div className="grid gap-5">
+            <div className="grid gap-3">
+              <SubHeading>About you</SubHeading>
+              <TextArea
+                label="Technical interests"
+                rows={2}
+                placeholder="e.g. Backend, ML, systems…"
+                value={data.about.technical_interests}
+                onChange={(v) => setSection("about", { technical_interests: v })}
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextField
+                  label="Branch / CGPA / Clubs"
+                  value={data.about.background}
+                  onChange={(v) => setSection("about", { background: v })}
+                />
+                <TextField
+                  label="Hobbies"
+                  value={data.about.hobbies}
+                  onChange={(v) => setSection("about", { hobbies: v })}
+                />
+              </div>
+            </div>
+            <div className="grid gap-3">
+              <SubHeading>Quick opinions</SubHeading>
+              <TextArea
+                label="DSA & CP — how necessary for placements?"
+                rows={2}
+                value={data.opinions.dsa_view}
+                onChange={(v) => setSection("opinions", { dsa_view: v })}
+              />
+              <TextArea
+                label="Skills/projects vs DSA?"
+                rows={2}
+                value={data.opinions.skills_vs_dsa}
+                onChange={(v) => setSection("opinions", { skills_vs_dsa: v })}
+              />
+              <TextField
+                label="What is a good CGPA?"
+                value={data.opinions.good_cgpa}
+                onChange={(v) => setSection("opinions", { good_cgpa: v })}
+              />
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "interview",
+        title: "The interview journey",
+        subtitle: "How it came to you, and each round you faced.",
+        mascot: "Break it down round by round — the specifics help juniors most.",
+        optional: true,
+        render: () => (
+          <div className="grid gap-5">
+            <div className="grid gap-3">
+              <SubHeading>How did this opportunity come to you?</SubHeading>
+              <ChoiceCards
+                options={["On campus", "Off campus"]}
+                value={data.source}
+                onChange={(v) => setValue("source", v)}
+              />
+            </div>
+            <div className="grid gap-3">
+              <SubHeading>Interview rounds</SubHeading>
+              <RoundsEditor
+                rounds={data.rounds}
+                onChange={(v) => setValue("rounds", v)}
+              />
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "offer",
+        title: "The offer",
+        subtitle: "Compensation and timeline. Share what you're comfortable with.",
+        mascot: "Numbers and dates are optional, but they set clear expectations.",
+        optional: true,
+        render: () => (
+          <div className="grid gap-5">
+            <div className="grid gap-3">
+              <SubHeading>Compensation</SubHeading>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextField
+                  label="Internship stipend"
+                  value={data.compensation.internship_stipend}
+                  onChange={(v) => setSection("compensation", { internship_stipend: v })}
+                />
+                <TextField
+                  label="Base salary"
+                  value={data.compensation.base_salary}
+                  onChange={(v) => setSection("compensation", { base_salary: v })}
+                />
+                <TextField
+                  label="Total CTC"
+                  value={data.compensation.total_ctc}
+                  onChange={(v) => setSection("compensation", { total_ctc: v })}
+                />
+                <TextField
+                  label="Stocks"
+                  value={data.compensation.stocks}
+                  onChange={(v) => setSection("compensation", { stocks: v })}
+                />
+                <TextField
+                  label="Bonuses"
+                  value={data.compensation.bonuses}
+                  onChange={(v) => setSection("compensation", { bonuses: v })}
+                />
+                <TextField
+                  label="Other benefits"
+                  value={data.compensation.other_benefits}
+                  onChange={(v) => setSection("compensation", { other_benefits: v })}
+                />
+              </div>
+            </div>
+            <div className="grid gap-3">
+              <SubHeading>Key dates</SubHeading>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextField
+                  label="Company arrival"
+                  value={data.dates.arrival}
+                  onChange={(v) => setSection("dates", { arrival: v })}
+                />
+                <TextField
+                  label="Online test"
+                  value={data.dates.online_test}
+                  onChange={(v) => setSection("dates", { online_test: v })}
+                />
+                <TextField
+                  label="Interview"
+                  value={data.dates.interview}
+                  onChange={(v) => setSection("dates", { interview: v })}
+                />
+                <TextField
+                  label="Placement"
+                  value={data.dates.placement}
+                  onChange={(v) => setSection("dates", { placement: v })}
+                />
+              </div>
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "wisdom",
+        title: "Pass on your wisdom",
+        subtitle: "Resources that helped, and parting advice.",
+        mascot: "Last stretch! Drop the links and one tip you wish you'd known.",
+        optional: true,
+        render: () => (
+          <div className="grid gap-5">
+            <div className="grid gap-3">
+              <SubHeading>Helpful resources</SubHeading>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextField
+                  label="Books"
+                  value={data.resources.books}
+                  onChange={(v) => setSection("resources", { books: v })}
+                />
+                <TextField
+                  label="Websites"
+                  value={data.resources.websites}
+                  onChange={(v) => setSection("resources", { websites: v })}
+                />
+                <TextField
+                  label="Courses"
+                  value={data.resources.courses}
+                  onChange={(v) => setSection("resources", { courses: v })}
+                />
+                <TextField
+                  label="Practice platforms"
+                  value={data.resources.platforms}
+                  onChange={(v) => setSection("resources", { platforms: v })}
+                />
+              </div>
+              <TextField
+                label="Others"
+                value={data.resources.others}
+                onChange={(v) => setSection("resources", { others: v })}
+              />
+            </div>
+            <div className="grid gap-3">
+              <SubHeading>Tips for the next batch</SubHeading>
+              <TextArea
+                label="Free advice"
+                rows={4}
+                placeholder="Write anything that could help the next batch…"
+                value={data.tips}
+                onChange={(v) => setValue("tips", v)}
+              />
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "review",
+        kind: "review",
+        title: "Review & submit",
+        subtitle: "Here's how your experience will look.",
+        mascot: "You made it! Give it a final read, then send it off. 🎉",
+      },
+    ];
+  }, [companies, data, setSection, setValue]);
+
+  const totalSteps = steps.length;
+  const current = steps[stepIndex];
+  const progress = Math.round((stepIndex / (totalSteps - 1)) * 100);
+  const mascotJustify = MASCOT_POSITIONS[stepIndex % MASCOT_POSITIONS.length];
+
+  const goNext = useCallback(() => {
+    setDirection(1);
+    setStepIndex((i) => Math.min(totalSteps - 1, i + 1));
+  }, [totalSteps]);
+
+  const goBack = useCallback(() => {
+    setDirection(-1);
+    setStepIndex((i) => Math.max(0, i - 1));
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (current.validate) {
+      const error = current.validate();
+      if (error) {
+        toast.error(error);
+        return;
+      }
     }
-  
-    // Validate LinkedIn URL
-    const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
-    if (!linkedinRegex.test(linkedin_url)) {
-      toast.error("Please enter a valid LinkedIn URL.");
-      return;
-    }
-  
-    // Validate Phone Number
-    const phoneRegex = /^[+]?[0-9]{10,15}$/; // Adjust the regex according to your phone number format requirements
-    if (!phoneRegex.test(phone_number)) {
-      toast.error("Please enter a valid phone number.");
-      return;
-    }
-  
-    const updatedFormData = {
-      ...formData,
-      remarks_markdown: remarkState,
-    };
-  
+    goNext();
+  }, [current, goNext]);
+
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
     try {
-      const response = await fetch("/api/add-student-placed", {
+      const payload = {
+        first_name: data.person.first_name,
+        middle_name: data.person.middle_name,
+        last_name: data.person.last_name,
+        year_placed: data.person.year_placed,
+        linkedin_url: data.person.linkedin_url,
+        phone_number: data.person.phone_number,
+        remarks_markdown: experienceMarkdown,
+        company_id:
+          data.company.mode === "existing" ? data.company.company_id : undefined,
+        new_company_name:
+          data.company.mode === "new" ? data.company.company_name : undefined,
+        new_company_description:
+          data.company.mode === "new" ? data.company.new_company_description : undefined,
+      };
+
+      const response = await fetch("/api/submit-experience", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedFormData),
+        body: JSON.stringify(payload),
       });
-      const result = await response.json();
-      toast.success("Student data registered successfully!");
-      toast.success(
-        "Thank you for your contribution! You can review your work after a quick admin check :)"
-      );
+      const body = await response.json();
+
+      if (!response.ok) {
+        throw new Error(body.error || "Submission failed.");
+      }
+
+      toast.success("Thank you! Your experience has been shared.");
+      setResult(body);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to register student data. Please try again later.");
+      console.error("Error submitting experience:", error);
+      toast.error(error.message || "Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-  };
-  
+  }, [data, experienceMarkdown]);
 
   return (
-    <div className="h-fit flex flex-col items-center justify-center md:p-6 p-1 m-2 ">
-      <Toaster />
-      <H text={"Add Your Experience!"} />
-      <P
-        text={
-          "Congratulations on landing your new role! 🎉 We’re thrilled to have you here. As you embark on this exciting journey, we invite you to share your triumphs and experiences with the PES community. Your insights could be the beacon that guides other students and juniors to their own success."
-        }
-      />
-      
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-2 place-items-center md:grid-cols-4 gap-4 p-[5px]"
-      >
-        <Button  
-          variant="flat" 
-          color="warning" 
-          onPress={onOpen}
-          className="capitalize"
-        >
-          {selectedCompany ? selectedCompany.company_name : "Select Company"}
-        </Button>
-        <Modal backdrop={backdrop} isOpen={isOpen} onClose={onClose} className = " p-3">
-          <ModalContent>
-            <ModalHeader className="flex flex-col gap-1">Select a Company</ModalHeader>
-            <ModalBody>
-              {companies.length === 0 ? (
-                <p>Loading companies...</p>
-              ) : (
-                <div className="flex flex-row flex-wrap gap-1 items-center justify-center">
-                  {companies.map((company) => (
-                    <>
-                    
-                    <Button
-                      key={company.id}
-                      color="success"
-                      onPress={() => handleCompanyChange(company)}
-                      className = "w-fit"
-                      variant="light"
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
+      <Toaster position="top-center" richColors />
+      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
+
+      <section className="relative z-10 mx-auto max-w-3xl">
+        {result ? (
+          <SuccessCard result={result} />
+        ) : (
+          <>
+            {/* progress — percentage + encouragement, no step numbers */}
+            <div className="mb-6">
+              <div className="mb-2 flex items-end justify-between">
+                <motion.span
+                  key={encouragement(progress)}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-sm font-bold text-amber-700"
+                >
+                  {encouragement(progress)}
+                </motion.span>
+                <span className="text-lg font-black text-amber-600">{progress}%</span>
+              </div>
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-amber-100">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                />
+              </div>
+            </div>
+
+            {/* mascot moves position each step to keep attention */}
+            <div className="mb-4 flex" style={{ justifyContent: mascotJustify }}>
+              <motion.div layout transition={{ type: "spring", stiffness: 220, damping: 22 }}>
+                <Mascot message={current.mascot} />
+              </motion.div>
+            </div>
+
+            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={current.key}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.28, ease: "easeInOut" }}
+                >
+                  {current.kind === "review" ? (
+                    <div>
+                      <StepHeader title={current.title} subtitle={current.subtitle} />
+                      <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50/60 px-4 py-3 text-sm text-amber-900">
+                        <p className="font-semibold">
+                          {data.person.first_name} {data.person.last_name}
+                        </p>
+                        <p className="text-amber-700">
+                          {data.company.company_name} · {data.person.year_placed}
+                        </p>
+                      </div>
+                      <div className="max-h-[45vh] overflow-auto rounded-2xl border border-amber-100 bg-white/80 p-4">
+                        <MarkdownReviewRenderer remarks_markdown={experienceMarkdown} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <StepHeader title={current.title} subtitle={current.subtitle} />
+                      {current.render()}
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              {/* controls */}
+              <div className="mt-8 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={goBack}
+                  disabled={stepIndex === 0}
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Back
+                </button>
+
+                <div className="flex items-center gap-3">
+                  {current.optional && (
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      className="text-sm font-medium text-amber-600 hover:text-amber-800"
                     >
-                      {company.company_name}
-                    </Button>
-
-                    </>
-                  ))}
+                      Skip
+                    </button>
+                  )}
+                  {current.kind === "review" ? (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={submitting}
+                      className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
+                    >
+                      {submitting ? "Submitting…" : "Submit experience"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
+                    >
+                      Continue
+                    </button>
+                  )}
                 </div>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              <Button color="success"  onPress={onClose}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-        
-        <Input
-          name="first_name"
-          type="text"
-          label="First Name"
-          color="success"
-          placeholder="Enter first name"
-          value={formData.first_name}
-          onChange={handleInputChange}
-          className="max-w-full"
-          required
-        />
-        <Input
-          name="middle_name"
-          type="text"
-          label="Middle Name"
-          color="success"
-          placeholder="Enter middle name"
-          value={formData.middle_name}
-          onChange={handleInputChange}
-          className="max-w-full"
-        />
-        <Input
-          name="last_name"
-          type="text"
-          label="Last Name"
-          color="success"
-          placeholder="Enter last name"
-          value={formData.last_name}
-          onChange={handleInputChange}
-          className="max-w-full"
-          required
-        />
-        <Input
-          name="year_placed"
-          type="number"
-          label="Year Placed"
-          color="success"
-          placeholder="Enter year placed"
-          value={formData.year_placed}
-          onChange={handleInputChange}
-          className="max-w-full"
-          required
-        />
-        <Input
-          name="linkedin_url"
-          type="text"
-          label="LinkedIn URL"
-          color="success"
-          placeholder="Enter LinkedIn URL"
-          value={formData.linkedin_url}
-          onChange={handleInputChange}
-          className="max-w-full"
-          required
-        />
-        <Input
-          name="phone_number"
-          type="text"
-          label="Phone Number"
-          color="success"
-          placeholder="Enter phone number"
-          value={formData.phone_number}
-          onChange={handleInputChange}
-          className="max-w-full"
-        />
-        <Button
-          type="submit"
-          color="success"
-          variant="shadow"
-          className="mt-4"
-          onClick={handleSubmit}
-        >
-          Submit
-        </Button>
-      </form>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+    </main>
+  );
+}
 
-      <CustomEditor remarkState={remarkState} setRemarkState={setRemarkState} />
+function SubHeading({ children }) {
+  return (
+    <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
+      {children}
+    </p>
+  );
+}
+
+function StepHeader({ title, subtitle }) {
+  return (
+    <div className="mb-6">
+      <h2 className="text-2xl font-black tracking-tight text-amber-950 sm:text-3xl">
+        {title}
+      </h2>
+      {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+    </div>
+  );
+}
+
+function SuccessCard({ result }) {
+  return (
+    <div className="rounded-3xl border border-white/70 bg-white/80 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+      <div className="mb-6 flex justify-center">
+        <Mascot message="You did it! Your story is now live for juniors to learn from." />
+      </div>
+      <h1 className="text-3xl font-black tracking-tight text-amber-950">
+        Thank you for contributing!
+      </h1>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
+        Your experience for{" "}
+        <span className="font-semibold text-amber-700">{result.companyName}</span>{" "}
+        has been saved and is now visible on the browse page.
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Link
+          href="/browse"
+          className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
+        >
+          Browse experiences
+        </Link>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="rounded-full border border-amber-300 px-6 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
+        >
+          Share another
+        </button>
+      </div>
     </div>
   );
 }
