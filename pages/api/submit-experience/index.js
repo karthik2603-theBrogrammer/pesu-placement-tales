@@ -46,33 +46,6 @@ async function resolveCompany(sql, { company_id, new_company_name, new_company_d
   return { id: created[0].id, name: created[0].company_name };
 }
 
-/**
- * Browse joins student_placed -> company_visited on (company_id, year).
- * Without a matching company_visited row a contribution would never appear,
- * so we insert a lightweight stub when one does not already exist.
- */
-async function ensureCompanyVisited(sql, companyId, year) {
-  const existing = await sql`
-    SELECT 1 FROM company_visited
-    WHERE company_id = ${companyId} AND year = ${year}
-    LIMIT 1;
-  `;
-  if (existing.length > 0) return;
-
-  await sql`
-    INSERT INTO company_visited (
-      company_id, year, base_salary, ctc, internship_stipend,
-      girls_only, internship_only, fte_only, internship_fte,
-      total_hired, males_hired, females_hired
-    )
-    VALUES (
-      ${companyId}, ${year}, 0, 0, 0,
-      false, false, false, false,
-      0, 0, 0
-    );
-  `;
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
@@ -135,8 +108,6 @@ export default async function handler(req, res) {
       new_company_name,
       new_company_description,
     });
-
-    await ensureCompanyVisited(sql, company.id, year);
 
     const inserted = await sql`
       INSERT INTO student_placed (

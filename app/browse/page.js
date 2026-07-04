@@ -10,7 +10,7 @@ import { Spinner, Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import H from "../components/Heading";
 import P from "../components/Paragraph";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import { CiSearch } from "react-icons/ci";
 import { FaLink } from "react-icons/fa";
 import Link from "next/link";
@@ -34,8 +34,85 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null); // Store selected student
   const [isModalOpen, setIsModalOpen] = useState(false); // Handle modal visibility
+  const [userVotes, setUserVotes] = useState({}); // studentId -> 'up' | 'down' (from localStorage)
   const closeModal = () => {
     setIsModalOpen(false); // Close the modal
+  };
+
+  // Load the viewer's previous votes so they can't vote the same post repeatedly.
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("pt_votes") || "{}");
+      setUserVotes(stored);
+    } catch {
+      setUserVotes({});
+    }
+  }, []);
+
+  const handleVote = async (target) => {
+    const id = selectedStudent?.student_id;
+    if (!id) return;
+
+    const prev = userVotes[id];
+    let upDelta = 0;
+    let downDelta = 0;
+    let next = prev;
+
+    if (target === "up") {
+      if (prev === "up") {
+        upDelta = -1;
+        next = undefined;
+      } else if (prev === "down") {
+        upDelta = 1;
+        downDelta = -1;
+        next = "up";
+      } else {
+        upDelta = 1;
+        next = "up";
+      }
+    } else {
+      if (prev === "down") {
+        downDelta = -1;
+        next = undefined;
+      } else if (prev === "up") {
+        downDelta = 1;
+        upDelta = -1;
+        next = "down";
+      } else {
+        downDelta = 1;
+        next = "down";
+      }
+    }
+
+    try {
+      const response = await fetch("/api/vote-student", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId: id, upDelta, downDelta }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Vote failed.");
+
+      setSelectedStudent((cur) =>
+        cur ? { ...cur, upvote: data.upvote, downvote: data.downvote } : cur
+      );
+      setStudentsPlacedAtCompanySelected((list) =>
+        list.map((it) =>
+          it.student_id === id
+            ? { ...it, upvote: data.upvote, downvote: data.downvote }
+            : it
+        )
+      );
+
+      const nextVotes = { ...userVotes };
+      if (next) nextVotes[id] = next;
+      else delete nextVotes[id];
+      setUserVotes(nextVotes);
+      localStorage.setItem("pt_votes", JSON.stringify(nextVotes));
+    } catch (error) {
+      console.error("Error voting:", error);
+      toast.error(error.message || "Could not register your vote.");
+    }
   };
 
   const visibleCompanies = searchQuery.trim() ? suggestions : companies;
@@ -197,24 +274,25 @@ export default function Home() {
 
           {/* Display students once they are fetched */}
           {studentsPlacedAtCompanySelected.length > 0 && !loadingStudents && (
-            <div className="mt-6">
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {studentsPlacedAtCompanySelected.map((item, index) => (
-                <Button
-                  key={index}
-                  className="flex flex-col items-center justify-center py-7"
+                <button
+                  key={item.student_id ?? index}
+                  type="button"
                   onClick={() => handleSelectStudent(item)}
-                  variant="flat"
-                  color="success"
+                  className="group rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
                 >
-                  <p>
+                  <p className="text-sm font-semibold text-gray-900">
                     {item.first_name} {item.middle_name} {item.last_name}
                   </p>
-                  {/* <p className="-m-2">{item.year_placed}</p>
-                  <div className="flex flex-row gap-2">
-                    <p className="">{item.upvote}</p>
-                    <p className="">{item.downvote}</p>
-                  </div> */}
-                </Button>
+                  <div className="mt-2 flex items-center text-xs text-amber-600">
+                    <span>Placed {item.year_placed}</span>
+                    <span className="ml-auto flex items-center gap-2 font-medium">
+                      <span>▲ {item.upvote ?? 0}</span>
+                      <span className="text-slate-400">▼ {item.downvote ?? 0}</span>
+                    </span>
+                  </div>
+                </button>
               ))}
             </div>
           )}
@@ -244,7 +322,7 @@ export default function Home() {
                             selectedStudent?.student_id
                           }&token=${generateRandomToken()}`}
                         >
-                          <FaLink size={15} color = "green" />
+                          <FaLink size={15} color="#d97706" />
                         </Link>
                       )}
                     </div>
@@ -285,14 +363,35 @@ export default function Home() {
                   </div>
 
                   {/* Modal footer */}
-                  <div className="flex flex-row items-center justify-end p-4">
-                    <div className="flex flex-row gap-2 mx-4">
-                      <Button className="" variant="flat" color="success">
-                        {selectedStudent?.upvote}
-                      </Button>
-                      <Button className="" variant="flat" color="danger">
-                        {selectedStudent?.downvote}
-                      </Button>
+                  <div className="flex flex-row items-center justify-end gap-3 p-4">
+                    <div className="mr-auto flex items-center gap-2">
+                      <span className="mr-1 text-xs font-medium text-gray-500">
+                        Was this helpful?
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleVote("up")}
+                        className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
+                          userVotes[selectedStudent?.student_id] === "up"
+                            ? "border-amber-400 bg-amber-100 text-amber-800"
+                            : "border-amber-200 bg-white text-amber-700 hover:bg-amber-50"
+                        }`}
+                      >
+                        <span>▲</span>
+                        <span>{selectedStudent?.upvote ?? 0}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleVote("down")}
+                        className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
+                          userVotes[selectedStudent?.student_id] === "down"
+                            ? "border-slate-400 bg-slate-100 text-slate-700"
+                            : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+                        }`}
+                      >
+                        <span>▼</span>
+                        <span>{selectedStudent?.downvote ?? 0}</span>
+                      </button>
                     </div>
                     <Button
                       color="warning"

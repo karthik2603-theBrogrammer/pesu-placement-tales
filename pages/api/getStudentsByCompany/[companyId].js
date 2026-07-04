@@ -12,7 +12,9 @@ export default async function handler(req, res) {
   const sql = neon(process.env.DATABASE_URL);
 
   try {
-    // Use tagged template literals for the query
+    // Students are tied directly to a company; company_visited is only stats
+    // data (and can have multiple role rows per year), so we join company alone
+    // to avoid duplicating students.
     const data = await sql`
       SELECT 
           sp.id AS student_id,
@@ -25,27 +27,15 @@ export default async function handler(req, res) {
           sp.remarks_markdown,
           sp.upvote,
           sp.downvote,
-          cv.year AS visited_year,
-          cv.base_salary,
-          cv.ctc,
-          cv.internship_stipend,
-          cv.girls_only,
-          cv.internship_only,
-          cv.fte_only,
-          cv.internship_fte,
-          cv.total_hired,
-          cv.males_hired,
-          cv.females_hired,
           c.company_name,
           c.company_description
       FROM 
           student_placed sp
       JOIN 
-          company_visited cv ON sp.company_placed_id = cv.company_id
-      JOIN 
-          company c ON cv.company_id = c.id
+          company c ON sp.company_placed_id = c.id
       WHERE 
-          sp.company_placed_id = ${companyId} AND sp.year_placed = cv.year;
+          sp.company_placed_id = ${companyId}
+      ORDER BY sp.year_placed DESC, sp.id DESC;
     `;
 
     // Send the data back as JSON

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Toaster, toast } from "sonner";
 import Mascot from "../components/contribute/Mascot";
+import Stepper from "../components/contribute/Stepper";
+import ProgressRing from "../components/contribute/ProgressRing";
 import {
   ChoiceCards,
   CompanyPicker,
@@ -50,8 +52,16 @@ const INITIAL_DATA = {
 const LINKEDIN_REGEX = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
 const PHONE_REGEX = /^[+]?[0-9]{10,15}$/;
 
-// Mascot rotates between positions each step to keep the eye moving.
-const MASCOT_POSITIONS = ["flex-start", "center", "flex-end", "center"];
+// Beacon strikes a different pose each step — position, tilt, drift and facing.
+const MASCOT_POSES = [
+  { justify: "flex-start", rotate: -6, y: 0, flip: false },
+  { justify: "flex-end", rotate: 6, y: 8, flip: true },
+  { justify: "center", rotate: -3, y: -6, flip: false },
+  { justify: "flex-start", rotate: 9, y: 4, flip: false },
+  { justify: "flex-end", rotate: -6, y: -3, flip: true },
+  { justify: "center", rotate: 4, y: 6, flip: false },
+  { justify: "flex-start", rotate: -8, y: 0, flip: false },
+];
 
 const slideVariants = {
   enter: (dir) => ({ opacity: 0, x: dir > 0 ? 60 : -60 }),
@@ -107,6 +117,7 @@ export default function ContributePage() {
     return [
       {
         key: "company",
+        label: "Company",
         title: "Let's start with the company",
         subtitle: "Pick an existing one, or type a new company to add it.",
         mascot: "Hi! I'm Beacon. This is quick — just pick or add your company to begin.",
@@ -124,6 +135,7 @@ export default function ContributePage() {
       },
       {
         key: "identity",
+        label: "About you",
         title: "A bit about you",
         subtitle: "Your name and how juniors can reach you.",
         mascot: "Nice to meet you! Your LinkedIn helps juniors connect with you.",
@@ -182,6 +194,7 @@ export default function ContributePage() {
       },
       {
         key: "story",
+        label: "Your story",
         title: "Your story so far",
         subtitle: "A quick intro and your honest takes. Skip anything you like.",
         mascot: "Honest opinions here are gold for juniors — but feel free to skip.",
@@ -235,6 +248,7 @@ export default function ContributePage() {
       },
       {
         key: "interview",
+        label: "Interview",
         title: "The interview journey",
         subtitle: "How it came to you, and each round you faced.",
         mascot: "Break it down round by round — the specifics help juniors most.",
@@ -261,6 +275,7 @@ export default function ContributePage() {
       },
       {
         key: "offer",
+        label: "The offer",
         title: "The offer",
         subtitle: "Compensation and timeline. Share what you're comfortable with.",
         mascot: "Numbers and dates are optional, but they set clear expectations.",
@@ -332,6 +347,7 @@ export default function ContributePage() {
       },
       {
         key: "wisdom",
+        label: "Wisdom",
         title: "Pass on your wisdom",
         subtitle: "Resources that helped, and parting advice.",
         mascot: "Last stretch! Drop the links and one tip you wish you'd known.",
@@ -384,6 +400,7 @@ export default function ContributePage() {
       {
         key: "review",
         kind: "review",
+        label: "Review",
         title: "Review & submit",
         subtitle: "Here's how your experience will look.",
         mascot: "You made it! Give it a final read, then send it off. 🎉",
@@ -394,7 +411,7 @@ export default function ContributePage() {
   const totalSteps = steps.length;
   const current = steps[stepIndex];
   const progress = Math.round((stepIndex / (totalSteps - 1)) * 100);
-  const mascotJustify = MASCOT_POSITIONS[stepIndex % MASCOT_POSITIONS.length];
+  const mascotPose = MASCOT_POSES[stepIndex % MASCOT_POSES.length];
 
   const goNext = useCallback(() => {
     setDirection(1);
@@ -465,41 +482,56 @@ export default function ContributePage() {
       <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
 
-      <section className="relative z-10 mx-auto max-w-3xl">
+      <section className="relative z-10 mx-auto max-w-5xl">
         {result ? (
           <SuccessCard result={result} />
         ) : (
-          <>
-            {/* progress — percentage + encouragement, no step numbers */}
-            <div className="mb-6">
-              <div className="mb-2 flex items-end justify-between">
-                <motion.span
+          <div className="grid gap-8 md:grid-cols-[220px_1fr]">
+            {/* left rail: circular progress + vertical stepper */}
+            <aside className="hidden md:block">
+              <div className="sticky top-10">
+                <div className="mb-8 flex items-center gap-3">
+                  <ProgressRing value={progress} />
+                  <motion.p
+                    key={encouragement(progress)}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-sm font-bold leading-snug text-amber-700"
+                  >
+                    {encouragement(progress)}
+                  </motion.p>
+                </div>
+                <Stepper steps={steps} current={stepIndex} />
+              </div>
+            </aside>
+
+            {/* right column: mascot + form card */}
+            <div>
+              {/* compact progress for mobile */}
+              <div className="mb-5 flex items-center gap-3 md:hidden">
+                <ProgressRing value={progress} size={52} stroke={5} />
+                <motion.p
                   key={encouragement(progress)}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-sm font-bold text-amber-700"
                 >
                   {encouragement(progress)}
-                </motion.span>
-                <span className="text-lg font-black text-amber-600">{progress}%</span>
+                </motion.p>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-amber-100">
+
+              {/* mascot changes pose (position, tilt, facing) each step */}
+              <div className="mb-4 flex" style={{ justifyContent: mascotPose.justify }}>
                 <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                />
+                  layout
+                  animate={{ rotate: mascotPose.rotate, y: mascotPose.y }}
+                  transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                >
+                  <Mascot message={current.mascot} flip={mascotPose.flip} />
+                </motion.div>
               </div>
-            </div>
 
-            {/* mascot moves position each step to keep attention */}
-            <div className="mb-4 flex" style={{ justifyContent: mascotJustify }}>
-              <motion.div layout transition={{ type: "spring", stiffness: 220, damping: 22 }}>
-                <Mascot message={current.mascot} />
-              </motion.div>
-            </div>
-
-            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
+              <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={current.key}
@@ -575,8 +607,9 @@ export default function ContributePage() {
                   )}
                 </div>
               </div>
+              </div>
             </div>
-          </>
+          </div>
         )}
       </section>
     </main>

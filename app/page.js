@@ -1,20 +1,71 @@
+import Link from "next/link";
 
-import Image from "next/image";
-import H from './components/Heading'
-import P from './components/Paragraph'
+const highlights = [
+  "Company-specific insights",
+  "Real interview patterns",
+  "Salary & hiring stats",
+];
 
 export default function Home() {
   return (
-    <div className="h-[100vh] w-[100vw] fixed flex flex-col items-center justify-center bg-[url('/hero-vector.png')]">
-      {/* Excited to announce PESU Placement Tales (PPT) - your go-to resource for 
-      company-specific preparation insights! Learn directly from successful candidates 
-      who've cracked these companies before. Are you an offered student? 
-      Pay it forward by sharing your experience to help upcoming batches. Preparing for 
-      online assessments or interviews? PPT is your ultimate guide! We're constantly 
-      improving, so feel free to suggest new features or report any bugs. Join PPT today 
-      and boost your placement journey with peer-powered knowledge! */}
-      <H text={" 🚀 PESU Placement Tales ✨"} styles = "text-gray-800"/>
-      <P text={`Get insights directly from successful candidates who've aced their interviews. If you’re a student with an offer, share your experience to support future batches. Whether you're prepping for assessments or interviews, PPT is your go-to resource. We’re always evolving, so share your feedback and suggestions. Join PPT today and enhance your placement journey with the power of peer knowledge! ✅`} styles = 'md:w-[50%]'/>
-    </div>
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-16 text-slate-950 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
+
+      <section className="relative z-10 mx-auto flex max-w-3xl flex-col items-center text-center">
+        <p className="mb-5 w-fit rounded-full border border-amber-200/70 bg-amber-100/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700 shadow-sm backdrop-blur">
+          PESU Placement Tales
+        </p>
+
+        <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-6xl">
+          Placement wisdom,
+          <span className="block bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent pb-2">
+            straight from your seniors
+          </span>
+        </h1>
+
+        <p className="mt-6 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+          Placement information is limited and scattered — yet interview patterns
+          often repeat within a company. Read seniors&apos; experiences, dig into
+          salary &amp; hiring stats, prepare sharper, and share what you know to
+          lift the next batch.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/add-student"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-7 py-3 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
+          >
+            Share your story
+          </Link>
+          <Link
+            href="/browse"
+            className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
+          >
+            Browse
+          </Link>
+          <Link
+            href="/stats"
+            className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
+          >
+            View stats
+          </Link>
+        </div>
+
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
+          {highlights.map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center gap-2 rounded-full border border-amber-200/70 bg-white/60 px-3.5 py-1.5 text-xs font-medium text-amber-800 shadow-sm backdrop-blur"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              {item}
+            </span>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
