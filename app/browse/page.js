@@ -205,6 +205,30 @@ export default function Home() {
               styles={"mx-auto max-w-xl"}
               text={"Choose a company to read placement stories from seniors."}
             />
+            <div className="mx-auto mt-4 max-w-2xl rounded-xl border border-slate-200/80 bg-slate-50/90 px-4 py-3 text-center sm:px-5">
+              <p className="text-sm leading-relaxed text-slate-600">
+                After reading a story, rate how helpful it was.{" "}
+                <span className="inline-flex items-center gap-1 align-middle">
+                  <span
+                    aria-hidden
+                    className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white px-2 py-0.5 text-xs font-semibold text-amber-700 shadow-sm"
+                  >
+                    ▲ <span className="tabular-nums">12</span>
+                  </span>
+                </span>{" "}
+                when an experience felt credible — it helps juniors find the
+                good ones.{" "}
+                <span className="inline-flex items-center gap-1 align-middle">
+                  <span
+                    aria-hidden
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-0.5 text-xs font-semibold text-slate-500 shadow-sm"
+                  >
+                    ▼ <span className="tabular-nums">2</span>
+                  </span>
+                </span>{" "}
+                if it wasn't useful, so others know to look at a different experience.
+              </p>
+            </div>
           </div>
 
           {/* Display companies in a flexbox once they are loaded */}

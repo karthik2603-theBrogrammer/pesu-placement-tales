@@ -14,6 +14,7 @@ export function TextField({
   placeholder,
   type = "text",
   autoFocus = false,
+  disabled = false,
 }) {
   return (
     <label className="block">
@@ -25,6 +26,7 @@ export function TextField({
         value={value ?? ""}
         autoFocus={autoFocus}
         placeholder={placeholder}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && onEnter) {
@@ -32,7 +34,7 @@ export function TextField({
             onEnter();
           }
         }}
-        className={baseInput}
+        className={`${baseInput} ${disabled ? "cursor-not-allowed bg-amber-50/80 opacity-70" : ""}`}
       />
       {hint && <span className="mt-2 block text-xs text-amber-600/80">{hint}</span>}
     </label>

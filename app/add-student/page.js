@@ -32,6 +32,7 @@ const INITIAL_DATA = {
     year_placed: "",
     linkedin_url: "",
     phone_number: "",
+    anonymous: false,
   },
   about: { technical_interests: "", background: "", hobbies: "" },
   opinions: { dsa_view: "", skills_vs_dsa: "", good_cgpa: "" },
@@ -52,6 +53,15 @@ const INITIAL_DATA = {
 
 const LINKEDIN_REGEX = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+\/?$/;
 const PHONE_REGEX = /^[+]?[0-9]{10,15}$/;
+
+/** Shown when the contributor opts to stay anonymous. */
+const ANONYMOUS_IDENTITY = {
+  first_name: "John",
+  middle_name: "",
+  last_name: "Doe",
+  linkedin_url: "",
+  phone_number: "",
+};
 
 // Beacon strikes a different pose each step — position, tilt, drift and facing.
 const MASCOT_POSES = [
@@ -108,6 +118,36 @@ export default function ContributePage() {
     setData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const toggleAnonymous = useCallback((yes) => {
+    setData((prev) => {
+      const { job_title, year_placed } = prev.person;
+      if (yes) {
+        return {
+          ...prev,
+          person: {
+            anonymous: true,
+            ...ANONYMOUS_IDENTITY,
+            job_title,
+            year_placed,
+          },
+        };
+      }
+      return {
+        ...prev,
+        person: {
+          anonymous: false,
+          first_name: "",
+          middle_name: "",
+          last_name: "",
+          job_title,
+          year_placed,
+          linkedin_url: "",
+          phone_number: "",
+        },
+      };
+    });
+  }, []);
+
   const experienceMarkdown = useMemo(
     () => buildExperienceMarkdown(data, data.company.company_name),
     [data]
@@ -138,36 +178,60 @@ export default function ContributePage() {
         key: "identity",
         label: "About you",
         title: "A bit about you",
-        subtitle: "Your name and how juniors can reach you.",
-        mascot: "Nice to meet you! Your LinkedIn helps juniors connect with you.",
+        subtitle:
+          "Only job title and placement year are required. Name and contact details are optional — juniors appreciate them, but it's your call.",
+        mascot: p.anonymous
+          ? "No worries — John Doe has your back. Just the role and year!"
+          : "Nice to meet you! Share what you're comfortable with.",
         validate: () => {
-          if (!p.first_name.trim() || !p.last_name.trim())
-            return "First and last name are required.";
           if (!p.job_title.trim()) return "Job title is required.";
           const year = parseInt(p.year_placed, 10);
           if (!year || Number.isNaN(year)) return "Enter a valid placement year.";
-          if (!LINKEDIN_REGEX.test(p.linkedin_url.trim()))
-            return "Enter a valid LinkedIn URL.";
-          if (p.phone_number.trim() && !PHONE_REGEX.test(p.phone_number.trim()))
-            return "Enter a valid phone number.";
+          if (!p.anonymous) {
+            if (p.linkedin_url.trim() && !LINKEDIN_REGEX.test(p.linkedin_url.trim()))
+              return "Enter a valid LinkedIn URL.";
+            if (p.phone_number.trim() && !PHONE_REGEX.test(p.phone_number.trim()))
+              return "Enter a valid phone number.";
+          }
           return null;
         },
         render: () => (
-          <div className="grid gap-3">
+          <div className="grid gap-4">
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-amber-100 bg-amber-50/40 px-3 py-2 text-xs text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/70">
+              <input
+                type="checkbox"
+                checked={p.anonymous}
+                onChange={(e) => toggleAnonymous(e.target.checked)}
+                className="h-3.5 w-3.5 shrink-0 accent-amber-500"
+              />
+              <span>
+                Stay anonymous{" "}
+                <span className="text-slate-400">(shows as John Doe)</span>
+              </span>
+            </label>
+
+            <p className="text-xs text-slate-500">
+              Fields marked <span className="font-medium text-amber-700">optional</span> can
+              be skipped. Juniors can reach out easier when you share contact details.
+            </p>
+
             <div className="grid gap-3 sm:grid-cols-3">
               <TextField
-                label="First name"
-                autoFocus
+                label="First name (optional)"
+                autoFocus={!p.anonymous}
+                disabled={p.anonymous}
                 value={p.first_name}
                 onChange={(v) => setSection("person", { first_name: v })}
               />
               <TextField
-                label="Middle (optional)"
+                label="Middle name (optional)"
+                disabled={p.anonymous}
                 value={p.middle_name}
                 onChange={(v) => setSection("person", { middle_name: v })}
               />
               <TextField
-                label="Last name"
+                label="Last name (optional)"
+                disabled={p.anonymous}
                 value={p.last_name}
                 onChange={(v) => setSection("person", { last_name: v })}
               />
@@ -186,14 +250,16 @@ export default function ContributePage() {
               onChange={(v) => setSection("person", { year_placed: v })}
             />
             <TextField
-              label="LinkedIn URL"
+              label="LinkedIn URL (optional)"
               placeholder="https://linkedin.com/in/your-handle"
+              disabled={p.anonymous}
               value={p.linkedin_url}
               onChange={(v) => setSection("person", { linkedin_url: v })}
             />
             <TextField
               label="Phone number (optional)"
               placeholder="10-15 digits"
+              disabled={p.anonymous}
               value={p.phone_number}
               onChange={(v) => setSection("person", { phone_number: v })}
             />
@@ -414,7 +480,7 @@ export default function ContributePage() {
         mascot: "You made it! Give it a final read, then send it off. 🎉",
       },
     ];
-  }, [companies, data, setSection, setValue]);
+  }, [companies, data, setSection, setValue, toggleAnonymous]);
 
   const totalSteps = steps.length;
   const current = steps[stepIndex];
@@ -445,14 +511,25 @@ export default function ContributePage() {
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     try {
+      const p = data.person;
+      const identity = p.anonymous
+        ? { ...ANONYMOUS_IDENTITY }
+        : {
+            first_name: p.first_name.trim(),
+            middle_name: p.middle_name.trim(),
+            last_name: p.last_name.trim(),
+            linkedin_url: p.linkedin_url.trim(),
+            phone_number: p.phone_number.trim(),
+          };
+
       const payload = {
-        first_name: data.person.first_name,
-        middle_name: data.person.middle_name,
-        last_name: data.person.last_name,
-        job_title: data.person.job_title,
-        year_placed: data.person.year_placed,
-        linkedin_url: data.person.linkedin_url,
-        phone_number: data.person.phone_number,
+        first_name: identity.first_name,
+        middle_name: identity.middle_name,
+        last_name: identity.last_name,
+        job_title: p.job_title,
+        year_placed: p.year_placed,
+        linkedin_url: identity.linkedin_url,
+        phone_number: identity.phone_number,
         remarks_markdown: experienceMarkdown,
         company_id:
           data.company.mode === "existing" ? data.company.company_id : undefined,

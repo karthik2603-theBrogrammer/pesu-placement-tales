@@ -70,10 +70,6 @@ export default async function handler(req, res) {
     new_company_description,
   } = req.body || {};
 
-  if (!trim(first_name) || !trim(last_name)) {
-    return res.status(400).json({ error: "First and last name are required." });
-  }
-
   if (!trim(job_title)) {
     return res.status(400).json({ error: "Job title is required." });
   }
