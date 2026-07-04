@@ -1,6 +1,6 @@
 -- Auto-generated schema snapshot of the public schema.
 -- Source: live database (scripts/dump-schema.mjs).
--- Generated: 2026-07-04T11:46:15.778Z
+-- Generated: 2026-07-04T13:17:00.866Z
 
 CREATE TABLE bug_reports (
   id INTEGER NOT NULL DEFAULT nextval('bug_reports_id_seq'::regclass),
@@ -66,6 +66,7 @@ CREATE TABLE student_placed (
   admin_verified BOOLEAN DEFAULT false,
   upvote INTEGER DEFAULT 0,
   downvote INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (id)
 );
 

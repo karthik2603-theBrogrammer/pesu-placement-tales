@@ -2,9 +2,29 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
+import AdminCollection from "../components/admin/AdminCollection";
+import PlacementStoryLogs from "../components/admin/PlacementStoryLogs";
 
 const STREAM_OPTIONS = ["CSE", "ECE", "EEE", "Mech", "AIML"];
 const TIER_OPTIONS = [1, 2, 3];
+const STATUS_OPTIONS = ["open", "planned", "in_progress", "done", "closed"];
+
+const fmtDate = (value) =>
+  value
+    ? new Date(value).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+const truncate = (text, n = 160) =>
+  text && text.length > n ? `${text.slice(0, n)}…` : text || "";
+
+const StatusChip = ({ status }) => (
+  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
+    {status || "open"}
+  </span>
+);
 
 const EMPTY_FORM = {
   id: "",
@@ -59,6 +79,51 @@ const parseStreams = (value) =>
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+
+const statusOptions = STATUS_OPTIONS.map((s) => ({ value: s, label: s }));
+
+const FEATURE_FIELDS = [
+  { key: "title", label: "Title", type: "text" },
+  { key: "description", label: "Description", type: "textarea", rows: 4 },
+  { key: "requester_name", label: "Requester name", type: "text" },
+  { key: "status", label: "Status", type: "select", options: statusOptions },
+];
+
+const BUG_FIELDS = [
+  { key: "title", label: "Title", type: "text" },
+  { key: "description", label: "Description", type: "textarea", rows: 4 },
+  { key: "reproduction_steps", label: "Reproduction steps", type: "textarea", rows: 3 },
+  { key: "page_url", label: "Page URL", type: "text" },
+  { key: "reporter_name", label: "Reporter name", type: "text" },
+  { key: "status", label: "Status", type: "select", options: statusOptions },
+];
+
+const featureSummary = (item) => (
+  <>
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-semibold text-amber-950">{item.title}</span>
+      <StatusChip status={item.status} />
+    </div>
+    <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
+    <p className="mt-1 text-xs text-slate-400">
+      {item.requester_name || "Anonymous"} · {fmtDate(item.created_at)}
+    </p>
+  </>
+);
+
+const bugSummary = (item) => (
+  <>
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-semibold text-amber-950">{item.title}</span>
+      <StatusChip status={item.status} />
+    </div>
+    <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
+    <p className="mt-1 text-xs text-slate-400">
+      {item.reporter_name || "Anonymous"} · {fmtDate(item.created_at)}
+      {item.page_url ? ` · ${item.page_url}` : ""}
+    </p>
+  </>
+);
 
 export default function AdminStatsPage() {
   const [token, setToken] = useState("");
@@ -240,8 +305,11 @@ export default function AdminStatsPage() {
               Admin
             </p>
             <h1 className="text-3xl font-black tracking-tight text-amber-950">
-              Company stats console
+              Admin console
             </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Company stats, placement stories, feature requests &amp; bug reports
+            </p>
           </div>
           {unlocked && (
             <button
@@ -257,7 +325,7 @@ export default function AdminStatsPage() {
         {!unlocked ? (
           <div className="max-w-sm rounded-2xl border border-white/70 bg-white/80 p-6 shadow-sm backdrop-blur">
             <p className="mb-3 text-sm text-slate-600">
-              Enter the admin token to manage company hiring &amp; salary data.
+              Enter the admin token to manage stats, stories, and feedback.
             </p>
             <input
               type="password"
@@ -277,7 +345,27 @@ export default function AdminStatsPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* form */}
+            {/* moderation — placement stories first */}
+            <PlacementStoryLogs token={token} companies={companies} />
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <AdminCollection
+                title="Feature requests"
+                endpoint="/api/admin/feature-requests"
+                token={token}
+                fields={FEATURE_FIELDS}
+                summary={featureSummary}
+              />
+              <AdminCollection
+                title="Bug reports"
+                endpoint="/api/admin/bug-reports"
+                token={token}
+                fields={BUG_FIELDS}
+                summary={bugSummary}
+              />
+            </div>
+
+            {/* company stats form */}
             <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
               <h2 className="mb-4 text-sm font-bold text-amber-950">
                 {form.id ? "Update record" : "Add a record"}
@@ -449,7 +537,7 @@ export default function AdminStatsPage() {
               </div>
             </div>
 
-            {/* table */}
+            {/* company stats table */}
             <div className="rounded-2xl border border-white/70 bg-white/80 p-2 shadow-sm backdrop-blur sm:p-3">
               <div className="max-h-[560px] overflow-auto rounded-xl">
                 <table className="w-full border-collapse text-sm">

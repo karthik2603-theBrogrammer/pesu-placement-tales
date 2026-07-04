@@ -62,7 +62,7 @@ export default function PassTheTorchPage() {
             Take over as maintainer
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
-            If you&apos;re from a currently studyingbatch and want to keep Placement Tales alive
+            If you&apos;re from a currently studying batch and want to keep Placement Tales alive
             for everyone, request access below and I&apos;ll help you take over.
           </p>
         </div>
