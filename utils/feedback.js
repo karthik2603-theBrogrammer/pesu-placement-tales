@@ -39,9 +39,10 @@ export const FEEDBACK_TYPES = {
     index: FEEDBACK_INDEXES.feature,
     tableName: "feature_requests",
     listQuery: `
-      SELECT id, title, description, requester_name, status, created_at
+      SELECT id, title, description, requester_name, status, created_at,
+             COALESCE(upvote, 0) AS upvote, COALESCE(downvote, 0) AS downvote
       FROM feature_requests
-      ORDER BY created_at DESC;
+      ORDER BY (COALESCE(upvote, 0) - COALESCE(downvote, 0)) DESC, created_at DESC;
     `,
   },
   bug: {

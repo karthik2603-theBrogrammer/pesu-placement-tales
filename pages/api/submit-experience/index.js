@@ -68,6 +68,10 @@ export default async function handler(req, res) {
     company_id,
     new_company_name,
     new_company_description,
+    internship_fte,
+    internship_only,
+    fte_only,
+    summer_internship,
   } = req.body || {};
 
   if (!trim(job_title)) {
@@ -114,12 +118,14 @@ export default async function handler(req, res) {
       INSERT INTO student_placed (
         first_name, middle_name, last_name, job_title,
         company_placed_id, year_placed, linkedin_url,
-        phone_number, remarks_markdown
+        phone_number, remarks_markdown,
+        internship_fte, internship_only, fte_only, summer_internship
       )
       VALUES (
         ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)}, ${trim(job_title)},
         ${company.id}, ${year}, ${linkedin || ""},
-        ${phone || null}, ${trim(remarks_markdown)}
+        ${phone || null}, ${trim(remarks_markdown)},
+        ${!!internship_fte}, ${!!internship_only}, ${!!fte_only}, ${!!summer_internship}
       )
       RETURNING id;
     `;

@@ -16,6 +16,7 @@ import {
   TextField,
 } from "../components/contribute/fields";
 import { buildExperienceMarkdown } from "../../utils/experienceMarkdown";
+import { PLACEMENT_TYPE_OPTIONS } from "../../utils/placementType";
 
 const MarkdownReviewRenderer = dynamic(
   () => import("../components/MarkdownReviewRenderer"),
@@ -33,6 +34,10 @@ const INITIAL_DATA = {
     linkedin_url: "",
     phone_number: "",
     anonymous: false,
+    internship_fte: false,
+    internship_only: false,
+    fte_only: false,
+    summer_internship: false,
   },
   about: { technical_interests: "", background: "", hobbies: "" },
   opinions: { dsa_view: "", skills_vs_dsa: "", good_cgpa: "" },
@@ -118,9 +123,21 @@ export default function ContributePage() {
     setData((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  const togglePlacementType = useCallback((key) => {
+    setData((prev) => {
+      const flags = PLACEMENT_TYPE_OPTIONS.reduce(
+        (acc, opt) => ({ ...acc, [opt.key]: opt.key === key }),
+        {}
+      );
+      return { ...prev, person: { ...prev.person, ...flags } };
+    });
+  }, []);
+
   const toggleAnonymous = useCallback((yes) => {
     setData((prev) => {
-      const { job_title, year_placed } = prev.person;
+      const { job_title, year_placed, internship_fte, internship_only, fte_only, summer_internship } =
+        prev.person;
+      const placementFlags = { internship_fte, internship_only, fte_only, summer_internship };
       if (yes) {
         return {
           ...prev,
@@ -129,6 +146,7 @@ export default function ContributePage() {
             ...ANONYMOUS_IDENTITY,
             job_title,
             year_placed,
+            ...placementFlags,
           },
         };
       }
@@ -143,6 +161,7 @@ export default function ContributePage() {
           year_placed,
           linkedin_url: "",
           phone_number: "",
+          ...placementFlags,
         },
       };
     });
@@ -187,6 +206,9 @@ export default function ContributePage() {
           if (!p.job_title.trim()) return "Job title is required.";
           const year = parseInt(p.year_placed, 10);
           if (!year || Number.isNaN(year)) return "Enter a valid placement year.";
+          if (!PLACEMENT_TYPE_OPTIONS.some((opt) => p[opt.key])) {
+            return "Select a placement type.";
+          }
           if (!p.anonymous) {
             if (p.linkedin_url.trim() && !LINKEDIN_REGEX.test(p.linkedin_url.trim()))
               return "Enter a valid LinkedIn URL.";
@@ -249,6 +271,33 @@ export default function ContributePage() {
               value={p.year_placed}
               onChange={(v) => setSection("person", { year_placed: v })}
             />
+
+            <div>
+              <p className="mb-2 text-sm font-medium text-slate-700">
+                Placement type
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {PLACEMENT_TYPE_OPTIONS.map((opt) => (
+                  <label
+                    key={opt.key}
+                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
+                      p[opt.key]
+                        ? "border-amber-400 bg-amber-50 text-amber-900"
+                        : "border-amber-100 bg-white/70 text-slate-700 hover:border-amber-200 hover:bg-amber-50/50"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!p[opt.key]}
+                      onChange={() => togglePlacementType(opt.key)}
+                      className="h-4 w-4 shrink-0 accent-amber-500"
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <TextField
               label="LinkedIn URL (optional)"
               placeholder="https://linkedin.com/in/your-handle"
@@ -530,6 +579,10 @@ export default function ContributePage() {
         year_placed: p.year_placed,
         linkedin_url: identity.linkedin_url,
         phone_number: identity.phone_number,
+        internship_fte: !!p.internship_fte,
+        internship_only: !!p.internship_only,
+        fte_only: !!p.fte_only,
+        summer_internship: !!p.summer_internship,
         remarks_markdown: experienceMarkdown,
         company_id:
           data.company.mode === "existing" ? data.company.company_id : undefined,

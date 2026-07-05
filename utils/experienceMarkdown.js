@@ -7,6 +7,8 @@
  * data, and the storage/render format lives in one place.
  */
 
+import { formatPlacementTypes } from "./placementType";
+
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
 
 /** Renders a labelled bullet only when the value is non-empty. */
@@ -130,9 +132,14 @@ function buildRole(jobTitle) {
  */
 export function buildExperienceMarkdown(answers = {}, companyName = "") {
   const jobTitle = trim(answers.person?.job_title);
+  const placementLabel = formatPlacementTypes(answers.person);
+  const rolePart = [jobTitle, placementLabel !== "—" ? placementLabel : ""]
+    .filter(Boolean)
+    .join(" · ");
+
   const title = companyName
-    ? jobTitle
-      ? `# Interview & Offer — ${companyName} · ${jobTitle}`
+    ? rolePart
+      ? `# Interview & Offer — ${companyName} · ${rolePart}`
       : `# Interview & Offer — ${companyName}`
     : "# Interview & Offer Experience";
 

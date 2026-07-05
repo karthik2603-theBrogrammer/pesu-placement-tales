@@ -21,9 +21,10 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       const result = await sql(`
-        SELECT id, title, description, requester_name, status, created_at
+        SELECT id, title, description, requester_name, status, created_at,
+               COALESCE(upvote, 0) AS upvote, COALESCE(downvote, 0) AS downvote
         FROM feature_requests
-        ORDER BY created_at DESC;
+        ORDER BY (COALESCE(upvote, 0) - COALESCE(downvote, 0)) DESC, created_at DESC;
       `);
 
       return res.status(200).json({ result });
@@ -55,7 +56,7 @@ export default async function handler(req, res) {
         `
           INSERT INTO feature_requests (title, description, requester_name)
           VALUES ($1, $2, $3)
-          RETURNING id, title, description, requester_name, status, created_at;
+          RETURNING id, title, description, requester_name, status, created_at, upvote, downvote;
         `,
         [
           normalizeText(title),

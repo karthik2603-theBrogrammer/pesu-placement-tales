@@ -1,4 +1,5 @@
 import Link from "next/link";
+import RecentStories from "./components/home/RecentStories";
 
 const highlights = [
   "Company-specific insights",
@@ -66,6 +67,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <RecentStories />
     </main>
   );
 }

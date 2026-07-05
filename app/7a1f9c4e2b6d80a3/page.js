@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import AdminCollection from "../components/admin/AdminCollection";
+import AdminKpiGrid from "../components/admin/AdminKpiGrid";
 import PlacementStoryLogs from "../components/admin/PlacementStoryLogs";
 
 const STREAM_OPTIONS = ["CSE", "ECE", "EEE", "Mech", "AIML"];
@@ -349,6 +350,8 @@ export default function AdminStatsPage() {
           </div>
         ) : (
           <div className="space-y-6">
+            <AdminKpiGrid token={token} />
+
             {/* moderation — placement stories first */}
             <PlacementStoryLogs token={token} companies={companies} />
 

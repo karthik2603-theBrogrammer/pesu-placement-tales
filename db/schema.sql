@@ -1,6 +1,6 @@
 -- Auto-generated schema snapshot of the public schema.
 -- Source: live database (scripts/dump-schema.mjs).
--- Generated: 2026-07-04T17:34:42.480Z
+-- Generated: 2026-07-05T14:47:09.340Z
 
 CREATE TABLE bug_reports (
   id INTEGER NOT NULL DEFAULT nextval('bug_reports_id_seq'::regclass),
@@ -51,6 +51,8 @@ CREATE TABLE feature_requests (
   requester_name VARCHAR(80),
   status VARCHAR(24) NOT NULL DEFAULT 'open'::character varying,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  upvote INTEGER NOT NULL DEFAULT 0,
+  downvote INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 
@@ -69,6 +71,10 @@ CREATE TABLE student_placed (
   downvote INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   job_title VARCHAR(255) NOT NULL DEFAULT ''::character varying,
+  internship_fte BOOLEAN NOT NULL DEFAULT false,
+  internship_only BOOLEAN NOT NULL DEFAULT false,
+  fte_only BOOLEAN NOT NULL DEFAULT false,
+  summer_internship BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id)
 );
 

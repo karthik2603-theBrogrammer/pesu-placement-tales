@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Spinner } from "@nextui-org/react";
 import { Toaster, toast } from "sonner";
 
+const FEATURE_VOTES_KEY = "pt_feature_votes";
+
 function formatDate(value) {
   if (!value) return "Just now";
 
@@ -23,6 +25,37 @@ function buildInitialForm(fields) {
   );
 }
 
+function VoteButtons({ item, userVote, onVote }) {
+  return (
+    <div className="flex shrink-0 flex-col items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onVote(item.id, "up")}
+        aria-label="Upvote"
+        className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold shadow-sm transition ${
+          userVote === "up"
+            ? "border-amber-300 bg-amber-100 text-amber-800"
+            : "border-amber-200 bg-white text-amber-700 hover:border-amber-300 hover:bg-amber-50"
+        }`}
+      >
+        ▲ <span className="tabular-nums">{item.upvote ?? 0}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onVote(item.id, "down")}
+        aria-label="Downvote"
+        className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold shadow-sm transition ${
+          userVote === "down"
+            ? "border-slate-300 bg-slate-100 text-slate-700"
+            : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+        }`}
+      >
+        ▼ <span className="tabular-nums">{item.downvote ?? 0}</span>
+      </button>
+    </div>
+  );
+}
+
 export default function FeedbackBoard({
   title,
   eyebrow,
@@ -32,16 +65,30 @@ export default function FeedbackBoard({
   emptyMessage,
   fields = [],
   renderMeta,
+  enableVoting = false,
+  voteEndpoint = "/api/vote-feature-request",
+  voteHint,
 }) {
   const initialForm = useMemo(() => buildInitialForm(fields), [fields]);
   const [formData, setFormData] = useState(initialForm);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [userVotes, setUserVotes] = useState({});
 
   const updateField = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  useEffect(() => {
+    if (!enableVoting) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem(FEATURE_VOTES_KEY) || "{}");
+      setUserVotes(stored);
+    } catch {
+      setUserVotes({});
+    }
+  }, [enableVoting]);
 
   const loadItems = async () => {
     try {
@@ -69,6 +116,64 @@ export default function FeedbackBoard({
     loadItems();
   }, [endpoint]);
 
+  const handleVote = async (id, target) => {
+    const prev = userVotes[id];
+    let upDelta = 0;
+    let downDelta = 0;
+    let next = prev;
+
+    if (target === "up") {
+      if (prev === "up") {
+        upDelta = -1;
+        next = undefined;
+      } else if (prev === "down") {
+        upDelta = 1;
+        downDelta = -1;
+        next = "up";
+      } else {
+        upDelta = 1;
+        next = "up";
+      }
+    } else if (prev === "down") {
+      downDelta = -1;
+      next = undefined;
+    } else if (prev === "up") {
+      downDelta = 1;
+      upDelta = -1;
+      next = "down";
+    } else {
+      downDelta = 1;
+      next = "down";
+    }
+
+    try {
+      const response = await fetch(voteEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: id, upDelta, downDelta }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Vote failed.");
+
+      setItems((list) =>
+        list.map((item) =>
+          item.id === id
+            ? { ...item, upvote: data.upvote, downvote: data.downvote }
+            : item
+        )
+      );
+
+      const nextVotes = { ...userVotes };
+      if (next) nextVotes[id] = next;
+      else delete nextVotes[id];
+      setUserVotes(nextVotes);
+      localStorage.setItem(FEATURE_VOTES_KEY, JSON.stringify(nextVotes));
+    } catch (error) {
+      console.error("Feature vote error:", error);
+      toast.error(error.message || "Could not register your vote.");
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -91,7 +196,12 @@ export default function FeedbackBoard({
         return;
       }
 
-      setItems((prev) => [data.result, ...prev]);
+      const created = {
+        ...data.result,
+        upvote: data.result?.upvote ?? 0,
+        downvote: data.result?.downvote ?? 0,
+      };
+      setItems((prev) => [created, ...prev]);
       setFormData(initialForm);
       toast.success("Submitted successfully.");
     } catch (error) {
@@ -121,6 +231,11 @@ export default function FeedbackBoard({
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
             {description}
           </p>
+          {enableVoting && voteHint && (
+            <div className="mt-4 max-w-2xl rounded-xl border border-slate-200/80 bg-slate-50/90 px-4 py-3">
+              <p className="text-sm leading-relaxed text-slate-600">{voteHint}</p>
+            </div>
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
@@ -218,7 +333,9 @@ export default function FeedbackBoard({
                   Previous submissions
                 </h2>
                 <p className="mt-1 text-xs text-slate-500">
-                  Newest first. Updated after every submit.
+                  {enableVoting
+                    ? "Sorted by community votes. Tap ▲ or ▼ to weigh in."
+                    : "Newest first. Updated after every submit."}
                 </p>
               </div>
               <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
@@ -241,25 +358,36 @@ export default function FeedbackBoard({
                     key={item.id}
                     className="rounded-2xl border border-amber-100 bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50/60 hover:shadow-md"
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-bold leading-snug text-slate-950">
-                          {item.title}
-                        </h3>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {formatDate(item.created_at)}
+                    <div className="flex gap-3">
+                      {enableVoting && (
+                        <VoteButtons
+                          item={item}
+                          userVote={userVotes[item.id]}
+                          onVote={handleVote}
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <h3 className="font-bold leading-snug text-slate-950">
+                              {item.title}
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {formatDate(item.created_at)}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
+                            {item.status}
+                          </span>
+                        </div>
+
+                        <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                          {item.description}
                         </p>
+
+                        {renderMeta?.(item)}
                       </div>
-                      <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
-                        {item.status}
-                      </span>
                     </div>
-
-                    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                      {item.description}
-                    </p>
-
-                    {renderMeta?.(item)}
                   </article>
                 ))}
               </div>
