@@ -1,4 +1,5 @@
 "use client";
+import VerdictChip from "../components/VerdictChip";
 // import "@blocknote/core/fonts/inter.css";
 // import { useCreateBlockNote } from "@blocknote/react";
 // import { BlockNoteView } from "@blocknote/mantine";
@@ -314,8 +315,9 @@ export default function Home() {
                       {item.job_title}
                     </p>
                   )}
-                  <div className="mt-2 flex items-center text-xs text-amber-600">
-                    <span>Placed {item.year_placed}</span>
+                  <div className="mt-2 flex items-center gap-2 text-xs text-amber-600">
+                    <span>Interview {item.year_placed}</span>
+                    <VerdictChip verdict={item.verdict} className="!text-[10px]" />
                     <span className="ml-auto flex items-center gap-2 font-medium">
                       <span>▲ {item.upvote ?? 0}</span>
                       <span className="text-slate-400">▼ {item.downvote ?? 0}</span>

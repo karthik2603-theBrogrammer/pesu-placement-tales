@@ -8,6 +8,8 @@
  */
 
 import { formatPlacementTypes } from "./placementType";
+import { formatDegree } from "./degree";
+import { formatRoundOutcome } from "./verdict";
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
 
@@ -32,10 +34,13 @@ function section(heading, body) {
   return `## ${heading}\n\n${text}\n`;
 }
 
-function buildAbout(about = {}) {
+function buildAbout(about = {}, person = {}) {
+  const branch = formatDegree(person.degree);
   const body =
     line(about.technical_interests) +
-    line(about.background) +
+    (branch !== "—" ? bullet("Branch", branch) : "") +
+    bullet("CGPA", about.cgpa) +
+    bullet("Clubs", about.clubs) +
     line(about.hobbies);
   return section("About Me", body);
 }
@@ -70,7 +75,7 @@ function buildRounds(rounds = []) {
         bullet("Description", round.description) +
         bullet("Key questions", round.questions) +
         bullet("Duration", round.duration) +
-        bullet("Outcome", round.outcome);
+        bullet("Outcome", formatRoundOutcome(round.outcome));
 
       const indented = details
         .split("\n")
@@ -145,7 +150,7 @@ export function buildExperienceMarkdown(answers = {}, companyName = "") {
 
   const sections = [
     buildRole(jobTitle),
-    buildAbout(answers.about),
+    buildAbout(answers.about, answers.person),
     buildOpinions(answers.opinions),
     buildSource(answers.source),
     buildRounds(answers.rounds),

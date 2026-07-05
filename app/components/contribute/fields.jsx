@@ -83,6 +83,11 @@ export function ChoiceCards({ options, value, onChange }) {
   );
 }
 
+import { ROUND_OUTCOME_OPTIONS } from "../../../utils/verdict";
+
+const selectClass =
+  "w-full rounded-xl border border-amber-100 bg-white/80 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
+
 const emptyRound = { description: "", questions: "", duration: "", outcome: "" };
 
 export function RoundsEditor({ rounds, onChange }) {
@@ -138,11 +143,23 @@ export function RoundsEditor({ rounds, onChange }) {
                 value={round.duration}
                 onChange={(v) => updateRound(index, "duration", v)}
               />
-              <TextField
-                placeholder="Outcome (e.g. Cleared)"
-                value={round.outcome}
-                onChange={(v) => updateRound(index, "outcome", v)}
-              />
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-slate-600">
+                  Outcome
+                </span>
+                <select
+                  value={round.outcome}
+                  onChange={(e) => updateRound(index, "outcome", e.target.value)}
+                  className={selectClass}
+                >
+                  <option value="">— Select —</option>
+                  {ROUND_OUTCOME_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
           </div>
         </div>

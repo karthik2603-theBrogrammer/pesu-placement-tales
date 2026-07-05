@@ -28,6 +28,8 @@ export default async function handler(req, res) {
         sp.internship_only,
         sp.fte_only,
         sp.summer_internship,
+        sp.verdict,
+        sp.is_anonymous,
         c.company_name
       FROM student_placed sp
       JOIN company c ON sp.company_placed_id = c.id

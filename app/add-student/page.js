@@ -17,6 +17,9 @@ import {
 } from "../components/contribute/fields";
 import { buildExperienceMarkdown } from "../../utils/experienceMarkdown";
 import { PLACEMENT_TYPE_OPTIONS } from "../../utils/placementType";
+import { DEGREE_OPTIONS, DEFAULT_DEGREE } from "../../utils/degree";
+import { VERDICT_OPTIONS } from "../../utils/verdict";
+import VerdictChip from "../components/VerdictChip";
 
 const MarkdownReviewRenderer = dynamic(
   () => import("../components/MarkdownReviewRenderer"),
@@ -34,12 +37,14 @@ const INITIAL_DATA = {
     linkedin_url: "",
     phone_number: "",
     anonymous: false,
+    verdict: "",
+    degree: DEFAULT_DEGREE,
     internship_fte: false,
     internship_only: false,
     fte_only: false,
     summer_internship: false,
   },
-  about: { technical_interests: "", background: "", hobbies: "" },
+  about: { technical_interests: "", cgpa: "", clubs: "", hobbies: "" },
   opinions: { dsa_view: "", skills_vs_dsa: "", good_cgpa: "" },
   source: "",
   rounds: [{ description: "", questions: "", duration: "", outcome: "" }],
@@ -135,7 +140,7 @@ export default function ContributePage() {
 
   const toggleAnonymous = useCallback((yes) => {
     setData((prev) => {
-      const { job_title, year_placed, internship_fte, internship_only, fte_only, summer_internship } =
+      const { job_title, year_placed, verdict, degree, internship_fte, internship_only, fte_only, summer_internship } =
         prev.person;
       const placementFlags = { internship_fte, internship_only, fte_only, summer_internship };
       if (yes) {
@@ -146,6 +151,8 @@ export default function ContributePage() {
             ...ANONYMOUS_IDENTITY,
             job_title,
             year_placed,
+            verdict,
+            degree,
             ...placementFlags,
           },
         };
@@ -159,6 +166,8 @@ export default function ContributePage() {
           last_name: "",
           job_title,
           year_placed,
+          verdict,
+          degree,
           linkedin_url: "",
           phone_number: "",
           ...placementFlags,
@@ -198,14 +207,15 @@ export default function ContributePage() {
         label: "About you",
         title: "A bit about you",
         subtitle:
-          "Only job title and placement year are required. Name and contact details are optional — juniors appreciate them, but it's your call.",
+          "Only job title and year of interview are required. Name and contact details are optional — juniors appreciate them, but it's your call.",
         mascot: p.anonymous
-          ? "No worries — John Doe has your back. Just the role and year!"
+          ? "No worries — John Doe has your back. Just the role and interview year!"
           : "Nice to meet you! Share what you're comfortable with.",
         validate: () => {
           if (!p.job_title.trim()) return "Job title is required.";
           const year = parseInt(p.year_placed, 10);
-          if (!year || Number.isNaN(year)) return "Enter a valid placement year.";
+          if (!year || Number.isNaN(year)) return "Enter a valid interview year.";
+          if (!p.verdict) return "Select a verdict — Selected or Rejected.";
           if (!PLACEMENT_TYPE_OPTIONS.some((opt) => p[opt.key])) {
             return "Select a placement type.";
           }
@@ -264,37 +274,83 @@ export default function ContributePage() {
               value={p.job_title}
               onChange={(v) => setSection("person", { job_title: v })}
             />
-            <TextField
-              label="Year placed"
-              type="number"
-              placeholder="e.g. 2025"
-              value={p.year_placed}
-              onChange={(v) => setSection("person", { year_placed: v })}
-            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <TextField
+                label="Year of interview"
+                type="number"
+                placeholder="e.g. 2025"
+                value={p.year_placed}
+                onChange={(v) => setSection("person", { year_placed: v })}
+              />
+              <div>
+                <p className="mb-2 text-sm font-medium text-slate-700">Verdict</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {VERDICT_OPTIONS.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
+                        p.verdict === opt.value
+                          ? opt.value === "selected"
+                            ? "border-emerald-400 bg-emerald-50 text-emerald-800"
+                            : "border-red-400 bg-red-50 text-red-800"
+                          : "border-amber-100 bg-white/70 text-slate-600 hover:border-amber-200"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="verdict"
+                        checked={p.verdict === opt.value}
+                        onChange={() => setSection("person", { verdict: opt.value })}
+                        className="sr-only"
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <div>
-              <p className="mb-2 text-sm font-medium text-slate-700">
-                Placement type
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {PLACEMENT_TYPE_OPTIONS.map((opt) => (
-                  <label
-                    key={opt.key}
-                    className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
-                      p[opt.key]
-                        ? "border-amber-400 bg-amber-50 text-amber-900"
-                        : "border-amber-100 bg-white/70 text-slate-700 hover:border-amber-200 hover:bg-amber-50/50"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={!!p[opt.key]}
-                      onChange={() => togglePlacementType(opt.key)}
-                      className="h-4 w-4 shrink-0 accent-amber-500"
-                    />
-                    {opt.label}
-                  </label>
-                ))}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="mb-2 text-sm font-medium text-slate-700">
+                  Placement type
+                </p>
+                <div className="grid gap-2">
+                  {PLACEMENT_TYPE_OPTIONS.map((opt) => (
+                    <label
+                      key={opt.key}
+                      className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
+                        p[opt.key]
+                          ? "border-amber-400 bg-amber-50 text-amber-900"
+                          : "border-amber-100 bg-white/70 text-slate-700 hover:border-amber-200 hover:bg-amber-50/50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!!p[opt.key]}
+                        onChange={() => togglePlacementType(opt.key)}
+                        className="h-4 w-4 shrink-0 accent-amber-500"
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Degree
+                </label>
+                <select
+                  value={p.degree}
+                  onChange={(e) => setSection("person", { degree: e.target.value })}
+                  className="w-full rounded-xl border border-amber-100 bg-white/80 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                >
+                  {DEGREE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -329,22 +385,30 @@ export default function ContributePage() {
               <TextArea
                 label="Technical interests"
                 rows={2}
-                placeholder="e.g. Backend, ML, systems…"
+                placeholder="e.g. Full-stack, DevOps, gamedev…"
                 value={data.about.technical_interests}
                 onChange={(v) => setSection("about", { technical_interests: v })}
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
-                  label="Branch / CGPA / Clubs"
-                  value={data.about.background}
-                  onChange={(v) => setSection("about", { background: v })}
+                  label="CGPA"
+                  placeholder="e.g. 8.14"
+                  value={data.about.cgpa}
+                  onChange={(v) => setSection("about", { cgpa: v })}
                 />
                 <TextField
-                  label="Hobbies"
-                  value={data.about.hobbies}
-                  onChange={(v) => setSection("about", { hobbies: v })}
+                  label="Clubs"
+                  placeholder="e.g. GDSC, CodeChef…"
+                  value={data.about.clubs}
+                  onChange={(v) => setSection("about", { clubs: v })}
                 />
               </div>
+              <TextField
+                label="Hobbies (optional)"
+                placeholder="e.g. football, reading…"
+                value={data.about.hobbies}
+                onChange={(v) => setSection("about", { hobbies: v })}
+              />
             </div>
             <div className="grid gap-3">
               <SubHeading>Quick opinions</SubHeading>
@@ -577,12 +641,15 @@ export default function ContributePage() {
         last_name: identity.last_name,
         job_title: p.job_title,
         year_placed: p.year_placed,
+        verdict: p.verdict,
+        degree: p.degree,
         linkedin_url: identity.linkedin_url,
         phone_number: identity.phone_number,
         internship_fte: !!p.internship_fte,
         internship_only: !!p.internship_only,
         fte_only: !!p.fte_only,
         summer_internship: !!p.summer_internship,
+        is_anonymous: !!p.anonymous,
         remarks_markdown: experienceMarkdown,
         company_id:
           data.company.mode === "existing" ? data.company.company_id : undefined,
@@ -689,8 +756,11 @@ export default function ContributePage() {
                           {data.person.first_name} {data.person.last_name}
                         </p>
                         <p className="text-amber-700">
-                          {data.company.company_name} · {data.person.year_placed}
+                          {data.company.company_name} · Interview {data.person.year_placed}
                         </p>
+                        <div className="mt-2">
+                          <VerdictChip verdict={data.person.verdict} />
+                        </div>
                       </div>
                       <div className="max-h-[45vh] overflow-auto rounded-2xl border border-amber-100 bg-white/80 p-4">
                         <MarkdownReviewRenderer remarks_markdown={experienceMarkdown} />

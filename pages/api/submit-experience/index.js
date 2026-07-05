@@ -1,4 +1,6 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../utils/db";
+import { isValidVerdict } from "../../../utils/verdict";
+import { isValidDegree } from "../../../utils/degree";
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
 
@@ -62,6 +64,7 @@ export default async function handler(req, res) {
     last_name,
     job_title,
     year_placed,
+    verdict,
     linkedin_url,
     phone_number,
     remarks_markdown,
@@ -72,6 +75,8 @@ export default async function handler(req, res) {
     internship_only,
     fte_only,
     summer_internship,
+    degree,
+    is_anonymous,
   } = req.body || {};
 
   if (!trim(job_title)) {
@@ -80,7 +85,15 @@ export default async function handler(req, res) {
 
   const year = parseInt(year_placed, 10);
   if (!year || Number.isNaN(year)) {
-    return res.status(400).json({ error: "A valid placement year is required." });
+    return res.status(400).json({ error: "A valid interview year is required." });
+  }
+
+  if (!isValidVerdict(verdict)) {
+    return res.status(400).json({ error: "Verdict must be Selected or Rejected." });
+  }
+
+  if (!isValidDegree(degree)) {
+    return res.status(400).json({ error: "Select a valid degree." });
   }
 
   if (!trim(remarks_markdown)) {
@@ -119,13 +132,15 @@ export default async function handler(req, res) {
         first_name, middle_name, last_name, job_title,
         company_placed_id, year_placed, linkedin_url,
         phone_number, remarks_markdown,
-        internship_fte, internship_only, fte_only, summer_internship
+        internship_fte, internship_only, fte_only, summer_internship,
+        verdict, degree, is_anonymous
       )
       VALUES (
         ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)}, ${trim(job_title)},
         ${company.id}, ${year}, ${linkedin || ""},
         ${phone || null}, ${trim(remarks_markdown)},
-        ${!!internship_fte}, ${!!internship_only}, ${!!fte_only}, ${!!summer_internship}
+        ${!!internship_fte}, ${!!internship_only}, ${!!fte_only}, ${!!summer_internship},
+        ${verdict}, ${degree}, ${!!is_anonymous}
       )
       RETURNING id;
     `;

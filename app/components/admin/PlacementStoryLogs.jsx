@@ -4,6 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
+import VerdictChip from "../VerdictChip";
+import { VERDICT_OPTIONS } from "../../../utils/verdict";
+import {
+  PLACEMENT_TYPE_OPTIONS,
+  activePlacementKey,
+  formatPlacementTypes,
+  placementFlagsFromKey,
+} from "../../../utils/placementType";
+import { DEGREE_OPTIONS, DEFAULT_DEGREE } from "../../../utils/degree";
 
 const MarkdownReviewRenderer = dynamic(
   () => import("../MarkdownReviewRenderer"),
@@ -121,6 +130,9 @@ export default function PlacementStoryLogs({ token, companies }) {
       last_name: item.last_name ?? "",
       job_title: item.job_title ?? "",
       year_placed: item.year_placed ?? "",
+      verdict: item.verdict ?? "selected",
+      placement_type: activePlacementKey(item),
+      degree: item.degree ?? DEFAULT_DEGREE,
       company_placed_id: String(item.company_placed_id ?? ""),
       linkedin_url: item.linkedin_url ?? "",
       phone_number: item.phone_number ?? "",
@@ -136,12 +148,17 @@ export default function PlacementStoryLogs({ token, companies }) {
 
   const save = async (id, e) => {
     e?.stopPropagation();
+    if (!editForm.placement_type) {
+      toast.error("Select a placement type.");
+      return;
+    }
+    const placementFlags = placementFlagsFromKey(editForm.placement_type);
     setSaving(true);
     try {
       const res = await fetch(ENDPOINT, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-admin-token": token },
-        body: JSON.stringify({ id, ...editForm }),
+        body: JSON.stringify({ id, ...editForm, ...placementFlags }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed.");
@@ -221,6 +238,12 @@ export default function PlacementStoryLogs({ token, companies }) {
                   </span>
                   <span className="mx-1.5 text-amber-300">·</span>
                   <span className="text-slate-500">{item.year_placed}</span>
+                  <span className="mx-1.5 text-amber-300">·</span>
+                  <span className="text-xs text-amber-700">
+                    {formatPlacementTypes(item)}
+                  </span>
+                  <span className="mx-1.5 text-amber-300">·</span>
+                  <VerdictChip verdict={item.verdict} className="!text-[10px]" />
                 </span>
                 <span className="shrink-0 text-xs tabular-nums text-slate-400">
                   {fmtAdded(item.created_at)}
@@ -307,7 +330,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                           </label>
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="text-xs font-semibold text-amber-700">
-                              Year placed
+                              Year of interview
                               <input
                                 type="number"
                                 value={editForm.year_placed}
@@ -321,18 +344,18 @@ export default function PlacementStoryLogs({ token, companies }) {
                               />
                             </label>
                             <label className="text-xs font-semibold text-amber-700">
-                              Company
+                              Verdict
                               <select
-                                value={editForm.company_placed_id}
+                                value={editForm.verdict}
                                 onChange={(e) =>
                                   setEditForm((p) => ({
                                     ...p,
-                                    company_placed_id: e.target.value,
+                                    verdict: e.target.value,
                                   }))
                                 }
                                 className={`${input} mt-1`}
                               >
-                                {companyOptions.map((o) => (
+                                {VERDICT_OPTIONS.map((o) => (
                                   <option key={o.value} value={o.value}>
                                     {o.label}
                                   </option>
@@ -340,6 +363,76 @@ export default function PlacementStoryLogs({ token, companies }) {
                               </select>
                             </label>
                           </div>
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                              <p className="mb-2 text-xs font-semibold text-amber-700">
+                                Placement type
+                              </p>
+                              <div className="grid gap-2">
+                                {PLACEMENT_TYPE_OPTIONS.map((opt) => (
+                                  <label
+                                    key={opt.key}
+                                    className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
+                                      editForm.placement_type === opt.key
+                                        ? "border-amber-400 bg-amber-50 text-amber-900"
+                                        : "border-amber-100 bg-white text-slate-700 hover:border-amber-200"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={editForm.placement_type === opt.key}
+                                      onChange={() =>
+                                        setEditForm((p) => ({
+                                          ...p,
+                                          placement_type: opt.key,
+                                        }))
+                                      }
+                                      className="h-3.5 w-3.5 accent-amber-500"
+                                    />
+                                    {opt.label}
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                            <label className="text-xs font-semibold text-amber-700">
+                              Degree
+                              <select
+                                value={editForm.degree}
+                                onChange={(e) =>
+                                  setEditForm((p) => ({
+                                    ...p,
+                                    degree: e.target.value,
+                                  }))
+                                }
+                                className={`${input} mt-1`}
+                              >
+                                {DEGREE_OPTIONS.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          </div>
+                          <label className="text-xs font-semibold text-amber-700">
+                            Company
+                            <select
+                              value={editForm.company_placed_id}
+                              onChange={(e) =>
+                                setEditForm((p) => ({
+                                  ...p,
+                                  company_placed_id: e.target.value,
+                                }))
+                              }
+                              className={`${input} mt-1`}
+                            >
+                              {companyOptions.map((o) => (
+                                <option key={o.value} value={o.value}>
+                                  {o.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="text-xs font-semibold text-amber-700">
                               LinkedIn URL

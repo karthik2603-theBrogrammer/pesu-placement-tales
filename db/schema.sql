@@ -1,6 +1,6 @@
 -- Auto-generated schema snapshot of the public schema.
 -- Source: live database (scripts/dump-schema.mjs).
--- Generated: 2026-07-05T14:47:09.340Z
+-- Generated: 2026-07-05T16:01:13.697Z
 
 CREATE TABLE bug_reports (
   id INTEGER NOT NULL DEFAULT nextval('bug_reports_id_seq'::regclass),
@@ -75,6 +75,9 @@ CREATE TABLE student_placed (
   internship_only BOOLEAN NOT NULL DEFAULT false,
   fte_only BOOLEAN NOT NULL DEFAULT false,
   summer_internship BOOLEAN NOT NULL DEFAULT false,
+  verdict VARCHAR(16) NOT NULL DEFAULT 'selected'::character varying,
+  degree VARCHAR(16) NOT NULL DEFAULT 'CSE'::character varying,
+  is_anonymous BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id)
 );
 
