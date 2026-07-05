@@ -1,5 +1,7 @@
 "use client";
-import VerdictChip from "../components/VerdictChip";
+import { formatPlacementTypes } from "../../utils/placementType";
+import { formatVerdict } from "../../utils/verdict";
+import { displayStoryName } from "../../utils/displayName";
 // import "@blocknote/core/fonts/inter.css";
 // import { useCreateBlockNote } from "@blocknote/react";
 // import { BlockNoteView } from "@blocknote/mantine";
@@ -305,24 +307,40 @@ export default function Home() {
                   key={item.student_id ?? index}
                   type="button"
                   onClick={() => handleSelectStudent(item)}
-                  className="group rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
+                  className="group rounded-xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
                 >
-                  <p className="text-sm font-semibold text-gray-900">
-                    {item.first_name} {item.middle_name} {item.last_name}
-                  </p>
-                  {item.job_title && (
-                    <p className="mt-0.5 text-xs font-medium text-amber-700">
-                      {item.job_title}
-                    </p>
-                  )}
-                  <div className="mt-2 flex items-center gap-2 text-xs text-amber-600">
-                    <span>Interview {item.year_placed}</span>
-                    <VerdictChip verdict={item.verdict} className="!text-[10px]" />
-                    <span className="ml-auto flex items-center gap-2 font-medium">
-                      <span>▲ {item.upvote ?? 0}</span>
-                      <span className="text-slate-400">▼ {item.downvote ?? 0}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-gray-900">
+                        {displayStoryName(item)}
+                      </p>
+                      {item.job_title && (
+                        <p className="truncate text-xs text-amber-700">{item.job_title}</p>
+                      )}
+                    </div>
+                    <span className="shrink-0 tabular-nums text-[10px] leading-tight text-slate-400">
+                      <span className="text-amber-600">▲{item.upvote ?? 0}</span>
+                      {" · "}
+                      <span>▼{item.downvote ?? 0}</span>
                     </span>
                   </div>
+                  <p className="mt-1 truncate text-[11px] leading-tight text-slate-500">
+                    <span className="font-medium text-amber-800">
+                      {formatPlacementTypes(item)}
+                    </span>
+                    <span className="text-amber-300"> · </span>
+                    {item.year_placed}
+                    <span className="text-amber-300"> · </span>
+                    <span
+                      className={
+                        item.verdict === "rejected"
+                          ? "font-medium text-red-600"
+                          : "font-medium text-emerald-600"
+                      }
+                    >
+                      {formatVerdict(item.verdict)}
+                    </span>
+                  </p>
                 </button>
               ))}
             </div>
