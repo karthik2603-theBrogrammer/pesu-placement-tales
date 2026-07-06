@@ -101,6 +101,16 @@ const BUG_FIELDS = [
   { key: "status", label: "Status", type: "select", options: statusOptions },
 ];
 
+const MAINTAINER_FIELDS = [
+  { key: "full_name", label: "Full name", type: "text" },
+  { key: "batch", label: "Batch", type: "text" },
+  { key: "department", label: "Department", type: "text" },
+  { key: "degree", label: "Degree", type: "text" },
+  { key: "email", label: "Email", type: "text" },
+  { key: "linkedin_url", label: "LinkedIn URL", type: "text" },
+  { key: "reason", label: "Reason", type: "textarea", rows: 3 },
+];
+
 const featureSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
@@ -124,6 +134,37 @@ const bugSummary = (item) => (
     <p className="mt-1 text-xs text-slate-400">
       {item.reporter_name || "Anonymous"} · {fmtDate(item.created_at)}
       {item.page_url ? ` · ${item.page_url}` : ""}
+    </p>
+  </>
+);
+
+const maintainerSummary = (item) => (
+  <>
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-semibold text-amber-950">{item.full_name}</span>
+      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
+        Batch {item.batch}
+      </span>
+    </div>
+    <p className="mt-1 text-sm text-slate-600">
+      {item.degree} · {item.department}
+    </p>
+    {item.reason ? (
+      <p className="mt-1 text-sm text-slate-600">{truncate(item.reason)}</p>
+    ) : null}
+    <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+      <a href={`mailto:${item.email}`} className="text-amber-700 hover:underline">
+        {item.email}
+      </a>
+      <a
+        href={item.linkedin_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-amber-700 hover:underline"
+      >
+        LinkedIn
+      </a>
+      <span>{fmtDate(item.created_at)}</span>
     </p>
   </>
 );
@@ -313,7 +354,7 @@ export default function AdminStatsPage() {
               Admin console
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              Company stats, placement stories, feature requests &amp; bug reports
+              Company stats, placement stories, feedback &amp; maintainer requests
             </p>
           </div>
           {unlocked && (
@@ -371,6 +412,14 @@ export default function AdminStatsPage() {
                 summary={bugSummary}
               />
             </div>
+
+            <AdminCollection
+              title="Pass the torch requests"
+              endpoint="/api/admin/maintainer-requests"
+              token={token}
+              fields={MAINTAINER_FIELDS}
+              summary={maintainerSummary}
+            />
 
             {/* company stats form */}
             <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
