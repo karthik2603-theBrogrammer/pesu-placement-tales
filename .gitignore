@@ -1,5 +1,9 @@
 node_modules
 .env
+.env.local
 .next
 .DS_Store
-.env.local
+scripts
+notes
+.npm-cache
+.vscode
