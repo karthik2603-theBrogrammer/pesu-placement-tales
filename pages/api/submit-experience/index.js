@@ -65,6 +65,7 @@ export default async function handler(req, res) {
     last_name,
     job_title,
     year_placed,
+    batch_of,
     verdict,
     linkedin_url,
     phone_number,
@@ -87,6 +88,11 @@ export default async function handler(req, res) {
   const year = parseInt(year_placed, 10);
   if (!year || Number.isNaN(year)) {
     return res.status(400).json({ error: "A valid interview year is required." });
+  }
+
+  const batch = parseInt(batch_of, 10);
+  if (!batch || Number.isNaN(batch)) {
+    return res.status(400).json({ error: "A valid batch year is required." });
   }
 
   if (!isValidVerdict(verdict)) {
@@ -131,14 +137,14 @@ export default async function handler(req, res) {
     const inserted = await sql`
       INSERT INTO student_placed (
         first_name, middle_name, last_name, job_title,
-        company_placed_id, year_placed, linkedin_url,
+        company_placed_id, year_placed, batch_of, linkedin_url,
         phone_number, remarks_markdown,
         internship_fte, internship_only, fte_only, summer_internship,
         verdict, degree, is_anonymous
       )
       VALUES (
         ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)}, ${trim(job_title)},
-        ${company.id}, ${year}, ${linkedin || ""},
+        ${company.id}, ${year}, ${batch}, ${linkedin || ""},
         ${phone || null}, ${trim(remarks_markdown)},
         ${!!internship_fte}, ${!!internship_only}, ${!!fte_only}, ${!!summer_internship},
         ${verdict}, ${degree}, ${!!is_anonymous}
@@ -155,6 +161,7 @@ export default async function handler(req, res) {
         company_name: company.name,
         verdict,
         year_placed: year,
+        batch_of: batch,
         is_anonymous: !!is_anonymous,
         is_new_company: !company_id,
       },

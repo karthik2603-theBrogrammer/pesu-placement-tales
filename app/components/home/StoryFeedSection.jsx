@@ -38,7 +38,7 @@ export default function StoryFeedSection({
                 <th className="px-4 py-3 text-center">▲</th>
                 <th className="px-4 py-3 text-center">▼</th>
                 <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Interview yr</th>
+                <th className="px-4 py-3">Batch</th>
                 <th className="px-4 py-3">Added</th>
               </tr>
             </thead>
@@ -70,7 +70,7 @@ export default function StoryFeedSection({
                     </span>
                   </td>
                   <td className="px-4 py-3 tabular-nums text-slate-600">
-                    {row.year_placed}
+                    {row.batch_of}
                   </td>
                   <td className="px-4 py-3 text-xs text-slate-500">
                     {timeAgo(row.created_at)}
@@ -99,7 +99,7 @@ export default function StoryFeedSection({
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-800">
                   {formatPlacementTypes(row)}
                 </span>
-                <span className="text-slate-500">Interview {row.year_placed}</span>
+                <span className="text-slate-500">Batch {row.batch_of}</span>
                 <span className="text-amber-700">▲ {row.upvote ?? 0}</span>
                 <span className="text-slate-500">▼ {row.downvote ?? 0}</span>
                 <span className="text-slate-400">{timeAgo(row.created_at)}</span>

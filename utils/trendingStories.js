@@ -15,6 +15,7 @@ export async function fetchTrendingStoriesPool(sql) {
       sp.last_name,
       sp.job_title,
       sp.year_placed,
+      sp.batch_of,
       sp.upvote,
       sp.downvote,
       sp.created_at,

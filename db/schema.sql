@@ -63,6 +63,7 @@ CREATE TABLE student_placed (
   last_name VARCHAR(255) NOT NULL,
   company_placed_id BIGINT NOT NULL,
   year_placed BIGINT NOT NULL,
+  batch_of BIGINT NOT NULL DEFAULT 2025,
   linkedin_url VARCHAR(255) NOT NULL,
   phone_number VARCHAR(15),
   remarks_markdown TEXT NOT NULL,

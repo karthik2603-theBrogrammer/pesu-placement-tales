@@ -130,6 +130,7 @@ export default function PlacementStoryLogs({ token, companies }) {
       last_name: item.last_name ?? "",
       job_title: item.job_title ?? "",
       year_placed: item.year_placed ?? "",
+      batch_of: item.batch_of ?? "",
       verdict: item.verdict ?? "selected",
       placement_type: activePlacementKey(item),
       degree: item.degree ?? DEFAULT_DEGREE,
@@ -237,7 +238,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                     {item.company_name}
                   </span>
                   <span className="mx-1.5 text-amber-300">·</span>
-                  <span className="text-slate-500">{item.year_placed}</span>
+                  <span className="text-slate-500">Batch {item.batch_of}</span>
                   <span className="mx-1.5 text-amber-300">·</span>
                   <span className="text-xs text-amber-700">
                     {formatPlacementTypes(item)}
@@ -328,7 +329,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                               className={`${input} mt-1`}
                             />
                           </label>
-                          <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="grid gap-3 sm:grid-cols-3">
                             <label className="text-xs font-semibold text-amber-700">
                               Year of interview
                               <input
@@ -338,6 +339,20 @@ export default function PlacementStoryLogs({ token, companies }) {
                                   setEditForm((p) => ({
                                     ...p,
                                     year_placed: e.target.value,
+                                  }))
+                                }
+                                className={`${input} mt-1`}
+                              />
+                            </label>
+                            <label className="text-xs font-semibold text-amber-700">
+                              Batch
+                              <input
+                                type="number"
+                                value={editForm.batch_of}
+                                onChange={(e) =>
+                                  setEditForm((p) => ({
+                                    ...p,
+                                    batch_of: e.target.value,
                                   }))
                                 }
                                 className={`${input} mt-1`}

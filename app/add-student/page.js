@@ -36,6 +36,7 @@ const INITIAL_DATA = {
     last_name: "",
     job_title: "",
     year_placed: "",
+    batch_of: "",
     linkedin_url: "",
     phone_number: "",
     anonymous: false,
@@ -153,7 +154,7 @@ export default function ContributePage() {
 
   const toggleAnonymous = useCallback((yes) => {
     setData((prev) => {
-      const { job_title, year_placed, verdict, degree, internship_fte, internship_only, fte_only, summer_internship } =
+      const { job_title, year_placed, batch_of, verdict, degree, internship_fte, internship_only, fte_only, summer_internship } =
         prev.person;
       const placementFlags = { internship_fte, internship_only, fte_only, summer_internship };
       if (yes) {
@@ -164,6 +165,7 @@ export default function ContributePage() {
             ...ANONYMOUS_IDENTITY,
             job_title,
             year_placed,
+            batch_of,
             verdict,
             degree,
             ...placementFlags,
@@ -179,6 +181,7 @@ export default function ContributePage() {
           last_name: "",
           job_title,
           year_placed,
+          batch_of,
           verdict,
           degree,
           linkedin_url: "",
@@ -228,6 +231,8 @@ export default function ContributePage() {
           if (!p.job_title.trim()) return "Job title is required.";
           const year = parseInt(p.year_placed, 10);
           if (!year || Number.isNaN(year)) return "Enter a valid interview year.";
+          const batch = parseInt(p.batch_of, 10);
+          if (!batch || Number.isNaN(batch)) return "Enter a valid batch year.";
           if (!p.verdict) return "Select a verdict — Selected or Rejected.";
           if (!PLACEMENT_TYPE_OPTIONS.some((opt) => p[opt.key])) {
             return "Select a placement type.";
@@ -310,7 +315,16 @@ export default function ContributePage() {
                 value={p.year_placed}
                 onChange={(v) => setSection("person", { year_placed: v })}
               />
-              <div>
+              <TextField
+                label="Batch"
+                required
+                type="number"
+                placeholder="e.g. 2026"
+                value={p.batch_of}
+                onChange={(v) => setSection("person", { batch_of: v })}
+              />
+            </div>
+            <div>
                 <FieldLabel required>Verdict</FieldLabel>
                 <div className="grid grid-cols-2 gap-2">
                   {VERDICT_OPTIONS.map((opt) => (
@@ -335,7 +349,6 @@ export default function ContributePage() {
                     </label>
                   ))}
                 </div>
-              </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -749,6 +762,7 @@ export default function ContributePage() {
         last_name: identity.last_name,
         job_title: p.job_title,
         year_placed: p.year_placed,
+        batch_of: p.batch_of,
         verdict: p.verdict,
         degree: p.degree,
         linkedin_url: identity.linkedin_url,
@@ -803,6 +817,7 @@ export default function ContributePage() {
           ? 'summer_internship'
           : 'unknown',
         year_placed: data.person.year_placed,
+        batch_of: data.person.batch_of,
         is_anonymous: !!data.person.anonymous,
       });
       setResult(body);
@@ -890,7 +905,7 @@ export default function ContributePage() {
                           {data.person.first_name} {data.person.last_name}
                         </p>
                         <p className="text-amber-700">
-                          {data.company.company_name} · Interview {data.person.year_placed}
+                          {data.company.company_name} · Batch {data.person.batch_of}
                         </p>
                         <div className="mt-2">
                           <VerdictChip verdict={data.person.verdict} />

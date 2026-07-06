@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       const rows = await sql`
         SELECT
           sp.id, sp.first_name, sp.middle_name, sp.last_name, sp.job_title, sp.year_placed,
-          sp.verdict,
+          sp.batch_of, sp.verdict,
           sp.internship_fte, sp.internship_only, sp.fte_only, sp.summer_internship,
           sp.degree,
           sp.linkedin_url, sp.phone_number, sp.remarks_markdown,
@@ -41,6 +41,7 @@ export default async function handler(req, res) {
         last_name,
         job_title,
         year_placed,
+        batch_of,
         verdict,
         company_placed_id,
         linkedin_url,
@@ -57,6 +58,10 @@ export default async function handler(req, res) {
       const year = parseInt(year_placed, 10);
       if (!year || Number.isNaN(year)) {
         return res.status(400).json({ error: "A valid interview year is required." });
+      }
+      const batch = parseInt(batch_of, 10);
+      if (!batch || Number.isNaN(batch)) {
+        return res.status(400).json({ error: "A valid batch year is required." });
       }
       const companyId = parseInt(company_placed_id, 10);
       if (!companyId) return res.status(400).json({ error: "A company is required." });
@@ -84,6 +89,7 @@ export default async function handler(req, res) {
           last_name = ${trim(last_name)},
           job_title = ${trim(job_title) || ""},
           year_placed = ${year},
+          batch_of = ${batch},
           verdict = ${verdict},
           degree = ${degree},
           internship_fte = ${placementFlags.internship_fte},
@@ -96,7 +102,7 @@ export default async function handler(req, res) {
           remarks_markdown = ${trim(remarks_markdown)}
         WHERE id = ${id}
         RETURNING
-          id, first_name, middle_name, last_name, job_title, year_placed, verdict,
+          id, first_name, middle_name, last_name, job_title, year_placed, batch_of, verdict,
           internship_fte, internship_only, fte_only, summer_internship, degree,
           linkedin_url, phone_number, remarks_markdown,
           upvote, downvote, company_placed_id, created_at;

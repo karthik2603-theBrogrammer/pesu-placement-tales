@@ -473,7 +473,7 @@ export default function Home() {
                       {formatPlacementTypes(item)}
                     </span>
                     <span className="text-amber-300"> · </span>
-                    {item.year_placed}
+                    {item.batch_of}
                     <span className="text-amber-300"> · </span>
                     <span
                       className={

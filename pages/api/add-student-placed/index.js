@@ -11,6 +11,7 @@ export default async function handler(req, res) {
       last_name,
       company_placed_id,
       year_placed,
+      batch_of,
       linkedin_url,
       phone_number,
       remarks_markdown
@@ -22,6 +23,7 @@ export default async function handler(req, res) {
       'last_name',
       'company_placed_id',
       'year_placed',
+      'batch_of',
       'linkedin_url',
       'remarks_markdown'
     ];
@@ -52,12 +54,13 @@ export default async function handler(req, res) {
           last_name,
           company_placed_id,
           year_placed,
+          batch_of,
           linkedin_url,
           phone_number,
           remarks_markdown
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8
+          $1, $2, $3, $4, $5, $6, $7, $8, $9
         )
         RETURNING id;
       `;
@@ -69,6 +72,7 @@ export default async function handler(req, res) {
         last_name,
         company_placed_id,
         year_placed,
+        batch_of ?? 2025,
         linkedin_url,
         phone_number,
         remarks_markdown

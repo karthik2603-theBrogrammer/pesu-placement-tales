@@ -23,6 +23,7 @@ export default async function handler(req, res) {
           sp.last_name,
           sp.job_title,
           sp.year_placed,
+          sp.batch_of,
           sp.verdict,
           sp.internship_fte,
           sp.internship_only,
