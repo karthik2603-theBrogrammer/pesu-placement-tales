@@ -1,6 +1,6 @@
 "use client";
 import posthog from "posthog-js";
-import { formatPlacementTypes } from "../../utils/placementType";
+import { activePlacementKey, formatPlacementTypes } from "../../utils/placementType";
 import { formatVerdict } from "../../utils/verdict";
 import { displayStoryName } from "../../utils/displayName";
 // import "@blocknote/core/fonts/inter.css";
@@ -126,6 +126,11 @@ export default function Home() {
         student_id: id,
         vote_direction: target,
         company_name: selectedCompany?.company_name,
+        company_id: selectedCompany?.id,
+        job_title: selectedStudent?.job_title || '',
+        year_placed: selectedStudent?.year_placed,
+        verdict: selectedStudent?.verdict,
+        placement_type: activePlacementKey(selectedStudent) || 'unknown',
       });
 
       const nextVotes = { ...userVotes };
@@ -245,8 +250,11 @@ export default function Home() {
     posthog.capture('story_opened', {
       student_id: student.student_id,
       company_name: selectedCompany?.company_name,
+      company_id: selectedCompany?.id,
+      job_title: student.job_title || '',
       verdict: student.verdict,
       year_placed: student.year_placed,
+      placement_type: activePlacementKey(student) || 'unknown',
     });
     setIsModalOpen(true);
   };
@@ -517,6 +525,11 @@ export default function Home() {
                         onClick={() => posthog.capture('story_link_shared', {
                           student_id: selectedStudent.student_id,
                           company_name: selectedCompany?.company_name,
+                          company_id: selectedCompany?.id,
+                          job_title: selectedStudent.job_title || '',
+                          year_placed: selectedStudent.year_placed,
+                          verdict: selectedStudent.verdict,
+                          placement_type: activePlacementKey(selectedStudent) || 'unknown',
                         })}
                       >
                         <FaLink size={15} />

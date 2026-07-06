@@ -100,6 +100,17 @@ function encouragement(pct) {
   return "All set — ready to submit!";
 }
 
+function trackContributeStep(event, { key, label, index, total, extra = {} }) {
+  posthog.capture(event, {
+    step_key: key,
+    step_label: label,
+    step_index: index,
+    step_number: index + 1,
+    total_steps: total,
+    ...extra,
+  });
+}
+
 export default function ContributePage() {
   const [companies, setCompanies] = useState([]);
   const [data, setData] = useState(INITIAL_DATA);
@@ -606,6 +617,24 @@ export default function ContributePage() {
   const progress = Math.round((stepIndex / (totalSteps - 1)) * 100);
   const mascotPose = MASCOT_POSES[stepIndex % MASCOT_POSES.length];
 
+  useEffect(() => {
+    if (result) return;
+    posthog.capture("contribute_form_started", { total_steps: totalSteps });
+  }, [result, totalSteps]);
+
+  useEffect(() => {
+    if (result) return;
+    const step = steps[stepIndex];
+    if (!step) return;
+    trackContributeStep("contribute_step_viewed", {
+      key: step.key,
+      label: step.label,
+      index: stepIndex,
+      total: totalSteps,
+      extra: { optional: !!step.optional },
+    });
+  }, [result, stepIndex, steps, totalSteps]);
+
   const goNext = useCallback(() => {
     setDirection(1);
     setStepIndex((i) => Math.min(totalSteps - 1, i + 1));
@@ -620,17 +649,36 @@ export default function ContributePage() {
     if (current.validate) {
       const error = current.validate();
       if (error) {
+        trackContributeStep("contribute_step_validation_failed", {
+          key: current.key,
+          label: current.label,
+          index: stepIndex,
+          total: totalSteps,
+        });
         toast.error(error);
         return;
       }
     }
-    posthog.capture('contribute_step_completed', {
-      step_key: current.key,
-      step_label: current.label,
-      step_index: stepIndex,
+    trackContributeStep("contribute_step_completed", {
+      key: current.key,
+      label: current.label,
+      index: stepIndex,
+      total: totalSteps,
+      extra: { skipped: false },
     });
     goNext();
-  }, [current, goNext, stepIndex]);
+  }, [current, goNext, stepIndex, totalSteps]);
+
+  const handleSkip = useCallback(() => {
+    trackContributeStep("contribute_step_completed", {
+      key: current.key,
+      label: current.label,
+      index: stepIndex,
+      total: totalSteps,
+      extra: { skipped: true },
+    });
+    goNext();
+  }, [current, goNext, stepIndex, totalSteps]);
 
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
@@ -685,6 +733,13 @@ export default function ContributePage() {
       }
 
       toast.success("Thank you! Your experience has been shared.");
+      trackContributeStep("contribute_step_completed", {
+        key: current.key,
+        label: current.label,
+        index: stepIndex,
+        total: totalSteps,
+        extra: { skipped: false },
+      });
       posthog.capture('story_submitted', {
         company_name: data.company.company_name,
         company_mode: data.company.mode,
@@ -708,7 +763,7 @@ export default function ContributePage() {
     } finally {
       setSubmitting(false);
     }
-  }, [data, experienceMarkdown]);
+  }, [current, data, experienceMarkdown, stepIndex, totalSteps]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
@@ -820,7 +875,7 @@ export default function ContributePage() {
                   {current.optional && (
                     <button
                       type="button"
-                      onClick={goNext}
+                      onClick={handleSkip}
                       className="text-sm font-medium text-amber-600 hover:text-amber-800"
                     >
                       Skip
