@@ -8,7 +8,7 @@ import { displayStoryName } from "../../utils/displayName";
 // import "@blocknote/mantine/style.css";
 import dynamic from "next/dynamic";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Spinner, Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import H from "../components/Heading";
@@ -34,7 +34,6 @@ export default function Home() {
   const [studentsPlacedAtCompanySelected, setStudentsPlacedAtCompanySelected] =
     useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false); // Loading state for students
-  const [suggestions, setSuggestions] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const storiesRef = useRef(null);
   const resultsStatusRef = useRef(null);
@@ -130,9 +129,30 @@ export default function Home() {
     }
   };
 
-  const visibleCompanies = searchQuery.trim() ? suggestions : companies;
+  const filterByName = (list, query) =>
+    list.filter((company) =>
+      company.company_name.toLowerCase().includes(query.toLowerCase())
+    );
+
+  const companiesWithStories = useMemo(
+    () => companies.filter((c) => c.story_count > 0),
+    [companies]
+  );
+  const companiesPending = useMemo(
+    () => companies.filter((c) => !c.story_count),
+    [companies]
+  );
+
+  const trimmedSearch = searchQuery.trim();
+  const visibleWithStories = trimmedSearch
+    ? filterByName(companiesWithStories, trimmedSearch)
+    : companiesWithStories;
+  const visiblePending = trimmedSearch
+    ? filterByName(companiesPending, trimmedSearch)
+    : companiesPending;
+
   const companyGridClass =
-    visibleCompanies.length <= 6
+    visibleWithStories.length <= 6
       ? "grid max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 max-h-[430px] overflow-y-auto pr-1";
 
@@ -143,7 +163,7 @@ export default function Home() {
     async function fetchCompanies() {
       try {
         setLoadingCompanies(true);
-        const response = await fetch("/api/get-companies");
+        const response = await fetch("/api/browse-companies");
         const data = await response.json();
         setCompanies(data.result);
         setLoadingCompanies(false);
@@ -161,13 +181,7 @@ export default function Home() {
       setSelectedCompany(null);
       setStudentsPlacedAtCompanySelected([]);
     }
-    if (value.length > 0) {
-      const filtered = companies.filter((company) =>
-        company.company_name.toLowerCase().includes(value.toLowerCase())
-      );
-      setSuggestions(filtered);
-    } else {
-      setSuggestions([]);
+    if (!value.length) {
       setSelectedCompany(null);
       setStudentsPlacedAtCompanySelected([]);
     }
@@ -191,7 +205,6 @@ export default function Home() {
   const handleSelectCompany = async (company) => {
     setSelectedCompany(company);
     setSearchQuery(company.company_name);
-    setSuggestions([company]);
     setStudentsPlacedAtCompanySelected([]);
     const studentsPlacedById = await fetchStudentsPlacedById(company.id);
     if (studentsPlacedById) {
@@ -275,10 +288,16 @@ export default function Home() {
               <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">
-                    Companies
+                    Companies with stories
                   </h2>
                   <p className="text-xs text-gray-500">
-                    {visibleCompanies.length} shown of {companies.length}
+                    {visibleWithStories.length} with stories
+                    {companiesPending.length > 0 && (
+                      <>
+                        {" "}
+                        · {companiesPending.length} awaiting a first tale
+                      </>
+                    )}
                   </p>
                 </div>
                 <Input
@@ -324,28 +343,70 @@ export default function Home() {
                     </p>
                   )}
                 </div>
-              ) : visibleCompanies.length === 0 ? (
+              ) : visibleWithStories.length === 0 &&
+                visiblePending.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 p-8 text-center text-sm text-gray-500">
                   No companies found.
                 </div>
               ) : (
-                <div className={companyGridClass}>
-                  {visibleCompanies.map((company) => (
-                    <button
-                      key={company.id}
-                      type="button"
-                      onClick={() => handleSelectCompany(company)}
-                      className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
-                    >
-                      <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
-                        {company.company_name}
+                <>
+                  {visibleWithStories.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
+                      {trimmedSearch
+                        ? "No companies with stories match your search."
+                        : "No stories have been shared yet."}
+                    </div>
+                  ) : (
+                    <div className={companyGridClass}>
+                      {visibleWithStories.map((company) => (
+                        <button
+                          key={company.id}
+                          type="button"
+                          onClick={() => handleSelectCompany(company)}
+                          className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
+                        >
+                          <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
+                            {company.company_name}
+                          </p>
+                          <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
+                            {company.story_count}{" "}
+                            {company.story_count === 1 ? "story" : "stories"}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {visiblePending.length > 0 && (
+                    <div className="mt-6 border-t border-dashed border-amber-100/80 pt-5">
+                      <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                        In our directory — no stories yet
                       </p>
-                      <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
-                        View stories
+                      <div className="flex flex-wrap gap-2">
+                        {visiblePending.map((company) => (
+                          <button
+                            key={company.id}
+                            type="button"
+                            onClick={() => handleSelectCompany(company)}
+                            className="rounded-full border border-dashed border-slate-200/90 bg-slate-50/60 px-3 py-1.5 text-xs text-slate-500 transition hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-100"
+                          >
+                            {company.company_name}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="mt-3 text-[11px] text-slate-400">
+                        These companies are listed — stories may appear here
+                        later.{" "}
+                        <Link
+                          href="/add-student"
+                          className="text-amber-600/80 underline-offset-2 hover:text-amber-700 hover:underline"
+                        >
+                          Share yours
+                        </Link>
                       </p>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -401,22 +462,23 @@ export default function Home() {
             </div>
           )}
 
-          {/* Story reader — full-screen on mobile, sits above navbar */}
+          {/* Story reader — full-screen on mobile; inset card below navbar on desktop */}
           {isModalOpen && selectedStudent && (
             <div
-              className="fixed inset-0 z-[100] flex flex-col"
+              className="fixed inset-0 z-[100] flex flex-col md:inset-x-0 md:bottom-0 md:top-16 md:z-30 md:p-5"
               role="dialog"
               aria-modal="true"
               aria-labelledby="story-modal-title"
             >
               <button
                 type="button"
-                className="absolute inset-0 bg-slate-900/55"
+                className="absolute inset-0 bg-slate-900/55 md:bg-slate-900/40"
                 onClick={closeModal}
                 aria-label="Close story"
               />
-              <div className="relative z-10 mx-auto flex h-[100dvh] w-full max-w-3xl flex-col bg-white shadow-2xl sm:my-3 sm:h-[calc(100dvh-1.5rem)] sm:max-h-[900px] sm:rounded-2xl sm:border sm:border-amber-100">
-                <div className="flex shrink-0 items-start justify-between gap-3 border-b border-amber-100 px-4 py-3 sm:px-5 sm:py-4">
+              {/* Panel width: change max-w-5xl (e.g. max-w-4xl, max-w-6xl, max-w-7xl) */}
+              <div className="relative z-10 mx-auto flex h-[100dvh] w-full max-w-7xl flex-col bg-white shadow-2xl md:h-full md:max-h-full md:rounded-2xl md:border md:border-amber-100">
+                <div className="flex shrink-0 items-start justify-between gap-1 border-b border-amber-100 bg-white px-1 py-3 sm:px-5 sm:py-4 rounded-2xl">
                   <div className="min-w-0 flex-1">
                     <h3
                       id="story-modal-title"
@@ -461,13 +523,13 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4 md:pb-6">
                   <MarkdownReviewRenderer
                     remarks_markdown={selectedStudent.remarks_markdown}
                   />
                 </div>
 
-                <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-amber-100 px-4 py-3 sm:px-5">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-amber-100 bg-white px-4 py-3 sm:px-5">
                   <div className="mr-auto flex flex-wrap items-center gap-2">
                     <span className="text-xs font-medium text-gray-500">
                       Was this helpful?

@@ -40,7 +40,7 @@
   width: 100%;
 }
 
-/* Placement story markdown — mobile-friendly BlockNote typography */
+/* Placement story markdown — BlockNote typography */
 .story-markdown .bn-editor {
   padding-inline: 0 !important;
 }
@@ -49,22 +49,32 @@
   margin-left: 0 !important;
 }
 
+/* Mobile headings — compact but readable; desktop scales up in media query below */
 .story-markdown h1,
-.story-markdown [data-level="1"] {
+.story-markdown .bn-block-content[data-content-type="heading"][data-level="1"],
+.story-markdown .bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > .bn-block-content[data-content-type="heading"][data-level="1"] {
   font-size: 1.3125rem !important;
   line-height: 1.35 !important;
   font-weight: 700 !important;
 }
 
 .story-markdown h2,
-.story-markdown [data-level="2"] {
+.story-markdown .bn-block-content[data-content-type="heading"][data-level="2"],
+.story-markdown .bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > .bn-block-content[data-content-type="heading"][data-level="2"] {
   font-size: 1.125rem !important;
   line-height: 1.4 !important;
   font-weight: 600 !important;
 }
 
 .story-markdown h3,
-.story-markdown [data-level="3"] {
+.story-markdown .bn-block-content[data-content-type="heading"][data-level="3"],
+.story-markdown .bn-block-outer:not([data-prev-type])
+  > .bn-block
+  > .bn-block-content[data-content-type="heading"][data-level="3"] {
   font-size: 1rem !important;
   line-height: 1.4 !important;
   font-weight: 600 !important;
@@ -76,20 +86,41 @@
   line-height: 1.65 !important;
 }
 
-@media (min-width: 640px) {
+.story-markdown .bn-block-content[data-content-type="heading"] .bn-inline-content {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  font-weight: inherit !important;
+}
+
+@media (min-width: 768px) {
   .story-markdown h1,
-  .story-markdown [data-level="1"] {
-    font-size: 1.625rem !important;
+  .story-markdown .bn-block-content[data-content-type="heading"][data-level="1"],
+  .story-markdown .bn-block-outer:not([data-prev-type])
+    > .bn-block
+    > .bn-block-content[data-content-type="heading"][data-level="1"] {
+    font-size: 1.875rem !important;
+    line-height: 1.25 !important;
+    font-weight: 700 !important;
   }
 
   .story-markdown h2,
-  .story-markdown [data-level="2"] {
-    font-size: 1.25rem !important;
+  .story-markdown .bn-block-content[data-content-type="heading"][data-level="2"],
+  .story-markdown .bn-block-outer:not([data-prev-type])
+    > .bn-block
+    > .bn-block-content[data-content-type="heading"][data-level="2"] {
+    font-size: 1.375rem !important;
+    line-height: 1.35 !important;
+    font-weight: 600 !important;
   }
 
   .story-markdown h3,
-  .story-markdown [data-level="3"] {
-    font-size: 1.0625rem !important;
+  .story-markdown .bn-block-content[data-content-type="heading"][data-level="3"],
+  .story-markdown .bn-block-outer:not([data-prev-type])
+    > .bn-block
+    > .bn-block-content[data-content-type="heading"][data-level="3"] {
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
   }
 
   .story-markdown p,
