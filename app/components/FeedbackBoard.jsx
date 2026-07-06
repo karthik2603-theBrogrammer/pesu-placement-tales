@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Spinner } from "@nextui-org/react";
 import { Toaster, toast } from "sonner";
+import posthog from "posthog-js";
 
 const FEATURE_VOTES_KEY = "pt_feature_votes";
 
@@ -163,6 +164,12 @@ export default function FeedbackBoard({
         )
       );
 
+      posthog.capture('feedback_voted', {
+        item_id: id,
+        vote_direction: target,
+        endpoint,
+      });
+
       const nextVotes = { ...userVotes };
       if (next) nextVotes[id] = next;
       else delete nextVotes[id];
@@ -204,6 +211,12 @@ export default function FeedbackBoard({
       setItems((prev) => [created, ...prev]);
       setFormData(initialForm);
       toast.success("Submitted successfully.");
+
+      const isBugReport = endpoint.includes('bug-report');
+      posthog.capture(isBugReport ? 'bug_report_submitted' : 'feature_request_submitted', {
+        endpoint,
+        title: formData.title,
+      });
     } catch (error) {
       console.error(`Failed to submit ${endpoint}:`, error);
       toast.error("Could not submit.");

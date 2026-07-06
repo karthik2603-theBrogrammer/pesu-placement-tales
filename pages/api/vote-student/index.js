@@ -1,4 +1,5 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../utils/db";
+import { captureServerEvent } from "../../../lib/posthog-server";
 
 const VALID_DELTAS = new Set([-1, 0, 1]);
 
@@ -42,6 +43,16 @@ export default async function handler(req, res) {
     if (result.length === 0) {
       return res.status(404).json({ error: "Experience not found." });
     }
+
+    await captureServerEvent({
+      distinctId: req.headers['x-posthog-distinct-id'] || 'anon-voter',
+      event: 'server_story_voted',
+      properties: {
+        student_id: id,
+        up_delta: upDelta,
+        down_delta: downDelta,
+      },
+    });
 
     return res.status(200).json({
       upvote: result[0].upvote,

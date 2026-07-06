@@ -1,4 +1,5 @@
 "use client";
+import posthog from "posthog-js";
 import { formatPlacementTypes } from "../../utils/placementType";
 import { formatVerdict } from "../../utils/verdict";
 import { displayStoryName } from "../../utils/displayName";
@@ -101,7 +102,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/vote-student", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-posthog-distinct-id": posthog.get_distinct_id() ?? "",
+        },
         body: JSON.stringify({ studentId: id, upDelta, downDelta }),
       });
       const data = await response.json();
@@ -117,6 +121,12 @@ export default function Home() {
             : it
         )
       );
+
+      posthog.capture('story_voted', {
+        student_id: id,
+        vote_direction: target,
+        company_name: selectedCompany?.company_name,
+      });
 
       const nextVotes = { ...userVotes };
       if (next) nextVotes[id] = next;
@@ -206,6 +216,10 @@ export default function Home() {
     setSelectedCompany(company);
     setSearchQuery(company.company_name);
     setStudentsPlacedAtCompanySelected([]);
+    posthog.capture('company_selected', {
+      company_name: company.company_name,
+      story_count: company.story_count,
+    });
     const studentsPlacedById = await fetchStudentsPlacedById(company.id);
     if (studentsPlacedById) {
       setStudentsPlacedAtCompanySelected(studentsPlacedById);
@@ -228,6 +242,12 @@ export default function Home() {
     //   student.remarks_markdown
     // );
     // editor.replaceBlocks(editor.document, blocks); // Replace blocks in the editor
+    posthog.capture('story_opened', {
+      student_id: student.student_id,
+      company_name: selectedCompany?.company_name,
+      verdict: student.verdict,
+      year_placed: student.year_placed,
+    });
     setIsModalOpen(true);
   };
 
@@ -494,6 +514,10 @@ export default function Home() {
                       <Link
                         href={`/share?q=${selectedStudent.student_id}&token=${generateRandomToken()}`}
                         className="rounded-lg p-1.5 text-amber-600 hover:bg-amber-50"
+                        onClick={() => posthog.capture('story_link_shared', {
+                          student_id: selectedStudent.student_id,
+                          company_name: selectedCompany?.company_name,
+                        })}
                       >
                         <FaLink size={15} />
                       </Link>

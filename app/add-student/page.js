@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import posthog from "posthog-js";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -623,8 +624,13 @@ export default function ContributePage() {
         return;
       }
     }
+    posthog.capture('contribute_step_completed', {
+      step_key: current.key,
+      step_label: current.label,
+      step_index: stepIndex,
+    });
     goNext();
-  }, [current, goNext]);
+  }, [current, goNext, stepIndex]);
 
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
@@ -666,7 +672,10 @@ export default function ContributePage() {
 
       const response = await fetch("/api/submit-experience", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-posthog-distinct-id": posthog.get_distinct_id() ?? "",
+        },
         body: JSON.stringify(payload),
       });
       const body = await response.json();
@@ -676,6 +685,22 @@ export default function ContributePage() {
       }
 
       toast.success("Thank you! Your experience has been shared.");
+      posthog.capture('story_submitted', {
+        company_name: data.company.company_name,
+        company_mode: data.company.mode,
+        verdict: data.person.verdict,
+        placement_type: data.person.internship_fte
+          ? 'internship_fte'
+          : data.person.internship_only
+          ? 'internship_only'
+          : data.person.fte_only
+          ? 'fte_only'
+          : data.person.summer_internship
+          ? 'summer_internship'
+          : 'unknown',
+        year_placed: data.person.year_placed,
+        is_anonymous: !!data.person.anonymous,
+      });
       setResult(body);
     } catch (error) {
       console.error("Error submitting experience:", error);

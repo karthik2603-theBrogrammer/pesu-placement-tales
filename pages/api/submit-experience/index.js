@@ -1,6 +1,7 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../utils/db";
 import { isValidVerdict } from "../../../utils/verdict";
 import { isValidDegree } from "../../../utils/degree";
+import { captureServerEvent } from "../../../lib/posthog-server";
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
 
@@ -144,6 +145,20 @@ export default async function handler(req, res) {
       )
       RETURNING id;
     `;
+
+    await captureServerEvent({
+      distinctId: req.headers['x-posthog-distinct-id'] || `anon-${inserted[0].id}`,
+      event: 'server_story_submitted',
+      properties: {
+        student_id: inserted[0].id,
+        company_id: company.id,
+        company_name: company.name,
+        verdict,
+        year_placed: year,
+        is_anonymous: !!is_anonymous,
+        is_new_company: !company_id,
+      },
+    });
 
     return res.status(201).json({
       studentId: inserted[0].id,

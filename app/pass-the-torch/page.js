@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { motion } from "framer-motion";
 import { Toaster, toast } from "sonner";
 import { TextArea, TextField } from "../components/contribute/fields";
@@ -36,6 +37,17 @@ export default function PassTheTorchPage() {
       if (!response.ok) throw new Error(body.error || "Submission failed.");
 
       toast.success("Request sent! We'll be in touch.");
+      if (form.email) {
+        posthog.identify(form.email, {
+          name: form.full_name || undefined,
+          batch: form.batch || undefined,
+          degree: form.degree || undefined,
+        });
+      }
+      posthog.capture('maintainer_access_requested', {
+        batch: form.batch,
+        degree: form.degree,
+      });
       setDone(true);
     } catch (error) {
       console.error("Maintainer request error:", error);
