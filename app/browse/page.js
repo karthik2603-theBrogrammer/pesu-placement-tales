@@ -8,7 +8,7 @@ import { displayStoryName } from "../../utils/displayName";
 // import "@blocknote/mantine/style.css";
 import dynamic from "next/dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Spinner, Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import H from "../components/Heading";
@@ -35,12 +35,24 @@ export default function Home() {
     useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false); // Loading state for students
   const [suggestions, setSuggestions] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const storiesRef = useRef(null);
+  const resultsStatusRef = useRef(null);
   const [selectedStudent, setSelectedStudent] = useState(null); // Store selected student
   const [isModalOpen, setIsModalOpen] = useState(false); // Handle modal visibility
   const [userVotes, setUserVotes] = useState({}); // studentId -> 'up' | 'down' (from localStorage)
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isModalOpen]);
 
   // Load the viewer's previous votes so they can't vote the same post repeatedly.
   useEffect(() => {
@@ -145,6 +157,10 @@ export default function Home() {
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
+    if (selectedCompany && value !== selectedCompany.company_name) {
+      setSelectedCompany(null);
+      setStudentsPlacedAtCompanySelected([]);
+    }
     if (value.length > 0) {
       const filtered = companies.filter((company) =>
         company.company_name.toLowerCase().includes(value.toLowerCase())
@@ -152,6 +168,8 @@ export default function Home() {
       setSuggestions(filtered);
     } else {
       setSuggestions([]);
+      setSelectedCompany(null);
+      setStudentsPlacedAtCompanySelected([]);
     }
   };
 
@@ -171,13 +189,24 @@ export default function Home() {
   }
 
   const handleSelectCompany = async (company) => {
+    setSelectedCompany(company);
     setSearchQuery(company.company_name);
+    setSuggestions([company]);
+    setStudentsPlacedAtCompanySelected([]);
     const studentsPlacedById = await fetchStudentsPlacedById(company.id);
     if (studentsPlacedById) {
       setStudentsPlacedAtCompanySelected(studentsPlacedById);
     }
-    setSuggestions([]);
   };
+
+  useEffect(() => {
+    if (!selectedCompany || loadingStudents) return;
+    const target =
+      studentsPlacedAtCompanySelected.length > 0
+        ? storiesRef.current
+        : resultsStatusRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [selectedCompany, loadingStudents, studentsPlacedAtCompanySelected.length]);
 
   const handleSelectStudent = async (student) => {
     setSelectedStudent(student); // Set selected student data
@@ -264,7 +293,38 @@ export default function Home() {
                 />
               </div>
 
-              {visibleCompanies.length === 0 ? (
+              {selectedCompany ? (
+                <div
+                  ref={resultsStatusRef}
+                  className="scroll-mt-24 rounded-2xl border border-amber-200 bg-amber-50/70 px-6 py-8 text-center"
+                >
+                  {loadingStudents ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <Spinner color="warning" size="sm" />
+                      <p className="text-sm text-amber-800">
+                        Finding results for{" "}
+                        <span className="font-semibold text-amber-950">
+                          {selectedCompany.company_name}
+                        </span>
+                      </p>
+                    </div>
+                  ) : studentsPlacedAtCompanySelected.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No stories yet for{" "}
+                      <span className="font-semibold text-amber-950">
+                        {selectedCompany.company_name}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="text-sm text-amber-800">
+                      Found {studentsPlacedAtCompanySelected.length} for{" "}
+                      <span className="font-semibold text-amber-950">
+                        {selectedCompany.company_name}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              ) : visibleCompanies.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 p-8 text-center text-sm text-gray-500">
                   No companies found.
                 </div>
@@ -290,18 +350,13 @@ export default function Home() {
             </div>
           )}
 
-          {/* Display spinner while students are being fetched */}
-          {loadingStudents && (
-            <div className="my-6 flex items-center justify-center rounded-2xl border border-amber-100 bg-white/70 p-5 shadow-sm">
-              <Spinner color="warning" labelColor="warning" className="text-xs">
-                Loading students...
-              </Spinner>
-            </div>
-          )}
-
-          {/* Display students once they are fetched */}
-          {studentsPlacedAtCompanySelected.length > 0 && !loadingStudents && (
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {selectedCompany &&
+            !loadingStudents &&
+            studentsPlacedAtCompanySelected.length > 0 && (
+            <div
+              ref={storiesRef}
+              className="mt-4 grid grid-cols-1 gap-3 scroll-mt-24 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {studentsPlacedAtCompanySelected.map((item, index) => (
                 <button
                   key={item.student_id ?? index}
@@ -346,44 +401,49 @@ export default function Home() {
             </div>
           )}
 
-          {/* Modal for displaying student remarks */}
-          {selectedStudent && (
+          {/* Story reader — full-screen on mobile, sits above navbar */}
+          {isModalOpen && selectedStudent && (
             <div
-              tabIndex="-1"
-              className={`fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto h-[calc(100%-1rem)] max-h-full ${
-                isModalOpen
-                  ? "backdrop-blur-md backdrop-filter block"
-                  : "hidden"
-              }`}
+              className="fixed inset-0 z-[100] flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="story-modal-title"
             >
-              <div className="relative w-full max-w-7xl max-h-full">
-                {/* Modal content */}
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                  {/* Modal header */}
-                  <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <div className="flex flex-row items-center justify-center gap-2">
-                      <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                        {selectedStudent?.job_title
-                          ? `${selectedStudent.first_name} ${selectedStudent.last_name} · ${selectedStudent.job_title}`
-                          : `${selectedStudent?.first_name} ${selectedStudent?.last_name}'s Experience`}
-                      </h3>
-                      {selectedStudent?.student_id && (
-                        <Link
-                          href={`/share?q=${
-                            selectedStudent?.student_id
-                          }&token=${generateRandomToken()}`}
-                        >
-                          <FaLink size={15} color="#d97706" />
-                        </Link>
-                      )}
-                    </div>
-                    <Button
+              <button
+                type="button"
+                className="absolute inset-0 bg-slate-900/55"
+                onClick={closeModal}
+                aria-label="Close story"
+              />
+              <div className="relative z-10 mx-auto flex h-[100dvh] w-full max-w-3xl flex-col bg-white shadow-2xl sm:my-3 sm:h-[calc(100dvh-1.5rem)] sm:max-h-[900px] sm:rounded-2xl sm:border sm:border-amber-100">
+                <div className="flex shrink-0 items-start justify-between gap-3 border-b border-amber-100 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="min-w-0 flex-1">
+                    <h3
+                      id="story-modal-title"
+                      className="text-base font-semibold leading-snug text-gray-900 sm:text-lg"
+                    >
+                      {selectedStudent.job_title
+                        ? `${displayStoryName(selectedStudent)} · ${selectedStudent.job_title}`
+                        : `${displayStoryName(selectedStudent)}'s experience`}
+                    </h3>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {selectedStudent.student_id && (
+                      <Link
+                        href={`/share?q=${selectedStudent.student_id}&token=${generateRandomToken()}`}
+                        className="rounded-lg p-1.5 text-amber-600 hover:bg-amber-50"
+                      >
+                        <FaLink size={15} />
+                      </Link>
+                    )}
+                    <button
                       type="button"
-                      className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                       onClick={closeModal}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900"
+                      aria-label="Close"
                     >
                       <svg
-                        className="w-3 h-3"
+                        className="h-3.5 w-3.5"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -397,63 +457,55 @@ export default function Home() {
                           d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                         />
                       </svg>
-                      <span className="sr-only">Close modal</span>
-                    </Button>
+                    </button>
                   </div>
+                </div>
 
-                  {/* Modal body */}
-                  <div className="p-4 md:p-5 space-y-4 overflow-y-scroll max-h-[600px]">
-                    {/* <BlockNoteView
-                      editor={editor}
-                      editable={false}
-                      theme="light"
-                    /> */}
-                    <MarkdownReviewRenderer
-                      remarks_markdown={selectedStudent?.remarks_markdown}
-                    />
-                  </div>
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
+                  <MarkdownReviewRenderer
+                    remarks_markdown={selectedStudent.remarks_markdown}
+                  />
+                </div>
 
-                  {/* Modal footer */}
-                  <div className="flex flex-row items-center justify-end gap-3 p-4">
-                    <div className="mr-auto flex items-center gap-2">
-                      <span className="mr-1 text-xs font-medium text-gray-500">
-                        Was this helpful?
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleVote("up")}
-                        className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
-                          userVotes[selectedStudent?.student_id] === "up"
-                            ? "border-amber-400 bg-amber-100 text-amber-800"
-                            : "border-amber-200 bg-white text-amber-700 hover:bg-amber-50"
-                        }`}
-                      >
-                        <span>▲</span>
-                        <span>{selectedStudent?.upvote ?? 0}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleVote("down")}
-                        className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
-                          userVotes[selectedStudent?.student_id] === "down"
-                            ? "border-slate-400 bg-slate-100 text-slate-700"
-                            : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
-                        }`}
-                      >
-                        <span>▼</span>
-                        <span>{selectedStudent?.downvote ?? 0}</span>
-                      </button>
-                    </div>
-                    <Button
-                      color="warning"
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-amber-100 px-4 py-3 sm:px-5">
+                  <div className="mr-auto flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-medium text-gray-500">
+                      Was this helpful?
+                    </span>
+                    <button
                       type="button"
-                      onClick={closeModal}
-                      className="text-white"
-                      variant="shadow"
+                      onClick={() => handleVote("up")}
+                      className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
+                        userVotes[selectedStudent.student_id] === "up"
+                          ? "border-amber-400 bg-amber-100 text-amber-800"
+                          : "border-amber-200 bg-white text-amber-700 hover:bg-amber-50"
+                      }`}
                     >
-                      Close
-                    </Button>
+                      <span>▲</span>
+                      <span>{selectedStudent.upvote ?? 0}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleVote("down")}
+                      className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-semibold transition ${
+                        userVotes[selectedStudent.student_id] === "down"
+                          ? "border-slate-400 bg-slate-100 text-slate-700"
+                          : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span>▼</span>
+                      <span>{selectedStudent.downvote ?? 0}</span>
+                    </button>
                   </div>
+                  <Button
+                    color="warning"
+                    type="button"
+                    onClick={closeModal}
+                    className="text-white"
+                    variant="shadow"
+                  >
+                    Close
+                  </Button>
                 </div>
               </div>
             </div>

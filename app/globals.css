@@ -39,3 +39,61 @@
   resize: none;
   width: 100%;
 }
+
+/* Placement story markdown — mobile-friendly BlockNote typography */
+.story-markdown .bn-editor {
+  padding-inline: 0 !important;
+}
+
+.story-markdown .bn-block-outer {
+  margin-left: 0 !important;
+}
+
+.story-markdown h1,
+.story-markdown [data-level="1"] {
+  font-size: 1.3125rem !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
+}
+
+.story-markdown h2,
+.story-markdown [data-level="2"] {
+  font-size: 1.125rem !important;
+  line-height: 1.4 !important;
+  font-weight: 600 !important;
+}
+
+.story-markdown h3,
+.story-markdown [data-level="3"] {
+  font-size: 1rem !important;
+  line-height: 1.4 !important;
+  font-weight: 600 !important;
+}
+
+.story-markdown p,
+.story-markdown .bn-inline-content {
+  font-size: 0.9375rem !important;
+  line-height: 1.65 !important;
+}
+
+@media (min-width: 640px) {
+  .story-markdown h1,
+  .story-markdown [data-level="1"] {
+    font-size: 1.625rem !important;
+  }
+
+  .story-markdown h2,
+  .story-markdown [data-level="2"] {
+    font-size: 1.25rem !important;
+  }
+
+  .story-markdown h3,
+  .story-markdown [data-level="3"] {
+    font-size: 1.0625rem !important;
+  }
+
+  .story-markdown p,
+  .story-markdown .bn-inline-content {
+    font-size: 1rem !important;
+  }
+}

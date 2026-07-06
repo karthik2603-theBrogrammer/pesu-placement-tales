@@ -38,14 +38,14 @@ const MarkdownReviewRenderer = ({ remarks_markdown, theme }) => {
 
   if (fallback) {
     return (
-      <div className="whitespace-pre-wrap text-sm leading-6 text-slate-700">
+      <div className="story-markdown whitespace-pre-wrap text-sm leading-6 text-slate-700 sm:text-base">
         {fallback}
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="story-markdown min-w-0 overflow-x-hidden">
       <BlockNoteView
         editor={editor}
         editable={false}

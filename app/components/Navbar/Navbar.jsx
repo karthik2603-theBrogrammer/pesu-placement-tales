@@ -36,6 +36,8 @@ export default function App() {
   const links = isHome ? SECONDARY_LINKS : [BROWSE_LINK, ...SECONDARY_LINKS];
   const showCta = !isHome;
 
+  const useGlass = scrolled || !isHome;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -47,9 +49,9 @@ export default function App() {
     <Navbar
       maxWidth="xl"
       isBlurred={false}
-      className={`transition-all duration-300 ${
-        scrolled
-          ? "border-b border-amber-100/70 bg-white/50 shadow-sm backdrop-blur-xl backdrop-saturate-150"
+      className={`sticky top-0 z-40 transition-all duration-300 ${
+        useGlass
+          ? "border-b border-amber-100/70 bg-white/60 shadow-sm backdrop-blur-xl backdrop-saturate-150"
           : "border-b border-transparent bg-transparent"
       }`}
       classNames={{ wrapper: "px-4 sm:px-6" }}
