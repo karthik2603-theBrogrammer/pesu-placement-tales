@@ -11,11 +11,12 @@ import ProgressRing from "../components/contribute/ProgressRing";
 import {
   ChoiceCards,
   CompanyPicker,
+  FieldLabel,
   RoundsEditor,
   TextArea,
   TextField,
 } from "../components/contribute/fields";
-import { buildExperienceMarkdown } from "../../utils/experienceMarkdown";
+import { buildExperienceMarkdown, hasValidInterviewRound } from "../../utils/experienceMarkdown";
 import { PLACEMENT_TYPE_OPTIONS } from "../../utils/placementType";
 import { DEGREE_OPTIONS, DEFAULT_DEGREE } from "../../utils/degree";
 import { VERDICT_OPTIONS } from "../../utils/verdict";
@@ -207,7 +208,7 @@ export default function ContributePage() {
         label: "About you",
         title: "A bit about you",
         subtitle:
-          "Only job title and year of interview are required. Name and contact details are optional — juniors appreciate them, but it's your call.",
+          "Required fields are marked with *. Everything else is optional.",
         mascot: p.anonymous
           ? "No worries — John Doe has your back. Just the role and interview year!"
           : "Nice to meet you! Share what you're comfortable with.",
@@ -243,26 +244,27 @@ export default function ContributePage() {
             </label>
 
             <p className="text-xs text-slate-500">
-              Fields marked <span className="font-medium text-amber-700">optional</span> can
-              be skipped. Juniors can reach out easier when you share contact details.
+              <span className="text-red-500">*</span> Required · share contact
+              details if you&apos;re comfortable — juniors appreciate being able
+              to reach out.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-3">
               <TextField
-                label="First name (optional)"
+                label="First name"
                 autoFocus={!p.anonymous}
                 disabled={p.anonymous}
                 value={p.first_name}
                 onChange={(v) => setSection("person", { first_name: v })}
               />
               <TextField
-                label="Middle name (optional)"
+                label="Middle name"
                 disabled={p.anonymous}
                 value={p.middle_name}
                 onChange={(v) => setSection("person", { middle_name: v })}
               />
               <TextField
-                label="Last name (optional)"
+                label="Last name"
                 disabled={p.anonymous}
                 value={p.last_name}
                 onChange={(v) => setSection("person", { last_name: v })}
@@ -270,6 +272,7 @@ export default function ContributePage() {
             </div>
             <TextField
               label="Job title"
+              required
               placeholder="e.g. Software Engineer, SDE, Business Analyst"
               value={p.job_title}
               onChange={(v) => setSection("person", { job_title: v })}
@@ -277,13 +280,14 @@ export default function ContributePage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <TextField
                 label="Year of interview"
+                required
                 type="number"
                 placeholder="e.g. 2025"
                 value={p.year_placed}
                 onChange={(v) => setSection("person", { year_placed: v })}
               />
               <div>
-                <p className="mb-2 text-sm font-medium text-slate-700">Verdict</p>
+                <FieldLabel required>Verdict</FieldLabel>
                 <div className="grid grid-cols-2 gap-2">
                   {VERDICT_OPTIONS.map((opt) => (
                     <label
@@ -312,9 +316,7 @@ export default function ContributePage() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="mb-2 text-sm font-medium text-slate-700">
-                  Placement type
-                </p>
+                <FieldLabel required>Placement type</FieldLabel>
                 <div className="grid gap-2">
                   {PLACEMENT_TYPE_OPTIONS.map((opt) => (
                     <label
@@ -337,9 +339,9 @@ export default function ContributePage() {
                 </div>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">
+                <FieldLabel required className="mb-2">
                   Degree
-                </label>
+                </FieldLabel>
                 <select
                   value={p.degree}
                   onChange={(e) => setSection("person", { degree: e.target.value })}
@@ -355,14 +357,14 @@ export default function ContributePage() {
             </div>
 
             <TextField
-              label="LinkedIn URL (optional)"
+              label="LinkedIn URL"
               placeholder="https://linkedin.com/in/your-handle"
               disabled={p.anonymous}
               value={p.linkedin_url}
               onChange={(v) => setSection("person", { linkedin_url: v })}
             />
             <TextField
-              label="Phone number (optional)"
+              label="Phone number"
               placeholder="10-15 digits"
               disabled={p.anonymous}
               value={p.phone_number}
@@ -381,7 +383,7 @@ export default function ContributePage() {
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
-              <SubHeading>About you</SubHeading>
+              <SubHeading optional>About you</SubHeading>
               <TextArea
                 label="Technical interests"
                 rows={2}
@@ -404,14 +406,14 @@ export default function ContributePage() {
                 />
               </div>
               <TextField
-                label="Hobbies (optional)"
+                label="Hobbies"
                 placeholder="e.g. football, reading…"
                 value={data.about.hobbies}
                 onChange={(v) => setSection("about", { hobbies: v })}
               />
             </div>
             <div className="grid gap-3">
-              <SubHeading>Quick opinions</SubHeading>
+              <SubHeading optional>Quick opinions</SubHeading>
               <TextArea
                 label="DSA & CP — how necessary for placements?"
                 rows={2}
@@ -437,13 +439,16 @@ export default function ContributePage() {
         key: "interview",
         label: "Interview",
         title: "The interview journey",
-        subtitle: "How it came to you, and each round you faced.",
+        subtitle: "Add at least one interview round — everything else on this step is optional.",
         mascot: "Break it down round by round — the specifics help juniors most.",
-        optional: true,
+        validate: () =>
+          hasValidInterviewRound(data.rounds)
+            ? null
+            : "Add at least one interview round (description, questions, duration, or outcome).",
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
-              <SubHeading>How did this opportunity come to you?</SubHeading>
+              <FieldLabel>How did this opportunity come to you?</FieldLabel>
               <ChoiceCards
                 options={["On campus", "Off campus"]}
                 value={data.source}
@@ -451,7 +456,7 @@ export default function ContributePage() {
               />
             </div>
             <div className="grid gap-3">
-              <SubHeading>Interview rounds</SubHeading>
+              <FieldLabel required>Interview rounds</FieldLabel>
               <RoundsEditor
                 rounds={data.rounds}
                 onChange={(v) => setValue("rounds", v)}
@@ -470,7 +475,7 @@ export default function ContributePage() {
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
-              <SubHeading>Compensation</SubHeading>
+              <SubHeading optional>Compensation</SubHeading>
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Internship stipend"
@@ -505,7 +510,7 @@ export default function ContributePage() {
               </div>
             </div>
             <div className="grid gap-3">
-              <SubHeading>Key dates</SubHeading>
+              <SubHeading optional>Key dates</SubHeading>
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Company arrival"
@@ -542,7 +547,7 @@ export default function ContributePage() {
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
-              <SubHeading>Helpful resources</SubHeading>
+              <SubHeading optional>Helpful resources</SubHeading>
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Books"
@@ -572,7 +577,7 @@ export default function ContributePage() {
               />
             </div>
             <div className="grid gap-3">
-              <SubHeading>Tips for the next batch</SubHeading>
+              <SubHeading optional>Tips for the next batch</SubHeading>
               <TextArea
                 label="Free advice"
                 rows={4}
@@ -825,10 +830,16 @@ export default function ContributePage() {
   );
 }
 
-function SubHeading({ children }) {
+function SubHeading({ children, optional = false }) {
   return (
     <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
       {children}
+      {optional ? (
+        <span className="font-normal normal-case tracking-normal text-slate-400">
+          {" "}
+          (optional)
+        </span>
+      ) : null}
     </p>
   );
 }

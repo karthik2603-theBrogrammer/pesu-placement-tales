@@ -5,6 +5,22 @@ import { useMemo, useState } from "react";
 const baseInput =
   "w-full rounded-2xl border border-amber-200 bg-white/80 px-4 py-3 text-base text-amber-950 shadow-sm outline-none transition placeholder:text-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-300/60";
 
+export function FieldLabel({ children, required = false, className = "mb-2" }) {
+  return (
+    <span className={`block text-sm font-semibold text-amber-800 ${className}`}>
+      {children}
+      {required ? (
+        <span className="text-red-500" aria-hidden>
+          {" "}
+          *
+        </span>
+      ) : (
+        <span className="font-normal text-slate-400"> (optional)</span>
+      )}
+    </span>
+  );
+}
+
 export function TextField({
   label,
   hint,
@@ -15,12 +31,11 @@ export function TextField({
   type = "text",
   autoFocus = false,
   disabled = false,
+  required = false,
 }) {
   return (
     <label className="block">
-      {label && (
-        <span className="mb-2 block text-sm font-semibold text-amber-800">{label}</span>
-      )}
+      {label && <FieldLabel required={required}>{label}</FieldLabel>}
       <input
         type={type}
         value={value ?? ""}
@@ -41,12 +56,18 @@ export function TextField({
   );
 }
 
-export function TextArea({ label, hint, value, onChange, placeholder, rows = 4 }) {
+export function TextArea({
+  label,
+  hint,
+  value,
+  onChange,
+  placeholder,
+  rows = 4,
+  required = false,
+}) {
   return (
     <label className="block">
-      {label && (
-        <span className="mb-2 block text-sm font-semibold text-amber-800">{label}</span>
-      )}
+      {label && <FieldLabel required={required}>{label}</FieldLabel>}
       <textarea
         rows={rows}
         value={value ?? ""}
@@ -114,6 +135,14 @@ export function RoundsEditor({ rounds, onChange }) {
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-bold text-amber-800">
               Round {index + 1}
+              {index === 0 ? (
+                <span className="text-red-500" aria-hidden>
+                  {" "}
+                  *
+                </span>
+              ) : (
+                <span className="font-normal text-slate-400"> (optional)</span>
+              )}
             </span>
             {list.length > 1 && (
               <button
@@ -144,9 +173,7 @@ export function RoundsEditor({ rounds, onChange }) {
                 onChange={(v) => updateRound(index, "duration", v)}
               />
               <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-slate-600">
-                  Outcome
-                </span>
+                <FieldLabel className="mb-1.5">Outcome</FieldLabel>
                 <select
                   value={round.outcome}
                   onChange={(e) => updateRound(index, "outcome", e.target.value)}
@@ -214,6 +241,8 @@ export function CompanyPicker({ companies, value, onChange }) {
   return (
     <div className="space-y-4">
       <TextField
+        label="Company"
+        required
         placeholder="Search a company or type a new one…"
         value={query}
         onChange={setQuery}
@@ -262,7 +291,7 @@ export function CompanyPicker({ companies, value, onChange }) {
         <TextArea
           label="Short company description"
           rows={2}
-          placeholder="One line about the company (optional)"
+          placeholder="One line about the company"
           value={value.new_company_description}
           onChange={(v) =>
             onChange({ ...value, new_company_description: v })

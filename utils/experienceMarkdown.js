@@ -59,13 +59,7 @@ function buildSource(source) {
 }
 
 function buildRounds(rounds = []) {
-  const validRounds = rounds.filter(
-    (round) =>
-      trim(round?.description) ||
-      trim(round?.questions) ||
-      trim(round?.duration) ||
-      trim(round?.outcome)
-  );
+  const validRounds = rounds.filter(isValidRound);
 
   if (validRounds.length === 0) return "";
 
@@ -88,6 +82,21 @@ function buildRounds(rounds = []) {
     .join("\n");
 
   return section("Interview Experience", body);
+}
+
+/** True when a round has any user-provided detail. */
+export function isValidRound(round = {}) {
+  return (
+    trim(round.description) ||
+    trim(round.questions) ||
+    trim(round.duration) ||
+    trim(round.outcome)
+  );
+}
+
+/** Form requires at least one filled interview round. */
+export function hasValidInterviewRound(rounds = []) {
+  return rounds.some(isValidRound);
 }
 
 function buildCompensation(comp = {}) {
