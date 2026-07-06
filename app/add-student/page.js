@@ -17,7 +17,7 @@ import {
   TextArea,
   TextField,
 } from "../components/contribute/fields";
-import { buildExperienceMarkdown, hasValidInterviewRound } from "../../utils/experienceMarkdown";
+import { buildExperienceMarkdown, validateInterviewStep } from "../../utils/experienceMarkdown";
 import { PLACEMENT_TYPE_OPTIONS } from "../../utils/placementType";
 import { DEGREE_OPTIONS, DEFAULT_DEGREE } from "../../utils/degree";
 import { VERDICT_OPTIONS } from "../../utils/verdict";
@@ -233,6 +233,8 @@ export default function ContributePage() {
             return "Select a placement type.";
           }
           if (!p.anonymous) {
+            if (!p.first_name.trim()) return "First name is required.";
+            if (!p.last_name.trim()) return "Last name is required.";
             if (p.linkedin_url.trim() && !LINKEDIN_REGEX.test(p.linkedin_url.trim()))
               return "Enter a valid LinkedIn URL.";
             if (p.phone_number.trim() && !PHONE_REGEX.test(p.phone_number.trim()))
@@ -255,15 +257,22 @@ export default function ContributePage() {
               </span>
             </label>
 
-            <p className="text-xs text-slate-500">
-              <span className="text-red-500">*</span> Required · share contact
-              details if you&apos;re comfortable — juniors appreciate being able
-              to reach out.
-            </p>
+            <div className="space-y-2 rounded-xl border border-amber-100/80 bg-amber-50/30 px-4 py-3">
+              <p className="text-xs text-slate-600">
+                <span className="text-red-500">*</span>{" "}
+                <span className="font-semibold text-amber-900">Required</span>
+              </p>
+              <p className="text-xs leading-relaxed text-slate-500">
+                Share contact details if you&apos;re comfortable — juniors appreciate
+                being able to reach out.
+              </p>
+            </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
               <TextField
                 label="First name"
+                required={!p.anonymous}
+                showOptional={false}
                 autoFocus={!p.anonymous}
                 disabled={p.anonymous}
                 value={p.first_name}
@@ -271,12 +280,15 @@ export default function ContributePage() {
               />
               <TextField
                 label="Middle name"
+                showOptional={false}
                 disabled={p.anonymous}
                 value={p.middle_name}
                 onChange={(v) => setSection("person", { middle_name: v })}
               />
               <TextField
                 label="Last name"
+                required={!p.anonymous}
+                showOptional={false}
                 disabled={p.anonymous}
                 value={p.last_name}
                 onChange={(v) => setSection("person", { last_name: v })}
@@ -389,9 +401,15 @@ export default function ContributePage() {
         key: "story",
         label: "Your story",
         title: "Your story so far",
-        subtitle: "A quick intro and your honest takes. Skip anything you like.",
+        subtitle: p.anonymous
+          ? "CGPA is required when anonymous — everything else here is optional."
+          : "A quick intro and your honest takes. Skip anything you like.",
         mascot: "Honest opinions here are gold for juniors — but feel free to skip.",
-        optional: true,
+        optional: !p.anonymous,
+        validate: () =>
+          p.anonymous && !data.about.cgpa.trim()
+            ? "CGPA is required when staying anonymous."
+            : null,
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
@@ -399,6 +417,7 @@ export default function ContributePage() {
               <TextArea
                 label="Technical interests"
                 rows={2}
+                showOptional={false}
                 placeholder="e.g. Full-stack, DevOps, gamedev…"
                 value={data.about.technical_interests}
                 onChange={(v) => setSection("about", { technical_interests: v })}
@@ -406,12 +425,15 @@ export default function ContributePage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="CGPA"
+                  required={p.anonymous}
+                  showOptional={!p.anonymous}
                   placeholder="e.g. 8.14"
                   value={data.about.cgpa}
                   onChange={(v) => setSection("about", { cgpa: v })}
                 />
                 <TextField
                   label="Clubs"
+                  showOptional={false}
                   placeholder="e.g. GDSC, CodeChef…"
                   value={data.about.clubs}
                   onChange={(v) => setSection("about", { clubs: v })}
@@ -419,6 +441,7 @@ export default function ContributePage() {
               </div>
               <TextField
                 label="Hobbies"
+                showOptional={false}
                 placeholder="e.g. football, reading…"
                 value={data.about.hobbies}
                 onChange={(v) => setSection("about", { hobbies: v })}
@@ -429,17 +452,20 @@ export default function ContributePage() {
               <TextArea
                 label="DSA & CP — how necessary for placements?"
                 rows={2}
+                showOptional={false}
                 value={data.opinions.dsa_view}
                 onChange={(v) => setSection("opinions", { dsa_view: v })}
               />
               <TextArea
                 label="Skills/projects vs DSA?"
                 rows={2}
+                showOptional={false}
                 value={data.opinions.skills_vs_dsa}
                 onChange={(v) => setSection("opinions", { skills_vs_dsa: v })}
               />
               <TextField
                 label="What is a good CGPA?"
+                showOptional={false}
                 value={data.opinions.good_cgpa}
                 onChange={(v) => setSection("opinions", { good_cgpa: v })}
               />
@@ -451,16 +477,14 @@ export default function ContributePage() {
         key: "interview",
         label: "Interview",
         title: "The interview journey",
-        subtitle: "Add at least one interview round — everything else on this step is optional.",
+        subtitle:
+          "Select placement source and complete Round 1 in full — extra rounds are optional.",
         mascot: "Break it down round by round — the specifics help juniors most.",
-        validate: () =>
-          hasValidInterviewRound(data.rounds)
-            ? null
-            : "Add at least one interview round (description, questions, duration, or outcome).",
+        validate: () => validateInterviewStep({ source: data.source, rounds: data.rounds }),
         render: () => (
           <div className="grid gap-5">
             <div className="grid gap-3">
-              <FieldLabel>How did this opportunity come to you?</FieldLabel>
+              <FieldLabel required>How did this opportunity come to you?</FieldLabel>
               <ChoiceCards
                 options={["On campus", "Off campus"]}
                 value={data.source}
@@ -469,6 +493,9 @@ export default function ContributePage() {
             </div>
             <div className="grid gap-3">
               <FieldLabel required>Interview rounds</FieldLabel>
+              <p className="text-xs leading-relaxed text-slate-500">
+                Please be as detailed as you can — just the way you would like to read it.
+              </p>
               <RoundsEditor
                 rounds={data.rounds}
                 onChange={(v) => setValue("rounds", v)}
@@ -491,31 +518,37 @@ export default function ContributePage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Internship stipend"
+                  showOptional={false}
                   value={data.compensation.internship_stipend}
                   onChange={(v) => setSection("compensation", { internship_stipend: v })}
                 />
                 <TextField
                   label="Base salary"
+                  showOptional={false}
                   value={data.compensation.base_salary}
                   onChange={(v) => setSection("compensation", { base_salary: v })}
                 />
                 <TextField
                   label="Total CTC"
+                  showOptional={false}
                   value={data.compensation.total_ctc}
                   onChange={(v) => setSection("compensation", { total_ctc: v })}
                 />
                 <TextField
                   label="Stocks"
+                  showOptional={false}
                   value={data.compensation.stocks}
                   onChange={(v) => setSection("compensation", { stocks: v })}
                 />
                 <TextField
                   label="Bonuses"
+                  showOptional={false}
                   value={data.compensation.bonuses}
                   onChange={(v) => setSection("compensation", { bonuses: v })}
                 />
                 <TextField
                   label="Other benefits"
+                  showOptional={false}
                   value={data.compensation.other_benefits}
                   onChange={(v) => setSection("compensation", { other_benefits: v })}
                 />
@@ -526,21 +559,25 @@ export default function ContributePage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Company arrival"
+                  showOptional={false}
                   value={data.dates.arrival}
                   onChange={(v) => setSection("dates", { arrival: v })}
                 />
                 <TextField
                   label="Online test"
+                  showOptional={false}
                   value={data.dates.online_test}
                   onChange={(v) => setSection("dates", { online_test: v })}
                 />
                 <TextField
                   label="Interview"
+                  showOptional={false}
                   value={data.dates.interview}
                   onChange={(v) => setSection("dates", { interview: v })}
                 />
                 <TextField
                   label="Placement"
+                  showOptional={false}
                   value={data.dates.placement}
                   onChange={(v) => setSection("dates", { placement: v })}
                 />
@@ -563,36 +600,48 @@ export default function ContributePage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <TextField
                   label="Books"
+                  showOptional={false}
                   value={data.resources.books}
                   onChange={(v) => setSection("resources", { books: v })}
                 />
                 <TextField
                   label="Websites"
+                  showOptional={false}
                   value={data.resources.websites}
                   onChange={(v) => setSection("resources", { websites: v })}
                 />
                 <TextField
                   label="Courses"
+                  showOptional={false}
                   value={data.resources.courses}
                   onChange={(v) => setSection("resources", { courses: v })}
                 />
                 <TextField
                   label="Practice platforms"
+                  showOptional={false}
                   value={data.resources.platforms}
                   onChange={(v) => setSection("resources", { platforms: v })}
                 />
               </div>
               <TextField
                 label="Others"
+                showOptional={false}
                 value={data.resources.others}
                 onChange={(v) => setSection("resources", { others: v })}
               />
             </div>
             <div className="grid gap-3">
-              <SubHeading optional>Tips for the next batch</SubHeading>
+              <div className="space-y-1.5">
+                <SubHeading optional>Tips for the next batch</SubHeading>
+                <p className="text-xs leading-relaxed text-slate-500">
+                  This is what helps students — so please be open. Talk about what
+                  you wished you had known beforehand.
+                </p>
+              </div>
               <TextArea
                 label="Free advice"
                 rows={4}
+                showOptional={false}
                 placeholder="Write anything that could help the next batch…"
                 value={data.tips}
                 onChange={(v) => setValue("tips", v)}

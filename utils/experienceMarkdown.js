@@ -94,9 +94,25 @@ export function isValidRound(round = {}) {
   );
 }
 
-/** Form requires at least one filled interview round. */
-export function hasValidInterviewRound(rounds = []) {
-  return rounds.some(isValidRound);
+/** Round 1 must have every field filled. */
+export function isRoundComplete(round = {}) {
+  return (
+    trim(round.description) &&
+    trim(round.questions) &&
+    trim(round.duration) &&
+    trim(round.outcome)
+  );
+}
+
+/** Interview step: placement source + a complete first round. */
+export function validateInterviewStep({ source = "", rounds = [] } = {}) {
+  if (!trim(source)) {
+    return "Select how this opportunity came to you.";
+  }
+  if (!isRoundComplete(rounds[0])) {
+    return "Round 1 needs description, questions, duration, and outcome.";
+  }
+  return null;
 }
 
 function buildCompensation(comp = {}) {

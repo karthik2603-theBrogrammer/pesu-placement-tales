@@ -5,7 +5,12 @@ import { useMemo, useState } from "react";
 const baseInput =
   "w-full rounded-2xl border border-amber-200 bg-white/80 px-4 py-3 text-base text-amber-950 shadow-sm outline-none transition placeholder:text-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-300/60";
 
-export function FieldLabel({ children, required = false, className = "mb-2" }) {
+export function FieldLabel({
+  children,
+  required = false,
+  showOptional = true,
+  className = "mb-2",
+}) {
   return (
     <span className={`block text-sm font-semibold text-amber-800 ${className}`}>
       {children}
@@ -14,9 +19,9 @@ export function FieldLabel({ children, required = false, className = "mb-2" }) {
           {" "}
           *
         </span>
-      ) : (
+      ) : showOptional ? (
         <span className="font-normal text-slate-400"> (optional)</span>
-      )}
+      ) : null}
     </span>
   );
 }
@@ -32,10 +37,15 @@ export function TextField({
   autoFocus = false,
   disabled = false,
   required = false,
+  showOptional = true,
 }) {
   return (
     <label className="block">
-      {label && <FieldLabel required={required}>{label}</FieldLabel>}
+      {label && (
+        <FieldLabel required={required} showOptional={showOptional}>
+          {label}
+        </FieldLabel>
+      )}
       <input
         type={type}
         value={value ?? ""}
@@ -64,10 +74,15 @@ export function TextArea({
   placeholder,
   rows = 4,
   required = false,
+  showOptional = true,
 }) {
   return (
     <label className="block">
-      {label && <FieldLabel required={required}>{label}</FieldLabel>}
+      {label && (
+        <FieldLabel required={required} showOptional={showOptional}>
+          {label}
+        </FieldLabel>
+      )}
       <textarea
         rows={rows}
         value={value ?? ""}
@@ -156,24 +171,35 @@ export function RoundsEditor({ rounds, onChange }) {
           </div>
           <div className="grid gap-3">
             <TextField
-              placeholder="Round type / description (e.g. Online Assessment)"
+              label="Round type / description"
+              required={index === 0}
+              showOptional={false}
+              placeholder="e.g. Online Assessment"
               value={round.description}
               onChange={(v) => updateRound(index, "description", v)}
             />
             <TextArea
+              label="Key questions asked"
               rows={2}
-              placeholder="Key questions asked"
+              required={index === 0}
+              showOptional={false}
+              placeholder="What they asked — be specific"
               value={round.questions}
               onChange={(v) => updateRound(index, "questions", v)}
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <TextField
-                placeholder="Duration (e.g. 45 min)"
+                label="Duration"
+                required={index === 0}
+                showOptional={false}
+                placeholder="e.g. 45 min"
                 value={round.duration}
                 onChange={(v) => updateRound(index, "duration", v)}
               />
               <label className="block">
-                <FieldLabel className="mb-1.5">Outcome</FieldLabel>
+                <FieldLabel required={index === 0} showOptional={false} className="mb-1.5">
+                  Outcome
+                </FieldLabel>
                 <select
                   value={round.outcome}
                   onChange={(e) => updateRound(index, "outcome", e.target.value)}
