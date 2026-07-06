@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TrendingStories from "./components/home/TrendingStories";
 import RecentStories from "./components/home/RecentStories";
 
 const highlights = [
@@ -68,6 +69,7 @@ export default function Home() {
         </div>
       </section>
 
+      <TrendingStories />
       <RecentStories />
     </main>
   );
