@@ -1,6 +1,7 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../utils/db";
+import { getTrendingStories } from "../../../utils/trendingStories";
 
-/** Top placement stories by total votes (up + down) for the home page. */
+/** Top placement stories for the home page (PostHog browse sort when available). */
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
@@ -13,31 +14,10 @@ export default async function handler(req, res) {
 
   try {
     const sql = getDb();
-    const result = await sql`
-      SELECT
-        sp.id,
-        sp.first_name,
-        sp.middle_name,
-        sp.last_name,
-        sp.job_title,
-        sp.year_placed,
-        sp.upvote,
-        sp.downvote,
-        sp.created_at,
-        sp.internship_fte,
-        sp.internship_only,
-        sp.fte_only,
-        sp.summer_internship,
-        sp.verdict,
-        sp.is_anonymous,
-        c.company_name
-      FROM student_placed sp
-      JOIN company c ON sp.company_placed_id = c.id
-      ORDER BY (COALESCE(sp.upvote, 0) + COALESCE(sp.downvote, 0)) DESC, sp.id DESC
-      LIMIT 10;
-    `;
+    const { result, sortBy } = await getTrendingStories(sql);
 
-    return res.status(200).json({ result });
+    res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
+    return res.status(200).json({ result, sortBy });
   } catch (error) {
     console.error("Trending stories error:", error);
     return res.status(500).json({ error: "Internal server error." });

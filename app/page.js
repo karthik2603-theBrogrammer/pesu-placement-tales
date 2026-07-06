@@ -1,6 +1,11 @@
 import Link from "next/link";
 import TrendingStories from "./components/home/TrendingStories";
 import RecentStories from "./components/home/RecentStories";
+import { getDb, isDbConfigured } from "../utils/db";
+import { getTrendingStories } from "../utils/trendingStories";
+import { fetchRecentStories } from "../utils/recentStories";
+
+export const revalidate = 300;
 
 const highlights = [
   "Company-specific insights",
@@ -8,7 +13,33 @@ const highlights = [
   "Salary & hiring stats",
 ];
 
-export default function Home() {
+async function loadHomeFeeds() {
+  if (!isDbConfigured()) {
+    return {
+      trending: { result: [], sortBy: "votes" },
+      recent: [],
+    };
+  }
+
+  try {
+    const sql = getDb();
+    const [trending, recent] = await Promise.all([
+      getTrendingStories(sql),
+      fetchRecentStories(sql),
+    ]);
+    return { trending, recent };
+  } catch (error) {
+    console.error("Home feed load error:", error);
+    return {
+      trending: { result: [], sortBy: "votes" },
+      recent: [],
+    };
+  }
+}
+
+export default async function Home() {
+  const { trending, recent } = await loadHomeFeeds();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-16 text-slate-950 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
@@ -48,12 +79,6 @@ export default function Home() {
           >
             Browse
           </Link>
-          {/* <Link
-            href="/stats"
-            className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
-          >
-            View stats
-          </Link> */}
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
@@ -69,8 +94,8 @@ export default function Home() {
         </div>
       </section>
 
-      <TrendingStories />
-      <RecentStories />
+      <TrendingStories stories={trending.result} sortBy={trending.sortBy} />
+      <RecentStories stories={recent} />
     </main>
   );
 }
