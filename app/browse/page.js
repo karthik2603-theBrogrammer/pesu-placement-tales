@@ -412,14 +412,12 @@ export default function Home() {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {visiblePending.map((company) => (
-                          <button
+                          <span
                             key={company.id}
-                            type="button"
-                            onClick={() => handleSelectCompany(company)}
-                            className="rounded-full border border-dashed border-slate-200/90 bg-slate-50/60 px-3 py-1.5 text-xs text-slate-500 transition hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-100"
+                            className="cursor-default rounded-full border border-dashed border-slate-200/90 bg-slate-50/60 px-3 py-1.5 text-xs text-slate-500 transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-800"
                           >
                             {company.company_name}
-                          </button>
+                          </span>
                         ))}
                       </div>
                       <p className="mt-3 text-[11px] text-slate-400">
