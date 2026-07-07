@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import VerdictChip from "../VerdictChip";
 import { displayStoryName } from "../../../utils/displayName";
 import { formatPlacementTypes } from "../../../utils/placementType";
 import { timeAgo } from "../../../utils/timeAgo";
+import { storyBrowsePath } from "../../../utils/browseRoutes";
+
+function storyHref(row) {
+  if (!row?.company_id || !row?.id) return null;
+  return storyBrowsePath(row.company_id, row.id);
+}
 
 export default function StoryFeedSection({
   eyebrow,
@@ -13,7 +20,20 @@ export default function StoryFeedSection({
   showBrowseLink = false,
   className = "mt-20",
 }) {
+  const router = useRouter();
+
   if (!stories.length) return null;
+
+  const openStory = (row) => {
+    const href = storyHref(row);
+    if (href) router.push(href);
+  };
+
+  const rowKeyDown = (event, row) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openStory(row);
+  };
 
   return (
     <section className={`relative z-10 mx-auto w-full max-w-5xl ${className}`}>
@@ -46,7 +66,11 @@ export default function StoryFeedSection({
               {stories.map((row, i) => (
                 <tr
                   key={row.id}
-                  className={`border-b border-amber-50/80 transition hover:bg-amber-50/40 ${
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => openStory(row)}
+                  onKeyDown={(event) => rowKeyDown(event, row)}
+                  className={`cursor-pointer border-b border-amber-50/80 transition hover:bg-amber-50/40 ${
                     i % 2 === 0 ? "bg-white/40" : "bg-amber-50/20"
                   }`}
                 >
@@ -82,30 +106,43 @@ export default function StoryFeedSection({
         </div>
 
         <div className="divide-y divide-amber-100/80 sm:hidden">
-          {stories.map((row) => (
-            <article key={row.id} className="px-4 py-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    {displayStoryName(row)}
-                  </p>
-                  <p className="text-sm text-amber-800">
-                    {row.company_name} · {row.job_title || "—"}
-                  </p>
+          {stories.map((row) => {
+            const href = storyHref(row);
+            const content = (
+              <>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      {displayStoryName(row)}
+                    </p>
+                    <p className="text-sm text-amber-800">
+                      {row.company_name} · {row.job_title || "—"}
+                    </p>
+                  </div>
+                  <VerdictChip verdict={row.verdict} />
                 </div>
-                <VerdictChip verdict={row.verdict} />
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-800">
-                  {formatPlacementTypes(row)}
-                </span>
-                <span className="text-slate-500">Batch {row.batch_of}</span>
-                <span className="text-amber-700">▲ {row.upvote ?? 0}</span>
-                <span className="text-slate-500">▼ {row.downvote ?? 0}</span>
-                <span className="text-slate-400">{timeAgo(row.created_at)}</span>
-              </div>
-            </article>
-          ))}
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-800">
+                    {formatPlacementTypes(row)}
+                  </span>
+                  <span className="text-slate-500">Batch {row.batch_of}</span>
+                  <span className="text-amber-700">▲ {row.upvote ?? 0}</span>
+                  <span className="text-slate-500">▼ {row.downvote ?? 0}</span>
+                  <span className="text-slate-400">{timeAgo(row.created_at)}</span>
+                </div>
+              </>
+            );
+
+            return href ? (
+              <Link key={row.id} href={href} className="block px-4 py-4 active:bg-amber-50/60">
+                {content}
+              </Link>
+            ) : (
+              <article key={row.id} className="px-4 py-4">
+                {content}
+              </article>
+            );
+          })}
         </div>
       </div>
 

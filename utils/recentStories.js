@@ -19,6 +19,7 @@ export async function fetchRecentStories(sql) {
       sp.summer_internship,
       sp.verdict,
       sp.is_anonymous,
+      sp.company_placed_id AS company_id,
       c.company_name
     FROM student_placed sp
     JOIN company c ON sp.company_placed_id = c.id
