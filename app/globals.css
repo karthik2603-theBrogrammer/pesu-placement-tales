@@ -128,3 +128,9 @@
     font-size: 1rem !important;
   }
 }
+
+/* Sonner toasts above sticky navbar (z-40) */
+.browse-toaster,
+[data-sonner-toaster].browse-toaster {
+  z-index: 9999 !important;
+}
