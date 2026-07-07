@@ -11,6 +11,7 @@ export default function BugReportPage() {
       endpoint="/api/bug-reports"
       submitLabel="Submit bug"
       emptyMessage="No bug reports yet. Hopefully that is good news."
+      feedbackType="bug"
       fields={[
         {
           name: "reproduction_steps",

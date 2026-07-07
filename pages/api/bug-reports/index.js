@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     if (req.method === "GET") {
       const result = await sql(`
-        SELECT id, title, description, reproduction_steps, page_url, reporter_name, status, created_at
+        SELECT id, title, description, reproduction_steps, page_url, reporter_name, status, admin_reply, created_at
         FROM bug_reports
         ORDER BY created_at DESC;
       `);
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
             reporter_name
           )
           VALUES ($1, $2, $3, $4, $5)
-          RETURNING id, title, description, reproduction_steps, page_url, reporter_name, status, created_at;
+          RETURNING id, title, description, reproduction_steps, page_url, reporter_name, status, admin_reply, created_at;
         `,
         [
           normalizeText(title),

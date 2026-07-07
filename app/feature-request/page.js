@@ -37,6 +37,7 @@ export default function FeatureRequestPage() {
       emptyMessage="No feature requests yet. Add the first one."
       enableVoting
       voteHint={voteHint}
+      feedbackType="feature"
       fields={[
         {
           name: "requester_name",

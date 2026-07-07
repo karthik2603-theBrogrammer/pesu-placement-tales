@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Spinner } from "@nextui-org/react";
 import { Toaster, toast } from "sonner";
 import posthog from "posthog-js";
+import {
+  formatStatusLabel,
+  statusBadgeClass,
+} from "../../utils/feedbackStatus";
 
 const FEATURE_VOTES_KEY = "pt_feature_votes";
 
@@ -57,6 +61,30 @@ function VoteButtons({ item, userVote, onVote }) {
   );
 }
 
+function StatusBadge({ status, feedbackType }) {
+  return (
+    <span
+      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${statusBadgeClass(status, feedbackType)}`}
+    >
+      {formatStatusLabel(status, feedbackType)}
+    </span>
+  );
+}
+
+function AdminReply({ text }) {
+  if (!text?.trim()) return null;
+  return (
+    <div className="mt-3 border-t border-amber-100/80 pt-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-600">
+        Team response
+      </p>
+      <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+        {text}
+      </p>
+    </div>
+  );
+}
+
 export default function FeedbackBoard({
   title,
   eyebrow,
@@ -69,6 +97,7 @@ export default function FeedbackBoard({
   enableVoting = false,
   voteEndpoint = "/api/vote-feature-request",
   voteHint,
+  feedbackType = "feature",
 }) {
   const initialForm = useMemo(() => buildInitialForm(fields), [fields]);
   const [formData, setFormData] = useState(initialForm);
@@ -389,9 +418,7 @@ export default function FeedbackBoard({
                               {formatDate(item.created_at)}
                             </p>
                           </div>
-                          <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
-                            {item.status}
-                          </span>
+                          <StatusBadge status={item.status} feedbackType={feedbackType} />
                         </div>
 
                         <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
@@ -399,6 +426,8 @@ export default function FeedbackBoard({
                         </p>
 
                         {renderMeta?.(item)}
+
+                        <AdminReply text={item.admin_reply} />
                       </div>
                     </div>
                   </article>

@@ -10,6 +10,7 @@ CREATE TABLE bug_reports (
   page_url TEXT,
   reporter_name VARCHAR(80),
   status VARCHAR(24) NOT NULL DEFAULT 'open'::character varying,
+  admin_reply TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (id)
 );
@@ -49,7 +50,8 @@ CREATE TABLE feature_requests (
   title VARCHAR(140) NOT NULL,
   description TEXT NOT NULL,
   requester_name VARCHAR(80),
-  status VARCHAR(24) NOT NULL DEFAULT 'open'::character varying,
+  status VARCHAR(24) NOT NULL DEFAULT 'open',
+  admin_reply TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   upvote INTEGER NOT NULL DEFAULT 0,
   downvote INTEGER NOT NULL DEFAULT 0,

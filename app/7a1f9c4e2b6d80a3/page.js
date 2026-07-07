@@ -5,10 +5,16 @@ import { Toaster, toast } from "sonner";
 import AdminCollection from "../components/admin/AdminCollection";
 import AdminKpiGrid from "../components/admin/AdminKpiGrid";
 import PlacementStoryLogs from "../components/admin/PlacementStoryLogs";
+import {
+  ADMIN_REPLY_LIMIT,
+  BUG_STATUSES,
+  FEATURE_STATUSES,
+  formatStatusLabel,
+  statusBadgeClass,
+} from "../../utils/feedbackStatus";
 
 const STREAM_OPTIONS = ["CSE", "ECE", "EEE", "Mech", "AIML"];
 const TIER_OPTIONS = [1, 2, 3];
-const STATUS_OPTIONS = ["open", "planned", "in_progress", "done", "closed"];
 
 const fmtDate = (value) =>
   value
@@ -21,9 +27,11 @@ const fmtDate = (value) =>
 const truncate = (text, n = 160) =>
   text && text.length > n ? `${text.slice(0, n)}…` : text || "";
 
-const StatusChip = ({ status }) => (
-  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
-    {status || "open"}
+const StatusChip = ({ status, feedbackType = "feature" }) => (
+  <span
+    className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${statusBadgeClass(status, feedbackType)}`}
+  >
+    {formatStatusLabel(status, feedbackType)}
   </span>
 );
 
@@ -83,13 +91,25 @@ const parseStreams = (value) =>
     .map((s) => s.trim())
     .filter(Boolean);
 
-const statusOptions = STATUS_OPTIONS.map((s) => ({ value: s, label: s }));
+const featureStatusOptions = FEATURE_STATUSES.map((s) => ({
+  value: s.value,
+  label: s.label,
+}));
+const bugStatusOptions = BUG_STATUSES.map((s) => ({ value: s.value, label: s.label }));
 
 const FEATURE_FIELDS = [
   { key: "title", label: "Title", type: "text" },
   { key: "description", label: "Description", type: "textarea", rows: 4 },
   { key: "requester_name", label: "Requester name", type: "text" },
-  { key: "status", label: "Status", type: "select", options: statusOptions },
+  { key: "status", label: "Status", type: "select", options: featureStatusOptions },
+  {
+    key: "admin_reply",
+    label: "Admin reply (shown publicly)",
+    type: "textarea",
+    rows: 3,
+    maxLength: ADMIN_REPLY_LIMIT,
+    hint: "Short update for users — leave blank to hide.",
+  },
 ];
 
 const BUG_FIELDS = [
@@ -98,7 +118,15 @@ const BUG_FIELDS = [
   { key: "reproduction_steps", label: "Reproduction steps", type: "textarea", rows: 3 },
   { key: "page_url", label: "Page URL", type: "text" },
   { key: "reporter_name", label: "Reporter name", type: "text" },
-  { key: "status", label: "Status", type: "select", options: statusOptions },
+  { key: "status", label: "Status", type: "select", options: bugStatusOptions },
+  {
+    key: "admin_reply",
+    label: "Admin reply (shown publicly)",
+    type: "textarea",
+    rows: 3,
+    maxLength: ADMIN_REPLY_LIMIT,
+    hint: "Short update for users — leave blank to hide.",
+  },
 ];
 
 const MAINTAINER_FIELDS = [
@@ -115,9 +143,15 @@ const featureSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
       <span className="font-semibold text-amber-950">{item.title}</span>
-      <StatusChip status={item.status} />
+      <StatusChip status={item.status} feedbackType="feature" />
     </div>
     <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
+    {item.admin_reply ? (
+      <p className="mt-2 rounded-lg border border-amber-100 bg-amber-50/50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
+        <span className="font-semibold text-amber-700">Reply: </span>
+        {truncate(item.admin_reply, 120)}
+      </p>
+    ) : null}
     <p className="mt-1 text-xs text-slate-400">
       {item.requester_name || "Anonymous"} · {fmtDate(item.created_at)}
     </p>
@@ -128,9 +162,15 @@ const bugSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
       <span className="font-semibold text-amber-950">{item.title}</span>
-      <StatusChip status={item.status} />
+      <StatusChip status={item.status} feedbackType="bug" />
     </div>
     <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
+    {item.admin_reply ? (
+      <p className="mt-2 rounded-lg border border-amber-100 bg-amber-50/50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
+        <span className="font-semibold text-amber-700">Reply: </span>
+        {truncate(item.admin_reply, 120)}
+      </p>
+    ) : null}
     <p className="mt-1 text-xs text-slate-400">
       {item.reporter_name || "Anonymous"} · {fmtDate(item.created_at)}
       {item.page_url ? ` · ${item.page_url}` : ""}

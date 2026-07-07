@@ -39,7 +39,7 @@ export const FEEDBACK_TYPES = {
     index: FEEDBACK_INDEXES.feature,
     tableName: "feature_requests",
     listQuery: `
-      SELECT id, title, description, requester_name, status, created_at,
+      SELECT id, title, description, requester_name, status, admin_reply, created_at,
              COALESCE(upvote, 0) AS upvote, COALESCE(downvote, 0) AS downvote
       FROM feature_requests
       ORDER BY (COALESCE(upvote, 0) - COALESCE(downvote, 0)) DESC, created_at DESC;
@@ -50,7 +50,7 @@ export const FEEDBACK_TYPES = {
     index: FEEDBACK_INDEXES.bug,
     tableName: "bug_reports",
     listQuery: `
-      SELECT id, title, description, reproduction_steps, page_url, reporter_name, status, created_at
+      SELECT id, title, description, reproduction_steps, page_url, reporter_name, status, admin_reply, created_at
       FROM bug_reports
       ORDER BY created_at DESC;
     `,
@@ -65,6 +65,18 @@ export async function ensureFeedbackTable(sql, type) {
 
   await sql(config.schema);
   await sql(config.index);
+
+  if (type === "feature") {
+    await sql`
+      ALTER TABLE feature_requests
+      ADD COLUMN IF NOT EXISTS admin_reply TEXT
+    `;
+  } else if (type === "bug") {
+    await sql`
+      ALTER TABLE bug_reports
+      ADD COLUMN IF NOT EXISTS admin_reply TEXT
+    `;
+  }
 }
 
 export function normalizeText(value) {

@@ -1,5 +1,10 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../../utils/db";
 import { readId, readPagination, requireAdmin } from "../../../../utils/adminAuth";
+import { ensureFeedbackTable } from "../../../../utils/feedback";
+import {
+  isValidFeatureStatus,
+  validateAdminReply,
+} from "../../../../utils/feedbackStatus";
 
 const trim = (v) => (typeof v === "string" ? v.trim() : "");
 
@@ -10,10 +15,12 @@ export default async function handler(req, res) {
   const sql = getDb();
 
   try {
+    await ensureFeedbackTable(sql, "feature");
+
     if (req.method === "GET") {
       const { limit, offset } = readPagination(req);
       const rows = await sql`
-        SELECT id, title, description, requester_name, status, created_at
+        SELECT id, title, description, requester_name, status, admin_reply, created_at
         FROM feature_requests
         ORDER BY created_at DESC
         LIMIT ${limit + 1} OFFSET ${offset};
@@ -23,16 +30,25 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "PUT") {
-      const { id, title, description, requester_name, status } = req.body || {};
+      const { id, title, description, requester_name, status, admin_reply } = req.body || {};
       if (!id) return res.status(400).json({ error: "id is required." });
+
+      const nextStatus = trim(status) || "open";
+      if (!isValidFeatureStatus(nextStatus)) {
+        return res.status(400).json({ error: "Invalid status." });
+      }
+      const replyError = validateAdminReply(admin_reply);
+      if (replyError) return res.status(400).json({ error: replyError });
+
       const updated = await sql`
         UPDATE feature_requests SET
           title = ${trim(title)},
           description = ${trim(description)},
           requester_name = ${trim(requester_name) || null},
-          status = ${trim(status) || "open"}
+          status = ${nextStatus},
+          admin_reply = ${trim(admin_reply) || null}
         WHERE id = ${id}
-        RETURNING id, title, description, requester_name, status, created_at;
+        RETURNING id, title, description, requester_name, status, admin_reply, created_at;
       `;
       if (updated.length === 0) return res.status(404).json({ error: "Not found." });
       return res.status(200).json({ result: updated[0] });

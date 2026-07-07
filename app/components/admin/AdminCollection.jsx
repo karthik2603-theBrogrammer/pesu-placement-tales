@@ -153,14 +153,22 @@ export default function AdminCollection({
                   <label key={f.key} className="block text-xs font-semibold text-amber-700">
                     {f.label}
                     {f.type === "textarea" ? (
-                      <textarea
-                        rows={f.rows || 3}
-                        value={editForm[f.key] ?? ""}
-                        onChange={(e) =>
-                          setEditForm((p) => ({ ...p, [f.key]: e.target.value }))
-                        }
-                        className={`${input} mt-1 resize-y`}
-                      />
+                      <>
+                        <textarea
+                          rows={f.rows || 3}
+                          value={editForm[f.key] ?? ""}
+                          onChange={(e) =>
+                            setEditForm((p) => ({ ...p, [f.key]: e.target.value }))
+                          }
+                          maxLength={f.maxLength}
+                          className={`${input} mt-1 resize-y`}
+                        />
+                        {f.hint ? (
+                          <span className="mt-1 block text-[11px] font-normal text-slate-400">
+                            {f.hint}
+                          </span>
+                        ) : null}
+                      </>
                     ) : f.type === "select" ? (
                       <select
                         value={editForm[f.key] ?? ""}
