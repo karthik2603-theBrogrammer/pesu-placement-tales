@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Spinner, Input } from "@nextui-org/react";
 import BrowseToaster from "./components/BrowseToaster";
 import { CiSearch } from "react-icons/ci";
-import Link from "next/link";
 import H from "../components/Heading";
 import P from "../components/Paragraph";
 import BrowseShell from "./components/BrowseShell";
@@ -45,21 +44,14 @@ export default function BrowseDirectoryPage() {
     () => companies.filter((c) => c.story_count > 0),
     [companies]
   );
-  const companiesPending = useMemo(
-    () => companies.filter((c) => !c.story_count),
-    [companies]
-  );
 
   const trimmedSearch = searchQuery.trim();
-  const visibleWithStories = trimmedSearch
+  const visibleCompanies = trimmedSearch
     ? filterByName(companiesWithStories, trimmedSearch)
     : companiesWithStories;
-  const visiblePending = trimmedSearch
-    ? filterByName(companiesPending, trimmedSearch)
-    : companiesPending;
 
   const companyGridClass =
-    visibleWithStories.length <= 6
+    visibleCompanies.length <= 6
       ? "grid max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 max-h-[430px] overflow-y-auto pr-1";
 
@@ -122,10 +114,8 @@ export default function BrowseDirectoryPage() {
                   Companies with stories
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {visibleWithStories.length} with stories
-                  {companiesPending.length > 0 && (
-                    <> · {companiesPending.length} awaiting a first tale</>
-                  )}
+                  {visibleCompanies.length}{" "}
+                  {visibleCompanies.length === 1 ? "company" : "companies"}
                 </p>
               </div>
               <Input
@@ -140,66 +130,31 @@ export default function BrowseDirectoryPage() {
               />
             </div>
 
-            {visibleWithStories.length === 0 && visiblePending.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 p-8 text-center text-sm text-gray-500">
-                No companies found.
+            {visibleCompanies.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
+                {trimmedSearch
+                  ? "No companies with stories match your search."
+                  : "No stories have been shared yet."}
               </div>
             ) : (
-              <>
-                {visibleWithStories.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
-                    {trimmedSearch
-                      ? "No companies with stories match your search."
-                      : "No stories have been shared yet."}
-                  </div>
-                ) : (
-                  <div className={companyGridClass}>
-                    {visibleWithStories.map((company) => (
-                      <button
-                        key={company.id}
-                        type="button"
-                        onClick={() => openCompany(company)}
-                        className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
-                      >
-                        <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
-                          {company.company_name}
-                        </p>
-                        <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
-                          {company.story_count}{" "}
-                          {company.story_count === 1 ? "story" : "stories"}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {visiblePending.length > 0 && (
-                  <div className="mt-6 border-t border-dashed border-amber-100/80 pt-5">
-                    <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                      In our directory — no stories yet
+              <div className={companyGridClass}>
+                {visibleCompanies.map((company) => (
+                  <button
+                    key={company.id}
+                    type="button"
+                    onClick={() => openCompany(company)}
+                    className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
+                  >
+                    <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
+                      {company.company_name}
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      {visiblePending.map((company) => (
-                        <span
-                          key={company.id}
-                          className="cursor-default rounded-full border border-dashed border-slate-200/90 bg-slate-50/60 px-3 py-1.5 text-xs text-slate-500 transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50/50 hover:text-amber-800"
-                        >
-                          {company.company_name}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="mt-3 text-[11px] text-slate-400">
-                      These companies are listed — stories may appear here later.{" "}
-                      <Link
-                        href="/add-student"
-                        className="text-amber-600/80 underline-offset-2 hover:text-amber-700 hover:underline"
-                      >
-                        Share yours
-                      </Link>
+                    <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
+                      {company.story_count}{" "}
+                      {company.story_count === 1 ? "story" : "stories"}
                     </p>
-                  </div>
-                )}
-              </>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         )}
