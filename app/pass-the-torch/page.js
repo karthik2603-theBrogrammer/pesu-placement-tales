@@ -26,6 +26,23 @@ export default function PassTheTorchPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const required = [
+      ["full_name", "Full name"],
+      ["batch", "Batch"],
+      ["degree", "Degree"],
+      ["department", "Department"],
+      ["email", "Email"],
+      ["linkedin_url", "LinkedIn URL"],
+      ["reason", "Why do you want access?"],
+    ];
+    for (const [key, label] of required) {
+      if (!form[key]?.trim()) {
+        toast.error(`Please fill in ${label}.`);
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const response = await fetch("/api/maintainer-requests", {
@@ -105,6 +122,8 @@ export default function PassTheTorchPage() {
             <div className="grid gap-4">
               <TextField
                 label="Full name"
+                required
+                showOptional={false}
                 value={form.full_name}
                 onChange={(v) => update("full_name", v)}
               />
@@ -112,12 +131,16 @@ export default function PassTheTorchPage() {
                 <TextField
                   label="Batch (graduating year)"
                   placeholder="e.g. 2027"
+                  required
+                  showOptional={false}
                   value={form.batch}
                   onChange={(v) => update("batch", v)}
                 />
                 <TextField
                   label="Degree"
                   placeholder="e.g. B.Tech CSE"
+                  required
+                  showOptional={false}
                   value={form.degree}
                   onChange={(v) => update("degree", v)}
                 />
@@ -125,6 +148,8 @@ export default function PassTheTorchPage() {
               <TextField
                 label="Department"
                 placeholder="e.g. Computer Science"
+                required
+                showOptional={false}
                 value={form.department}
                 onChange={(v) => update("department", v)}
               />
@@ -132,18 +157,24 @@ export default function PassTheTorchPage() {
                 label="Email"
                 type="email"
                 placeholder="you@example.com"
+                required
+                showOptional={false}
                 value={form.email}
                 onChange={(v) => update("email", v)}
               />
               <TextField
                 label="LinkedIn URL"
                 placeholder="https://linkedin.com/in/your-handle"
+                required
+                showOptional={false}
                 value={form.linkedin_url}
                 onChange={(v) => update("linkedin_url", v)}
               />
               <TextArea
-                label="Why do you want access? (optional)"
+                label="Why do you want access?"
                 rows={3}
+                required
+                showOptional={false}
                 placeholder="A line or two about why you'd be a good maintainer."
                 value={form.reason}
                 onChange={(v) => update("reason", v)}

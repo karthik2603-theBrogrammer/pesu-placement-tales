@@ -42,9 +42,15 @@ export default async function handler(req, res) {
     reason: trim(reason),
   };
 
-  const missing = ["full_name", "batch", "department", "degree", "linkedin_url", "email"].filter(
-    (field) => !values[field]
-  );
+  const missing = [
+    "full_name",
+    "batch",
+    "department",
+    "degree",
+    "linkedin_url",
+    "email",
+    "reason",
+  ].filter((field) => !values[field]);
   if (missing.length > 0) {
     return res.status(400).json({ error: `Please fill: ${missing.join(", ")}.` });
   }
@@ -68,7 +74,7 @@ export default async function handler(req, res) {
       VALUES (
         ${values.full_name}, ${values.batch}, ${values.department},
         ${values.degree}, ${values.linkedin_url}, ${values.email},
-        ${values.reason || null}
+        ${values.reason}
       )
       RETURNING id, created_at;
     `;
