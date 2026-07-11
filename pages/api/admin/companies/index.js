@@ -48,9 +48,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "DELETE") {
-      const { id } = req.body;
+      const id = readId(req);
       if (!id) return res.status(400).json({ error: "ID required." });
-
       // Optional: check for linked records before deletion to give a friendly error
       const visits = await sql`SELECT id FROM company_visited WHERE company_id = ${id} LIMIT 1`;
       const stories = await sql`SELECT id FROM student_placed WHERE company_placed_id = ${id} LIMIT 1`;
