@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Spinner, Input, Select, SelectItem } from "@nextui-org/react";
 import BrowseToaster from "./components/BrowseToaster";
 import { CiSearch } from "react-icons/ci";
+import { FiX } from "react-icons/fi";
 import H from "../components/Heading";
 import P from "../components/Paragraph";
 import BrowseShell from "./components/BrowseShell";
@@ -12,37 +13,97 @@ import {
   companyBrowsePath,
   markDirectoryCompanyNavigation,
 } from "../../utils/browseRoutes";
+import { DEGREE_OPTIONS } from "../../utils/degree";
 
 export default function BrowseDirectoryPage() {
   const router = useRouter();
   const [companies, setCompanies] = useState([]);
+  const [filterMeta, setFilterMeta] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [jobFilter, setJobFilter] = useState("all");
+  const [degreeFilter, setDegreeFilter] = useState("all");
+  const [batchFilter, setBatchFilter] = useState("all");
+  const [verdictFilter, setVerdictFilter] = useState("all");
+
   useEffect(() => {
-    async function fetchCompanies() {
+    async function fetchData() {
       try {
         setLoadingCompanies(true);
-        const response = await fetch("/api/browse-companies");
-        const data = await response.json();
-        setCompanies(data.result || []);
+        const [companiesRes, filtersRes] = await Promise.all([
+          fetch("/api/browse-companies"),
+          fetch("/api/browse-companies/filters"),
+        ]);
+        const companiesData = await companiesRes.json();
+        const filtersData = await filtersRes.json();
+        setCompanies(companiesData.result || []);
+        setFilterMeta(filtersData.result || []);
       } catch (error) {
         console.error("Error fetching companies:", error);
       } finally {
         setLoadingCompanies(false);
       }
     }
-    fetchCompanies();
+    fetchData();
   }, []);
 
-  const filterByNameAndJob = (list, query, job) =>
-    list.filter((company) => {
-      const name = company.company_name.toLowerCase().includes(query.toLowerCase());
-      if (!name) return false;
+  // Build a lookup: companyId → filter metadata
+  const filterLookup = useMemo(() => {
+    const map = {};
+    for (const row of filterMeta) {
+      map[row.company_id] = row;
+    }
+    return map;
+  }, [filterMeta]);
 
-      if (job === "intern") return company.has_intern_stories;
-      if (job === "fte") return company.has_fte_stories;
-      if (job === "intern_fte") return company.has_intern_fte_stories;
+  // Compute distinct batch years across all companies for the batch dropdown
+  const allBatches = useMemo(() => {
+    const set = new Set();
+    for (const row of filterMeta) {
+      (row.batches || []).forEach((b) => set.add(String(b)));
+    }
+    return Array.from(set)
+      .sort()
+      .reverse();
+  }, [filterMeta]);
+
+  const hasActiveFilters =
+    jobFilter !== "all" ||
+    degreeFilter !== "all" ||
+    batchFilter !== "all" ||
+    verdictFilter !== "all";
+
+  const clearAllFilters = () => {
+    setJobFilter("all");
+    setDegreeFilter("all");
+    setBatchFilter("all");
+    setVerdictFilter("all");
+  };
+
+  const filterCompanies = (list, query, job, degree, batch, verdict) =>
+    list.filter((company) => {
+      // Name search
+      if (
+        query &&
+        !company.company_name.toLowerCase().includes(query.toLowerCase())
+      )
+        return false;
+
+      // Job type filter (uses the original browse-companies aggregates)
+      if (job === "intern" && !company.has_intern_stories) return false;
+      if (job === "fte" && !company.has_fte_stories) return false;
+      if (job === "intern_fte" && !company.has_intern_fte_stories) return false;
+
+      // Filters using the per-company metadata
+      const meta = filterLookup[company.id];
+      if (!meta) return job === "all" && degree === "all" && batch === "all" && verdict === "all";
+
+      if (degree !== "all" && !(meta.degrees || []).includes(degree))
+        return false;
+      if (batch !== "all" && !(meta.batches || []).map(String).includes(String(batch)))
+        return false;
+      if (verdict !== "all" && !(meta.verdicts || []).includes(verdict))
+        return false;
 
       return true;
     });
@@ -53,7 +114,14 @@ export default function BrowseDirectoryPage() {
   );
 
   const trimmedSearch = searchQuery.trim();
-  const visibleCompanies = filterByNameAndJob(companiesWithStories, trimmedSearch, jobFilter);
+  const visibleCompanies = filterCompanies(
+    companiesWithStories,
+    trimmedSearch,
+    jobFilter,
+    degreeFilter,
+    batchFilter,
+    verdictFilter
+  );
 
   const companyGridClass =
     visibleCompanies.length <= 6
@@ -70,7 +138,7 @@ export default function BrowseDirectoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BrowseToaster />
         <div className="mx-auto mb-8 max-w-3xl text-center">
-          <div className="mb-3 inline-flex rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+          <div className="mb-3 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
             Company directory
           </div>
           <H text="Browse Companies" styles="text-gray-900" />
@@ -84,7 +152,7 @@ export default function BrowseDirectoryPage() {
               <span className="inline-flex items-center gap-1 align-middle">
                 <span
                   aria-hidden
-                  className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white px-2 py-0.5 text-xs font-semibold text-amber-700 shadow-sm"
+                  className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-white px-2 py-0.5 text-xs font-semibold text-indigo-700 shadow-sm"
                 >
                   ▲ <span className="tabular-nums">12</span>
                 </span>
@@ -106,57 +174,119 @@ export default function BrowseDirectoryPage() {
         </div>
 
         {loadingCompanies ? (
-          <div className="flex items-center justify-center rounded-3xl border border-amber-100 bg-white/70 p-10 shadow-sm">
-            <Spinner color="warning" labelColor="warning" className="text-xs">
+          <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-10 shadow-sm">
+            <Spinner color="default" labelColor="foreground" className="text-xs">
               Loading companies...
             </Spinner>
           </div>
         ) : (
-          <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-4 shadow-sm backdrop-blur md:p-6">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
                   Companies with stories
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {visibleCompanies.length}{" "}
-                  {visibleCompanies.length === 1 ? "company" : "companies"}
+                  {hasActiveFilters
+                    ? `${visibleCompanies.length} of ${companiesWithStories.length} companies`
+                    : `${visibleCompanies.length} ${visibleCompanies.length === 1 ? "company" : "companies"}`}
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full md:max-w-xl">
-                <Select
-                  aria-label="Filter by Job Type"
-                  className="w-full sm:max-w-[180px]"
-                  placeholder="Job Type"
-                  selectedKeys={[jobFilter]}
-                  onChange={(e) => setJobFilter(e.target.value)}
-                  color="warning"
-                  variant="bordered"
-                  size="sm"
+              <Input
+                aria-label="Search companies"
+                className="w-full md:max-w-xs"
+                placeholder="Search company..."
+                startContent={<CiSearch className="text-gray-400" />}
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+                color="default"
+                variant="bordered"
+                size="sm"
+              />
+            </div>
+
+            {/* Filter bar */}
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <Select
+                aria-label="Filter by Job Type"
+                className="w-full sm:w-[150px]"
+                placeholder="Job Type"
+                selectedKeys={[jobFilter]}
+                onChange={(e) => setJobFilter(e.target.value)}
+                color="default"
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Roles</SelectItem>
+                <SelectItem key="intern" value="intern">Internship</SelectItem>
+                <SelectItem key="fte" value="fte">FTE</SelectItem>
+                <SelectItem key="intern_fte" value="intern_fte">Intern + FTE</SelectItem>
+              </Select>
+              <Select
+                aria-label="Filter by Degree"
+                className="w-full sm:w-[150px]"
+                placeholder="Degree"
+                selectedKeys={[degreeFilter]}
+                onChange={(e) => setDegreeFilter(e.target.value)}
+                color="default"
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Degrees</SelectItem>
+                {DEGREE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                aria-label="Filter by Batch"
+                className="w-full sm:w-[140px]"
+                placeholder="Batch"
+                selectedKeys={[batchFilter]}
+                onChange={(e) => setBatchFilter(e.target.value)}
+                color="default"
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Batches</SelectItem>
+                {allBatches.map((b) => (
+                  <SelectItem key={b} value={b}>
+                    Batch {b}
+                  </SelectItem>
+                ))}
+              </Select>
+              <Select
+                aria-label="Filter by Verdict"
+                className="w-full sm:w-[140px]"
+                placeholder="Verdict"
+                selectedKeys={[verdictFilter]}
+                onChange={(e) => setVerdictFilter(e.target.value)}
+                color="default"
+                variant="bordered"
+                size="sm"
+              >
+                <SelectItem key="all" value="all">All Verdicts</SelectItem>
+                <SelectItem key="selected" value="selected">Selected</SelectItem>
+                <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
+              </Select>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
                 >
-                  <SelectItem key="all" value="all">All Roles</SelectItem>
-                  <SelectItem key="intern" value="intern">Internship</SelectItem>
-                  <SelectItem key="fte" value="fte">FTE</SelectItem>
-                  <SelectItem key="intern_fte" value="intern_fte">Intern + FTE</SelectItem>
-                </Select>
-                <Input
-                  aria-label="Search companies"
-                  className="w-full"
-                  placeholder="Search company..."
-                  startContent={<CiSearch className="text-gray-400" />}
-                  value={searchQuery}
-                  onValueChange={setSearchQuery}
-                  color="warning"
-                  variant="bordered"
-                  size="sm"
-                />
-              </div>
+                  <FiX size={12} />
+                  Clear
+                </button>
+              )}
             </div>
 
             {visibleCompanies.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
-                {trimmedSearch
-                  ? "No companies with stories match your search."
+              <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+                {trimmedSearch || hasActiveFilters
+                  ? "No companies match your filters."
                   : "No stories have been shared yet."}
               </div>
             ) : (
@@ -166,12 +296,12 @@ export default function BrowseDirectoryPage() {
                     key={company.id}
                     type="button"
                     onClick={() => openCompany(company)}
-                    className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
+                    className="group min-h-[88px] rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-200"
                   >
-                    <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
+                    <p className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
                       {company.company_name}
                     </p>
-                    <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
+                    <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-indigo-600 opacity-75 transition group-hover:opacity-100">
                       {company.story_count}{" "}
                       {company.story_count === 1 ? "story" : "stories"}
                     </p>

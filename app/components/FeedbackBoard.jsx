@@ -39,8 +39,8 @@ function VoteButtons({ item, userVote, onVote }) {
         aria-label="Upvote"
         className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold shadow-sm transition ${
           userVote === "up"
-            ? "border-amber-300 bg-amber-100 text-amber-800"
-            : "border-amber-200 bg-white text-amber-700 hover:border-amber-300 hover:bg-amber-50"
+            ? "border-indigo-300 bg-indigo-100 text-indigo-800"
+            : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
         }`}
       >
         ▲ <span className="tabular-nums">{item.upvote ?? 0}</span>
@@ -74,8 +74,8 @@ function StatusBadge({ status, feedbackType }) {
 function AdminReply({ text }) {
   if (!text?.trim()) return null;
   return (
-    <div className="mt-3 border-t border-amber-100/80 pt-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-600">
+    <div className="mt-3 border-t border-slate-200 pt-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-indigo-600">
         Team response
       </p>
       <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
@@ -255,16 +255,16 @@ export default function FeedbackBoard({
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-slate-50 px-4 py-10 text-slate-900 sm:px-6 lg:px-8">
       <Toaster position="top-center" richColors />
-      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
-      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
+      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(148,163,184,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(148,163,184,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-slate-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-indigo-200/25 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
 
       <section className="relative z-10 mx-auto max-w-6xl">
         <div className="mb-10 max-w-3xl">
-          <p className="mb-3 w-fit rounded-full border border-amber-200/70 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700 shadow-sm backdrop-blur">
+          <p className="mb-3 w-fit rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-slate-600 shadow-sm">
             {eyebrow}
           </p>
           <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
@@ -283,10 +283,10 @@ export default function FeedbackBoard({
         <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
           <form
             onSubmit={handleSubmit}
-            className="h-fit rounded-3xl border border-white/70 bg-white/70 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl"
+            className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
           >
             <div className="mb-5">
-              <h2 className="text-lg font-bold text-amber-950">Submit</h2>
+              <h2 className="text-lg font-bold text-slate-900">Submit</h2>
               <p className="mt-1 text-xs text-slate-500">
                 Keep it clear. We keep it visible.
               </p>
@@ -300,7 +300,7 @@ export default function FeedbackBoard({
                 value={formData.title}
                 onChange={(event) => updateField("title", event.target.value)}
                 maxLength={140}
-                color="warning"
+                color="default"
                 variant="bordered"
                 isRequired
               />
@@ -318,7 +318,7 @@ export default function FeedbackBoard({
                   }
                   maxLength={1200}
                   required
-                  className="min-h-[130px] w-full resize-y rounded-2xl border border-amber-100 bg-white/80 px-3 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                  className="min-h-[130px] w-full resize-y rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
                 />
               </label>
 
@@ -336,7 +336,7 @@ export default function FeedbackBoard({
                         updateField(field.name, event.target.value)
                       }
                       maxLength={field.maxLength}
-                      className="min-h-[110px] w-full resize-y rounded-2xl border border-amber-100 bg-white/80 px-3 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                      className="min-h-[110px] w-full resize-y rounded-2xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
                     />
                   </label>
                 ) : (
@@ -350,7 +350,7 @@ export default function FeedbackBoard({
                       updateField(field.name, event.target.value)
                     }
                     maxLength={field.maxLength}
-                    color="warning"
+                    color="default"
                     variant="bordered"
                   />
                 )
@@ -358,9 +358,9 @@ export default function FeedbackBoard({
 
               <Button
                 type="submit"
-                color="warning"
+                color="default"
                 variant="shadow"
-                className="w-full bg-amber-500 text-white shadow-lg shadow-amber-200"
+                className="w-full bg-slate-900 text-white shadow-lg shadow-slate-200"
                 isLoading={submitting}
               >
                 {submitLabel}
@@ -368,10 +368,10 @@ export default function FeedbackBoard({
             </div>
           </form>
 
-          <section className="rounded-3xl border border-white/70 bg-white/65 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold text-amber-950">
+                <h2 className="text-lg font-bold text-slate-900">
                   Previous submissions
                 </h2>
                 <p className="mt-1 text-xs text-slate-500">
@@ -380,7 +380,7 @@ export default function FeedbackBoard({
                     : "Newest first. Updated after every submit."}
                 </p>
               </div>
-              <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
                 {items.length}
               </span>
             </div>
@@ -390,7 +390,7 @@ export default function FeedbackBoard({
                 <Spinner color="default" label="Loading..." />
               </div>
             ) : items.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/60 p-8 text-center">
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
                 <p className="text-sm text-slate-500">{emptyMessage}</p>
               </div>
             ) : (
@@ -398,7 +398,7 @@ export default function FeedbackBoard({
                 {items.map((item) => (
                   <article
                     key={item.id}
-                    className="rounded-2xl border border-amber-100 bg-white/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50/60 hover:shadow-md"
+                    className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
                   >
                     <div className="flex gap-3">
                       {enableVoting && (

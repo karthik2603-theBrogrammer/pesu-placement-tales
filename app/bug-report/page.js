@@ -34,10 +34,10 @@ export default function BugReportPage() {
         },
       ]}
       renderMeta={(item) => (
-        <div className="mt-4 space-y-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-3 text-xs text-slate-500">
+        <div className="mt-4 space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
           {item.reproduction_steps && (
             <div>
-              <p className="font-bold text-amber-800">Steps</p>
+              <p className="font-bold text-slate-800">Steps</p>
               <p className="mt-1 whitespace-pre-wrap leading-5">
                 {item.reproduction_steps}
               </p>
@@ -49,7 +49,7 @@ export default function BugReportPage() {
                 href={item.page_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-amber-700 underline underline-offset-4"
+                className="font-medium text-indigo-600 underline underline-offset-4"
               >
                 Affected page
               </a>

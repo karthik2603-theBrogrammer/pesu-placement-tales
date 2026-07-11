@@ -11,6 +11,7 @@ import { companyBrowsePath } from "../../../../utils/browseRoutes";
 import { useCompanyBrowse } from "../../components/CompanyBrowseLayout";
 import ShareStoryButton from "../../components/ShareStoryButton";
 import StoryVoteButtons from "../../components/StoryVoteButtons";
+import BookmarkButton from "../../components/BookmarkButton";
 
 const MarkdownReviewRenderer = dynamic(
   () => import("../../../components/MarkdownReviewRenderer"),
@@ -61,47 +62,50 @@ export default function StoryPage() {
 
   if (loading || !story) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-sm text-amber-700">
+      <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-500">
         Loading story…
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] flex-col rounded-2xl border border-amber-100 bg-white/90 shadow-sm lg:min-h-[calc(100vh-10rem)]">
-      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-amber-100 px-3 py-3 sm:px-5 sm:py-4">
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col rounded-lg border border-slate-200 bg-white shadow-sm lg:min-h-[calc(100vh-10rem)]">
+      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-slate-200 px-3 py-3 sm:px-5 sm:py-4">
         <div className="min-w-0 flex-1">
           <Link
             href={companyBrowsePath(companyId)}
-            className="text-xs font-medium text-amber-700 hover:underline lg:hidden"
+            className="text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline lg:hidden"
           >
             ← {companyName}
           </Link>
           <button
             type="button"
             onClick={() => setMobileSidebarOpen(true)}
-            className="mt-1 mx-2 inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800 lg:hidden"
+            className="mt-1 mx-2 inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600 lg:hidden hover:bg-slate-100"
           >
             ☰ Stories
           </button>
-          <h1 className="mt-2 text-base font-semibold leading-snug text-gray-900 sm:text-lg">
+          <h1 className="mt-2 text-base font-serif font-semibold leading-snug text-slate-900 sm:text-lg">
             {story.job_title
               ? `${displayStoryName(story)} · ${story.job_title}`
               : `${displayStoryName(story)}'s experience`}
           </h1>
         </div>
-        <ShareStoryButton
-          companyId={companyId}
-          story={story}
-          companyName={companyName}
-        />
+        <div className="flex items-center gap-1">
+          <BookmarkButton storyId={story.student_id} companyId={companyId} story={story} companyName={companyName} />
+          <ShareStoryButton
+            companyId={companyId}
+            story={story}
+            companyName={companyName}
+          />
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-5 sm:py-4">
         <MarkdownReviewRenderer remarks_markdown={story.remarks_markdown} />
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-amber-100 px-4 py-3 sm:px-5">
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-slate-200 px-4 py-3 sm:px-5">
         <span className="text-xs font-medium text-gray-500">Was this helpful?</span>
         <StoryVoteButtons
           storyId={story.student_id}

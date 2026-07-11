@@ -16,6 +16,10 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
+        serif: ["var(--font-merriweather)", "ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
+      },
     },
   },
   darkMode: "class",

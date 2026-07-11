@@ -8,7 +8,7 @@ const voteHint = (
     <span className="inline-flex items-center gap-1 align-middle">
       <span
         aria-hidden
-        className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white px-2 py-0.5 text-xs font-semibold text-amber-700 shadow-sm"
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 shadow-sm"
       >
         ▲ <span className="tabular-nums">12</span>
       </span>

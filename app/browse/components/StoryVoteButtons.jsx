@@ -24,8 +24,8 @@ export default function StoryVoteButtons({
         }}
         className={`${btnClass} ${
           userVote === "up"
-            ? "border-amber-400 bg-amber-100 text-amber-800"
-            : "border-amber-200 bg-white text-amber-700 hover:bg-amber-50"
+            ? "border-indigo-300 bg-indigo-50 text-indigo-700"
+            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
         }`}
         aria-label="Upvote"
       >
