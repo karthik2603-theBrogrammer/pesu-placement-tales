@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Spinner, Input } from "@nextui-org/react";
+import { Spinner, Input, Select, SelectItem } from "@nextui-org/react";
 import BrowseToaster from "./components/BrowseToaster";
 import { CiSearch } from "react-icons/ci";
 import H from "../components/Heading";
@@ -18,7 +18,7 @@ export default function BrowseDirectoryPage() {
   const [companies, setCompanies] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [jobFilter, setJobFilter] = useState("all");
   useEffect(() => {
     async function fetchCompanies() {
       try {
@@ -35,10 +35,17 @@ export default function BrowseDirectoryPage() {
     fetchCompanies();
   }, []);
 
-  const filterByName = (list, query) =>
-    list.filter((company) =>
-      company.company_name.toLowerCase().includes(query.toLowerCase())
-    );
+  const filterByNameAndJob = (list, query, job) =>
+    list.filter((company) => {
+      const name = company.company_name.toLowerCase().includes(query.toLowerCase());
+      if (!name) return false;
+
+      if (job === "intern") return company.has_intern_stories;
+      if (job === "fte") return company.has_fte_stories;
+      if (job === "intern_fte") return company.has_intern_fte_stories;
+
+      return true;
+    });
 
   const companiesWithStories = useMemo(
     () => companies.filter((c) => c.story_count > 0),
@@ -46,9 +53,7 @@ export default function BrowseDirectoryPage() {
   );
 
   const trimmedSearch = searchQuery.trim();
-  const visibleCompanies = trimmedSearch
-    ? filterByName(companiesWithStories, trimmedSearch)
-    : companiesWithStories;
+  const visibleCompanies = filterByNameAndJob(companiesWithStories, trimmedSearch, jobFilter);
 
   const companyGridClass =
     visibleCompanies.length <= 6
@@ -118,16 +123,34 @@ export default function BrowseDirectoryPage() {
                   {visibleCompanies.length === 1 ? "company" : "companies"}
                 </p>
               </div>
-              <Input
-                aria-label="Search companies"
-                className="w-full md:max-w-sm"
-                placeholder="Search company..."
-                startContent={<CiSearch className="text-gray-400" />}
-                value={searchQuery}
-                onValueChange={setSearchQuery}
-                color="warning"
-                variant="bordered"
-              />
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:max-w-xl">
+                <Select
+                  aria-label="Filter by Job Type"
+                  className="w-full sm:max-w-[180px]"
+                  placeholder="Job Type"
+                  selectedKeys={[jobFilter]}
+                  onChange={(e) => setJobFilter(e.target.value)}
+                  color="warning"
+                  variant="bordered"
+                  size="sm"
+                >
+                  <SelectItem key="all" value="all">All Roles</SelectItem>
+                  <SelectItem key="intern" value="intern">Internship</SelectItem>
+                  <SelectItem key="fte" value="fte">FTE</SelectItem>
+                  <SelectItem key="intern_fte" value="intern_fte">Intern + FTE</SelectItem>
+                </Select>
+                <Input
+                  aria-label="Search companies"
+                  className="w-full"
+                  placeholder="Search company..."
+                  startContent={<CiSearch className="text-gray-400" />}
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  color="warning"
+                  variant="bordered"
+                  size="sm"
+                />
+              </div>
             </div>
 
             {visibleCompanies.length === 0 ? (

@@ -18,7 +18,10 @@ export default async function handler(req, res) {
         c.id,
         c.company_name,
         c.company_description,
-        COUNT(sp.id)::int AS story_count
+        COUNT(sp.id)::int AS story_count,
+        bool_or(sp.internship_only OR sp.summer_internship) as has_intern_stories,
+        bool_or(sp.fte_only) as has_fte_stories,
+        bool_or(sp.internship_fte) as has_intern_fte_stories
       FROM company c
       LEFT JOIN student_placed sp ON sp.company_placed_id = c.id
       GROUP BY c.id, c.company_name, c.company_description
