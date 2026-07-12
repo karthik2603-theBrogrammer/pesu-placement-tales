@@ -100,39 +100,37 @@ function SearchPageInner() {
       </div>
 
       {/* Search input form */}
-      <form onSubmit={handleSubmit} className="relative mb-6 flex max-w-2xl gap-3">
-        <div className="relative flex-1">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-            <CiSearch className="h-5 w-5 text-slate-400" />
-          </div>
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder='Try "system design", "HR round", "DSA"...'
-            className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setResults([]);
-                setSearched(false);
-                router.push("/search");
-                inputRef.current?.focus();
-              }}
-              className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600"
-              aria-label="Clear search"
-            >
-              <FiX size={16} />
-            </button>
-          )}
+      <form onSubmit={handleSubmit} className="relative mb-8 flex max-w-2xl items-center rounded-full border border-amber-200/60 bg-white/80 p-1.5 shadow-sm backdrop-blur transition-all focus-within:border-amber-400 focus-within:bg-white focus-within:shadow-md hover:shadow-md">
+        <div className="pointer-events-none pl-4 pr-2">
+          <CiSearch className="h-5 w-5 text-amber-500" />
         </div>
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder='Try "system design", "HR round", "DSA"...'
+          className="w-full bg-transparent py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setResults([]);
+              setSearched(false);
+              router.push("/search");
+              inputRef.current?.focus();
+            }}
+            className="flex items-center px-3 text-slate-400 hover:text-slate-600"
+            aria-label="Clear search"
+          >
+            <FiX size={16} />
+          </button>
+        )}
         <button
           type="submit"
-          className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+          className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-7 py-3 text-sm font-bold text-white shadow-sm transition hover:from-amber-600 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1"
         >
           Search
         </button>
@@ -146,11 +144,12 @@ function SearchPageInner() {
           </Spinner>
         </div>
       ) : searched && results.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-10 text-center shadow-sm">
-          <p className="text-sm font-medium text-slate-600">
-            No stories match &ldquo;{query.trim()}&rdquo;
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[2rem] border border-dashed border-amber-200 bg-amber-50/40 p-10 text-center shadow-sm backdrop-blur">
+          <div className="mb-4 text-4xl">🤔</div>
+          <p className="text-lg font-semibold text-slate-700">
+            No stories match &ldquo;<span className="text-amber-700">{query.trim()}</span>&rdquo;
           </p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-2 text-sm text-slate-500">
             Try different keywords or a shorter search term.
           </p>
         </div>
@@ -273,12 +272,14 @@ function SearchPageInner() {
         </div>
       ) : (
         /* Initial state — no search yet */
-        <div className="rounded-2xl border border-amber-100 bg-white/70 p-10 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 border border-amber-100">
-            <CiSearch className="text-amber-600" size={24} />
+        <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[2rem] border border-amber-100 bg-white/60 p-10 text-center shadow-sm backdrop-blur">
+          <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-yellow-50 shadow-inner ring-1 ring-amber-200/50">
+            <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl"></div>
+            <CiSearch className="relative z-10 text-amber-600" size={32} />
           </div>
-          <p className="text-sm text-slate-500">
-            Type at least 2 characters to search across all placement stories.
+          <h2 className="text-xl font-bold text-slate-800">What are you looking for?</h2>
+          <p className="mt-2 max-w-sm text-sm text-slate-500">
+            Enter a keyword and hit Search to explore all placement stories, rounds, and tips.
           </p>
         </div>
       )}

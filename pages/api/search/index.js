@@ -53,8 +53,6 @@ export default async function handler(req, res) {
         sp.remarks_markdown ILIKE ${pattern}
         OR sp.job_title ILIKE ${pattern}
         OR c.company_name ILIKE ${pattern}
-        OR sp.first_name ILIKE ${pattern}
-        OR sp.last_name ILIKE ${pattern}
       ORDER BY
         COALESCE(sp.upvote, 0) DESC,
         sp.created_at DESC
