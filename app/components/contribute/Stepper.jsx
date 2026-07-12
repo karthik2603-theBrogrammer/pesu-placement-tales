@@ -45,7 +45,7 @@ export default function Stepper({ steps, current, windowSize = 3 }) {
                 {!isLastVisible && (
                   <span
                     className={`absolute left-[13px] top-7 h-[calc(100%-1rem)] w-0.5 rounded-full transition-colors duration-500 ${
-                      index < current ? "bg-indigo-500" : "bg-slate-200"
+                      index < current ? "bg-amber-400" : "bg-amber-100"
                     }`}
                   />
                 )}
@@ -60,8 +60,8 @@ export default function Stepper({ steps, current, windowSize = 3 }) {
                   <p
                     className={`text-sm ${
                       state === "current"
-                        ? "font-bold text-slate-900"
-                        : "font-medium text-slate-500"
+                        ? "font-bold text-amber-900"
+                        : "font-medium text-amber-700"
                     }`}
                   >
                     {step.label}
@@ -81,8 +81,8 @@ export default function Stepper({ steps, current, windowSize = 3 }) {
 function Ellipsis() {
   return (
     <div className="mb-2 flex h-4 flex-col items-center justify-center gap-[3px] pl-[10px]">
-      <span className="h-1 w-1 rounded-full bg-slate-300" />
-      <span className="h-1 w-1 rounded-full bg-slate-300" />
+      <span className="h-1 w-1 rounded-full bg-amber-200" />
+      <span className="h-1 w-1 rounded-full bg-amber-200" />
     </div>
   );
 }
@@ -90,7 +90,7 @@ function Ellipsis() {
 function StepNode({ state }) {
   if (state === "done") {
     return (
-      <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white shadow-sm">
+      <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-white shadow-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path
             d="M20 6 9 17l-5-5"
@@ -110,16 +110,16 @@ function StepNode({ state }) {
         initial={{ scale: 0.8 }}
         animate={{ scale: [1, 1.12, 1] }}
         transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-indigo-500 bg-white ring-4 ring-indigo-50"
+        className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-amber-500 bg-white ring-4 ring-amber-200"
       >
-        <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
       </motion.span>
     );
   }
 
   return (
-    <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white">
-      <span className="h-2 w-2 rounded-full bg-slate-300" />
+    <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-white">
+      <span className="h-2 w-2 rounded-full bg-amber-200" />
     </span>
   );
 }

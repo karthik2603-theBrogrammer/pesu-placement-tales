@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 const baseInput =
-  "w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100";
+  "w-full rounded-2xl border border-amber-200 bg-white/80 px-4 py-3 text-base text-amber-950 shadow-sm outline-none transition placeholder:text-amber-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-300/60";
 
 export function FieldLabel({
   children,
@@ -12,7 +12,7 @@ export function FieldLabel({
   className = "mb-2",
 }) {
   return (
-    <span className={`block text-sm font-semibold text-slate-700 ${className}`}>
+    <span className={`block text-sm font-semibold text-amber-800 ${className}`}>
       {children}
       {required ? (
         <span className="text-red-500" aria-hidden>
@@ -59,9 +59,9 @@ export function TextField({
             onEnter();
           }
         }}
-        className={`${baseInput} ${disabled ? "cursor-not-allowed bg-slate-50 opacity-70" : ""}`}
+        className={`${baseInput} ${disabled ? "cursor-not-allowed bg-amber-50/80 opacity-70" : ""}`}
       />
-      {hint && <span className="mt-2 block text-xs text-slate-500">{hint}</span>}
+      {hint && <span className="mt-2 block text-xs text-amber-600/80">{hint}</span>}
     </label>
   );
 }
@@ -90,7 +90,7 @@ export function TextArea({
         onChange={(e) => onChange(e.target.value)}
         className={`${baseInput} resize-none leading-relaxed`}
       />
-      {hint && <span className="mt-2 block text-xs text-slate-500">{hint}</span>}
+      {hint && <span className="mt-2 block text-xs text-amber-600/80">{hint}</span>}
     </label>
   );
 }
@@ -107,8 +107,8 @@ export function ChoiceCards({ options, value, onChange }) {
             onClick={() => onChange(option)}
             className={`rounded-2xl border px-5 py-4 text-left text-base font-semibold transition ${
               active
-                ? "border-slate-400 bg-slate-100 text-slate-900 shadow-sm"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                ? "border-amber-400 bg-amber-100 text-amber-900 shadow-sm"
+                : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
             }`}
           >
             {option}
@@ -122,7 +122,7 @@ export function ChoiceCards({ options, value, onChange }) {
 import { ROUND_OUTCOME_OPTIONS } from "../../../utils/verdict";
 
 const selectClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-100";
+  "w-full rounded-xl border border-amber-100 bg-white/80 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
 
 const emptyRound = { description: "", questions: "", duration: "", outcome: "" };
 
@@ -145,10 +145,10 @@ export function RoundsEditor({ rounds, onChange }) {
       {list.map((round, index) => (
         <div
           key={index}
-          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="rounded-2xl border border-amber-200 bg-white/70 p-4 shadow-sm"
         >
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-700">
+            <span className="text-sm font-bold text-amber-800">
               Round {index + 1}
               {index === 0 ? (
                 <span className="text-red-500" aria-hidden>
@@ -163,7 +163,7 @@ export function RoundsEditor({ rounds, onChange }) {
               <button
                 type="button"
                 onClick={() => removeRound(index)}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-700"
+                className="text-xs font-semibold text-amber-600 hover:text-amber-800"
               >
                 Remove
               </button>
@@ -221,7 +221,7 @@ export function RoundsEditor({ rounds, onChange }) {
       <button
         type="button"
         onClick={addRound}
-        className="w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+        className="w-full rounded-2xl border border-dashed border-amber-300 bg-amber-50/60 px-4 py-3 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
       >
         + Add another round
       </button>
@@ -286,8 +286,8 @@ export function CompanyPicker({ companies, value, onChange }) {
               onClick={() => selectExisting(company)}
               className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                 active
-                  ? "border-slate-400 bg-slate-100 text-slate-900"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  ? "border-amber-400 bg-amber-100 text-amber-900"
+                  : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
               }`}
             >
               {company.company_name}
@@ -295,7 +295,7 @@ export function CompanyPicker({ companies, value, onChange }) {
           );
         })}
         {filtered.length === 0 && query.trim() && (
-          <p className="text-sm text-slate-500">No matches — add it as a new company below.</p>
+          <p className="text-sm text-amber-600">No matches — add it as a new company below.</p>
         )}
       </div>
 
@@ -305,8 +305,8 @@ export function CompanyPicker({ companies, value, onChange }) {
           onClick={selectNew}
           className={`w-full rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition ${
             value?.mode === "new"
-              ? "border-slate-400 bg-slate-100 text-slate-900"
-              : "border-dashed border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100"
+              ? "border-amber-400 bg-amber-100 text-amber-900"
+              : "border-dashed border-amber-300 bg-amber-50/60 text-amber-700 hover:bg-amber-100"
           }`}
         >
           + Add “{query.trim()}” as a new company
@@ -326,7 +326,7 @@ export function CompanyPicker({ companies, value, onChange }) {
       )}
 
       {value?.mode && (
-        <p className="rounded-xl bg-indigo-50 px-3 py-2 text-xs font-medium text-indigo-700">
+        <p className="rounded-xl bg-amber-100/70 px-3 py-2 text-xs font-medium text-amber-800">
           Selected: {value.company_name}
           {value.mode === "new" ? " (new company)" : ""}
         </p>
