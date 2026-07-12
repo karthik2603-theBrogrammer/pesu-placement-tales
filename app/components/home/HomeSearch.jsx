@@ -20,7 +20,7 @@ export default function HomeSearch() {
       onSubmit={handleSearch}
       className="relative mx-auto mt-8 w-full max-w-2xl"
     >
-      <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+      <div className="relative flex items-center overflow-hidden rounded-2xl border border-slate-200 bg-white/70 backdrop-blur shadow-sm focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-100 transition-all">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
           <CiSearch className="h-6 w-6 text-slate-400" />
         </div>
@@ -34,7 +34,7 @@ export default function HomeSearch() {
         <div className="absolute inset-y-0 right-1.5 flex items-center">
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
           >
             Search
           </button>

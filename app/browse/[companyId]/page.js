@@ -61,12 +61,12 @@ export default function CompanyStoriesPage() {
       <div className="mb-6">
         <Link
           href="/browse"
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 hover:underline"
+          className="text-sm font-medium text-amber-700 hover:underline"
         >
           ← All companies
         </Link>
         <h1 className="mt-2 text-2xl font-bold text-gray-900">{companyName}</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-amber-800">
           {hasActiveFilters
             ? `${filteredStories.length} of ${stories.length} ${stories.length === 1 ? "story" : "stories"}`
             : `${stories.length} ${stories.length === 1 ? "story" : "stories"}`}
@@ -82,7 +82,7 @@ export default function CompanyStoriesPage() {
             placeholder="Degree"
             selectedKeys={[degreeFilter]}
             onChange={(e) => setDegreeFilter(e.target.value)}
-            color="default"
+            color="warning"
             variant="bordered"
             size="sm"
           >
@@ -99,7 +99,7 @@ export default function CompanyStoriesPage() {
             placeholder="Batch"
             selectedKeys={[batchFilter]}
             onChange={(e) => setBatchFilter(e.target.value)}
-            color="default"
+            color="warning"
             variant="bordered"
             size="sm"
           >
@@ -116,7 +116,7 @@ export default function CompanyStoriesPage() {
             placeholder="Verdict"
             selectedKeys={[verdictFilter]}
             onChange={(e) => setVerdictFilter(e.target.value)}
-            color="default"
+            color="warning"
             variant="bordered"
             size="sm"
           >
@@ -130,7 +130,7 @@ export default function CompanyStoriesPage() {
             placeholder="Type"
             selectedKeys={[typeFilter]}
             onChange={(e) => setTypeFilter(e.target.value)}
-            color="default"
+            color="warning"
             variant="bordered"
             size="sm"
           >
@@ -146,7 +146,7 @@ export default function CompanyStoriesPage() {
             <button
               type="button"
               onClick={clearFilters}
-              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+              className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
             >
               <FiX size={12} />
               Clear
@@ -156,7 +156,7 @@ export default function CompanyStoriesPage() {
       )}
 
       {filteredStories.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">
+        <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-8 text-center text-sm text-gray-500">
           {hasActiveFilters
             ? "No stories match your filters."
             : "No stories yet for this company."}
@@ -170,7 +170,7 @@ export default function CompanyStoriesPage() {
               onClick={() =>
                 router.push(storyBrowsePath(companyId, item.student_id))
               }
-              className="group rounded-lg border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-200"
+              className="group rounded-xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
@@ -178,26 +178,26 @@ export default function CompanyStoriesPage() {
                     {displayStoryName(item)}
                   </p>
                   {item.job_title && (
-                    <p className="truncate text-xs text-indigo-700">{item.job_title}</p>
+                    <p className="truncate text-xs text-amber-700">{item.job_title}</p>
                   )}
                 </div>
                 <span className="shrink-0 tabular-nums text-[10px] leading-tight text-slate-400">
-                  <span className="text-indigo-600">▲{item.upvote ?? 0}</span>
+                  <span className="text-amber-600">▲{item.upvote ?? 0}</span>
                   {" · "}
                   <span>▼{item.downvote ?? 0}</span>
                 </span>
               </div>
               <p className="mt-1 truncate text-[11px] leading-tight text-slate-500">
-                <span className="font-medium text-indigo-700">
+                <span className="font-medium text-amber-800">
                   {formatPlacementTypes(item)}
                 </span>
-                <span className="text-slate-300"> · </span>
+                <span className="text-amber-300"> · </span>
                 Batch {item.batch_of}
-                <span className="text-slate-300"> · </span>
+                <span className="text-amber-300"> · </span>
                 <span
                   className={
                     item.verdict === "rejected"
-                      ? "font-medium text-rose-600"
+                      ? "font-medium text-red-600"
                       : "font-medium text-emerald-600"
                   }
                 >

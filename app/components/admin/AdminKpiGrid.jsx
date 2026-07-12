@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const CARDS = [
-  { key: "stories", label: "Stories", accent: "from-indigo-500 to-indigo-400" },
-  { key: "featureRequests", label: "Feature requests", accent: "from-slate-500 to-slate-400" },
-  { key: "companies", label: "Companies", accent: "from-indigo-400 to-slate-400" },
-  { key: "bugReports", label: "Bug reports", accent: "from-slate-600 to-slate-500" },
+  { key: "stories", label: "Stories", accent: "from-amber-500 to-amber-400" },
+  { key: "featureRequests", label: "Feature requests", accent: "from-yellow-500 to-yellow-400" },
+  { key: "companies", label: "Companies", accent: "from-amber-400 to-yellow-400" },
+  { key: "bugReports", label: "Bug reports", accent: "from-yellow-600 to-amber-500" },
 ];
 
 export default function AdminKpiGrid({ token }) {
@@ -38,7 +38,7 @@ export default function AdminKpiGrid({ token }) {
         {CARDS.map((card) => (
           <div
             key={card.key}
-            className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-slate-50"
+            className="h-28 animate-pulse rounded-[2rem] border border-amber-100 bg-amber-50/20"
           />
         ))}
       </div>
@@ -55,12 +55,12 @@ export default function AdminKpiGrid({ token }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          className="group relative overflow-hidden rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md backdrop-blur"
         >
           <div
             className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${card.accent} opacity-10 blur-2xl transition group-hover:opacity-20`}
           />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
             {card.label}
           </p>
           <p className="mt-2 text-4xl font-black tabular-nums tracking-tight text-slate-900">

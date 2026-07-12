@@ -93,3 +93,9 @@ CREATE TABLE tasks (
   topic_related VARCHAR(255),
   PRIMARY KEY (task_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_student_placed_remarks_trgm ON student_placed USING gin (remarks_markdown gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_student_placed_job_title_trgm ON student_placed USING gin (job_title gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_student_placed_first_name_trgm ON student_placed USING gin (first_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_student_placed_last_name_trgm ON student_placed USING gin (last_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_company_name_trgm ON company USING gin (company_name gin_trgm_ops);

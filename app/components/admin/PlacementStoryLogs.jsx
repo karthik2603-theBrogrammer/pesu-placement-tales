@@ -28,7 +28,7 @@ const ENDPOINT = "/api/admin/contributions";
 const PAGE_SIZE = 5;
 
 const input =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100";
+  "w-full rounded-lg border border-amber-200 bg-white/80 px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
 
 const fullName = (item) =>
   [item.first_name, item.middle_name, item.last_name].filter(Boolean).join(" ");
@@ -199,9 +199,9 @@ export default function PlacementStoryLogs({ token, companies }) {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm backdrop-blur">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-slate-900">Placement stories</h2>
+        <h2 className="text-sm font-bold text-amber-950">Placement stories</h2>
         <span className="text-xs text-slate-500">{items.length} loaded</span>
       </div>
 
@@ -213,10 +213,10 @@ export default function PlacementStoryLogs({ token, companies }) {
           return (
             <div
               key={item.id}
-              className={`overflow-hidden rounded-lg border transition-colors ${
+              className={`overflow-hidden rounded-xl border transition-colors ${
                 open
-                  ? "border-indigo-200 bg-indigo-50/40 shadow-sm"
-                  : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                  ? "border-amber-300 bg-amber-50 shadow-sm"
+                  : "border-amber-100 bg-white hover:border-amber-200 hover:bg-amber-50/60"
               }`}
             >
               {/* collapsed log row */}
@@ -251,7 +251,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                 </span>
                 <span
                   className={`shrink-0 text-slate-400 transition-transform ${
-                    open ? "rotate-180 text-indigo-500" : ""
+                    open ? "rotate-180 text-amber-600" : ""
                   }`}
                   aria-hidden
                 >
@@ -389,8 +389,8 @@ export default function PlacementStoryLogs({ token, companies }) {
                                     key={opt.key}
                                     className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
                                       editForm.placement_type === opt.key
-                                        ? "border-indigo-400 bg-indigo-50 text-indigo-900"
-                                        : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                                        ? "border-amber-400 bg-amber-100 text-amber-900"
+                                        : "border-amber-200 bg-white text-slate-700 hover:border-amber-300"
                                     }`}
                                   >
                                     <input
@@ -402,7 +402,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                           placement_type: opt.key,
                                         }))
                                       }
-                                      className="h-3.5 w-3.5 accent-indigo-600"
+                                      className="h-3.5 w-3.5 accent-amber-500"
                                     />
                                     {opt.label}
                                   </label>
@@ -495,14 +495,14 @@ export default function PlacementStoryLogs({ token, companies }) {
                               type="button"
                               disabled={saving}
                               onClick={(e) => save(item.id, e)}
-                              className="rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-bold text-white shadow-sm disabled:opacity-60 hover:bg-slate-800"
+                              className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-white shadow-md disabled:opacity-60 hover:from-amber-600 hover:to-yellow-600"
                             >
                               {saving ? "Saving…" : "Save"}
                             </button>
                             <button
                               type="button"
                               onClick={cancelEdit}
-                              className="text-xs font-medium text-slate-600 hover:text-slate-800"
+                              className="text-xs font-medium text-amber-700 hover:text-amber-900"
                             >
                               Cancel
                             </button>
@@ -518,13 +518,13 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 href={item.linkedin_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-medium text-indigo-600 hover:underline"
+                                className="font-medium text-amber-700 hover:underline"
                               >
                                 LinkedIn
                               </a>
                             )}
                           </div>
-                          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                          <div className="rounded-xl border border-amber-100 bg-amber-50/20 p-3">
                             <MarkdownReviewRenderer
                               remarks_markdown={item.remarks_markdown}
                               theme="light"
@@ -534,14 +534,14 @@ export default function PlacementStoryLogs({ token, companies }) {
                             <button
                               type="button"
                               onClick={(e) => startEdit(item, e)}
-                              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm"
+                              className="rounded-full border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 shadow-sm"
                             >
                               Edit
                             </button>
                             <button
                               type="button"
                               onClick={(e) => remove(item.id, e)}
-                              className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                              className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
                             >
                               Delete
                             </button>

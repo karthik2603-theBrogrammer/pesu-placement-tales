@@ -1,9 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 * {
   scroll-behavior: smooth;
+  font-family: "Poppins", sans-serif;
 }
 @media print {
 	body {
@@ -78,13 +81,11 @@
 
 .story-markdown p,
 .story-markdown .bn-inline-content {
-  font-family: var(--font-merriweather), serif !important;
   font-size: 0.9375rem !important;
-  line-height: 1.7 !important;
+  line-height: 1.65 !important;
 }
 
 .story-markdown .bn-block-content[data-content-type="heading"] .bn-inline-content {
-  font-family: var(--font-inter), sans-serif !important;
   font-size: inherit !important;
   line-height: inherit !important;
   font-weight: inherit !important;

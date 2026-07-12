@@ -57,8 +57,8 @@ export default function BookmarkButton({
         onClick={handleToggle}
         className={`rounded-lg p-1 transition ${
           saved
-            ? "text-indigo-600 hover:text-indigo-700"
-            : "text-slate-400 hover:text-indigo-500"
+            ? "text-amber-600 hover:text-amber-700"
+            : "text-slate-400 hover:text-amber-500"
         } ${className}`}
         aria-label={label}
         title={label}
@@ -74,8 +74,8 @@ export default function BookmarkButton({
       onClick={handleToggle}
       className={`rounded-lg p-1.5 transition ${
         saved
-          ? "text-indigo-600 hover:text-indigo-700"
-          : "text-slate-400 hover:text-indigo-500"
+          ? "text-amber-600 hover:text-amber-700"
+          : "text-slate-400 hover:text-amber-500"
       } ${className}`}
       aria-label={label}
       title={label}

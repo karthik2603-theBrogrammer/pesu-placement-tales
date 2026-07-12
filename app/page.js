@@ -50,20 +50,20 @@ export default async function Home() {
   const { trending, recent, stats } = await loadHomeFeeds();
 
   return (
-    <main className="relative min-h-screen bg-slate-50 text-slate-950 overflow-hidden">
-      {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:linear-gradient(rgba(148,163,184,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(148,163,184,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_80%)]" />
-      <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[600px] w-[800px] rounded-full bg-indigo-300/15 blur-3xl" />
-      <div className="pointer-events-none absolute left-0 top-0 h-96 w-96 rounded-full bg-slate-300/25 blur-3xl" />
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-16 text-slate-950 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
 
-      <section className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center px-4 py-20 sm:px-6 lg:px-8">
-        <p className="mb-5 w-fit rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-slate-600 shadow-sm">
+      <section className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
+        <p className="mb-5 w-fit rounded-full border border-amber-200/70 bg-amber-100/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700 shadow-sm backdrop-blur">
           PESU Placement Tales
         </p>
 
-        <h1 className="text-5xl font-serif font-black leading-tight tracking-tight sm:text-7xl text-slate-900">
+        <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-6xl text-slate-900">
           Placement wisdom,
-          <span className="block text-indigo-700 pb-2">
+          <span className="block bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent pb-2">
             straight from your seniors
           </span>
         </h1>
@@ -74,18 +74,18 @@ export default async function Home() {
 
         <HomeSearch />
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/browse"
-            className="rounded-xl bg-white border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-          >
-            Browse directory
-          </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/add-student"
-            className="text-sm font-semibold text-indigo-700 underline-offset-4 hover:underline"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-7 py-3 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
           >
             Share your story
+          </Link>
+          <Link
+            href="/browse"
+            className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
+          >
+            Browse directory
           </Link>
         </div>
 
@@ -93,9 +93,9 @@ export default async function Home() {
           {highlights.map((item) => (
             <span
               key={item}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-amber-200/70 bg-white/60 px-3.5 py-1.5 text-xs font-medium text-amber-800 shadow-sm backdrop-blur"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
               {item}
             </span>
           ))}
@@ -108,8 +108,8 @@ export default async function Home() {
       </div>
       
       {/* Bottom CTA */}
-      <section className="relative z-10 border-t border-slate-200 bg-white px-4 py-20 text-center sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-serif font-black tracking-tight text-slate-900 sm:text-4xl">
+      <section className="relative z-10 border-t border-amber-100/70 bg-amber-50/40 px-4 py-20 text-center sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
           Help the next batch
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-slate-600 leading-relaxed text-base">
@@ -119,13 +119,13 @@ export default async function Home() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/add-student"
-            className="rounded-xl bg-slate-900 px-7 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-7 py-3 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
           >
             Share your story
           </Link>
           <Link
             href="/pass-the-torch"
-            className="rounded-xl border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="rounded-xl border border-amber-300 bg-white/70 px-7 py-3 text-sm font-semibold text-amber-700 backdrop-blur transition hover:bg-amber-100"
           >
             Pass the torch
           </Link>

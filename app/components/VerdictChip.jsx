@@ -2,8 +2,8 @@ import { formatVerdict } from "../../utils/verdict";
 
 const STYLES = {
   selected:
-    "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
-  rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
+    "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80",
+  rejected: "bg-red-50 text-red-700 ring-1 ring-red-200/80",
 };
 
 export default function VerdictChip({ verdict, className = "" }) {

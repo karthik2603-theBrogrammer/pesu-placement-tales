@@ -249,12 +249,12 @@ export default function ContributePage() {
         },
         render: () => (
           <div className="grid gap-4">
-            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-slate-100">
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2 text-xs text-amber-700 transition hover:border-amber-300 hover:bg-amber-100">
               <input
                 type="checkbox"
                 checked={p.anonymous}
                 onChange={(e) => toggleAnonymous(e.target.checked)}
-                className="h-3.5 w-3.5 shrink-0 accent-indigo-600"
+                className="h-3.5 w-3.5 shrink-0 accent-amber-500"
               />
               <span>
                 Stay anonymous{" "}
@@ -262,7 +262,7 @@ export default function ContributePage() {
               </span>
             </label>
 
-            <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <div className="space-y-2 rounded-xl border border-amber-100 bg-white/80 px-4 py-3">
               <p className="text-xs text-slate-600">
                 <span className="text-red-500">*</span>{" "}
                 <span className="font-semibold text-slate-900">Required</span>
@@ -335,7 +335,7 @@ export default function ContributePage() {
                           ? opt.value === "selected"
                             ? "border-emerald-400 bg-emerald-50 text-emerald-800"
                             : "border-red-400 bg-red-50 text-red-800"
-                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
                       }`}
                     >
                       <input
@@ -360,15 +360,15 @@ export default function ContributePage() {
                       key={opt.key}
                       className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
                         p[opt.key]
-                          ? "border-indigo-400 bg-indigo-50 text-indigo-900"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                          ? "border-amber-400 bg-amber-100 text-amber-900"
+                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={!!p[opt.key]}
                         onChange={() => togglePlacementType(opt.key)}
-                        className="h-4 w-4 shrink-0 accent-indigo-600"
+                        className="h-4 w-4 shrink-0 accent-amber-500"
                       />
                       {opt.label}
                     </label>
@@ -382,7 +382,7 @@ export default function ContributePage() {
                 <select
                   value={p.degree}
                   onChange={(e) => setSection("person", { degree: e.target.value })}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+                  className="w-full rounded-xl border border-amber-100 bg-white/80 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
                 >
                   {DEGREE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -830,12 +830,12 @@ export default function ContributePage() {
   }, [current, data, experienceMarkdown, stepIndex, totalSteps]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-50 px-4 py-10 text-slate-900 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
       <Toaster position="top-center" richColors />
-      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(148,163,184,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(148,163,184,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
-      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-slate-300/25 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-indigo-200/25 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
+      <div className="pointer-events-none absolute inset-0 opacity-90 [background-image:linear-gradient(rgba(180,83,9,0.32)_1.2px,transparent_1.2px),linear-gradient(90deg,rgba(180,83,9,0.32)_1.2px,transparent_1.2px)] [background-size:44px_44px] [mask-image:radial-gradient(circle_at_top,black,transparent_95%)]" />
+      <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-28 h-96 w-96 rounded-full bg-yellow-200/35 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.16),transparent_38%),linear-gradient(to_bottom,rgba(255,255,255,0.04),rgba(255,255,255,0.35))]" />
 
       <section className="relative z-10 mx-auto max-w-5xl">
         {result ? (
@@ -851,7 +851,7 @@ export default function ContributePage() {
                     key={encouragement(progress)}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-sm font-bold leading-snug text-indigo-700"
+                    className="text-sm font-bold leading-snug text-amber-700"
                   >
                     {encouragement(progress)}
                   </motion.p>
@@ -869,7 +869,7 @@ export default function ContributePage() {
                   key={encouragement(progress)}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-sm font-bold text-indigo-700"
+                  className="text-sm font-bold text-amber-700"
                 >
                   {encouragement(progress)}
                 </motion.p>
@@ -886,7 +886,7 @@ export default function ContributePage() {
                 </motion.div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+              <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={current.key}
@@ -900,18 +900,18 @@ export default function ContributePage() {
                   {current.kind === "review" ? (
                     <div>
                       <StepHeader title={current.title} subtitle={current.subtitle} />
-                      <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900">
+                      <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50/60 px-4 py-3 text-sm text-amber-900">
                         <p className="font-semibold">
                           {data.person.first_name} {data.person.last_name}
                         </p>
-                        <p className="text-slate-600">
+                        <p className="text-amber-700">
                           {data.company.company_name} · Batch {data.person.batch_of}
                         </p>
                         <div className="mt-2">
                           <VerdictChip verdict={data.person.verdict} />
                         </div>
                       </div>
-                      <div className="max-h-[45vh] overflow-auto rounded-xl border border-slate-200 bg-white p-4">
+                      <div className="max-h-[45vh] overflow-auto rounded-2xl border border-amber-100 bg-white/80 p-4">
                         <MarkdownReviewRenderer remarks_markdown={experienceMarkdown} />
                       </div>
                     </div>
@@ -930,7 +930,7 @@ export default function ContributePage() {
                   type="button"
                   onClick={goBack}
                   disabled={stepIndex === 0}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Back
                 </button>
@@ -940,7 +940,7 @@ export default function ContributePage() {
                     <button
                       type="button"
                       onClick={handleSkip}
-                      className="text-sm font-medium text-slate-500 hover:text-slate-700"
+                      className="text-sm font-medium text-amber-600 hover:text-amber-800"
                     >
                       Skip
                     </button>
@@ -950,7 +950,7 @@ export default function ContributePage() {
                       type="button"
                       onClick={handleSubmit}
                       disabled={submitting}
-                      className="rounded-lg bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
+                      className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
                     >
                       {submitting ? "Submitting…" : "Submit experience"}
                     </button>
@@ -958,7 +958,7 @@ export default function ContributePage() {
                     <button
                       type="button"
                       onClick={handleNext}
-                      className="rounded-lg bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+                      className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
                     >
                       Continue
                     </button>
@@ -976,7 +976,7 @@ export default function ContributePage() {
 
 function SubHeading({ children, optional = false }) {
   return (
-    <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">
+    <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
       {children}
       {optional ? (
         <span className="font-normal normal-case tracking-normal text-slate-400">
@@ -991,7 +991,7 @@ function SubHeading({ children, optional = false }) {
 function StepHeader({ title, subtitle }) {
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+      <h2 className="text-2xl font-black tracking-tight text-amber-950 sm:text-3xl">
         {title}
       </h2>
       {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
@@ -1001,29 +1001,29 @@ function StepHeader({ title, subtitle }) {
 
 function SuccessCard({ result }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+    <div className="rounded-3xl border border-white/70 bg-white/80 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
       <div className="mb-6 flex justify-center">
         <Mascot message="You did it! Your story is now live for juniors to learn from." />
       </div>
-      <h1 className="text-3xl font-black tracking-tight text-slate-900">
+      <h1 className="text-3xl font-black tracking-tight text-amber-950">
         Thank you for contributing!
       </h1>
       <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
         Your experience for{" "}
-        <span className="font-semibold text-indigo-700">{result.companyName}</span>{" "}
+        <span className="font-semibold text-amber-700">{result.companyName}</span>{" "}
         has been saved and is now visible on the browse page.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/browse"
-          className="rounded-lg bg-slate-900 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800"
+          className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
         >
           Browse experiences
         </Link>
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="rounded-lg border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          className="rounded-full border border-amber-300 px-6 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
         >
           Share another
         </button>

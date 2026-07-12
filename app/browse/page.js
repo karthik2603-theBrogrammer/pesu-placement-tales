@@ -138,7 +138,7 @@ export default function BrowseDirectoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BrowseToaster />
         <div className="mx-auto mb-8 max-w-3xl text-center">
-          <div className="mb-3 inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
+          <div className="mb-3 inline-flex rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
             Company directory
           </div>
           <H text="Browse Companies" styles="text-gray-900" />
@@ -152,7 +152,7 @@ export default function BrowseDirectoryPage() {
               <span className="inline-flex items-center gap-1 align-middle">
                 <span
                   aria-hidden
-                  className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-white px-2 py-0.5 text-xs font-semibold text-indigo-700 shadow-sm"
+                  className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white px-2 py-0.5 text-xs font-semibold text-amber-700 shadow-sm"
                 >
                   ▲ <span className="tabular-nums">12</span>
                 </span>
@@ -174,13 +174,13 @@ export default function BrowseDirectoryPage() {
         </div>
 
         {loadingCompanies ? (
-          <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-white p-10 shadow-sm">
-            <Spinner color="default" labelColor="foreground" className="text-xs">
+          <div className="flex items-center justify-center rounded-3xl border border-amber-100 bg-white/70 p-10 shadow-sm">
+            <Spinner color="warning" labelColor="warning" className="text-xs">
               Loading companies...
             </Spinner>
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+          <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-4 shadow-sm backdrop-blur md:p-6">
             <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
@@ -199,7 +199,7 @@ export default function BrowseDirectoryPage() {
                 startContent={<CiSearch className="text-gray-400" />}
                 value={searchQuery}
                 onValueChange={setSearchQuery}
-                color="default"
+                color="warning"
                 variant="bordered"
                 size="sm"
               />
@@ -213,7 +213,7 @@ export default function BrowseDirectoryPage() {
                 placeholder="Job Type"
                 selectedKeys={[jobFilter]}
                 onChange={(e) => setJobFilter(e.target.value)}
-                color="default"
+                color="warning"
                 variant="bordered"
                 size="sm"
               >
@@ -228,7 +228,7 @@ export default function BrowseDirectoryPage() {
                 placeholder="Degree"
                 selectedKeys={[degreeFilter]}
                 onChange={(e) => setDegreeFilter(e.target.value)}
-                color="default"
+                color="warning"
                 variant="bordered"
                 size="sm"
               >
@@ -245,7 +245,7 @@ export default function BrowseDirectoryPage() {
                 placeholder="Batch"
                 selectedKeys={[batchFilter]}
                 onChange={(e) => setBatchFilter(e.target.value)}
-                color="default"
+                color="warning"
                 variant="bordered"
                 size="sm"
               >
@@ -262,7 +262,7 @@ export default function BrowseDirectoryPage() {
                 placeholder="Verdict"
                 selectedKeys={[verdictFilter]}
                 onChange={(e) => setVerdictFilter(e.target.value)}
-                color="default"
+                color="warning"
                 variant="bordered"
                 size="sm"
               >
@@ -275,7 +275,7 @@ export default function BrowseDirectoryPage() {
                 <button
                   type="button"
                   onClick={clearAllFilters}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                  className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
                 >
                   <FiX size={12} />
                   Clear
@@ -284,7 +284,7 @@ export default function BrowseDirectoryPage() {
             </div>
 
             {visibleCompanies.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+              <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
                 {trimmedSearch || hasActiveFilters
                   ? "No companies match your filters."
                   : "No stories have been shared yet."}
@@ -296,12 +296,12 @@ export default function BrowseDirectoryPage() {
                     key={company.id}
                     type="button"
                     onClick={() => openCompany(company)}
-                    className="group min-h-[88px] rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-200"
+                    className="group min-h-[88px] rounded-2xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-200"
                   >
-                    <p className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
+                    <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">
                       {company.company_name}
                     </p>
-                    <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-indigo-600 opacity-75 transition group-hover:opacity-100">
+                    <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-amber-600 opacity-75 transition group-hover:opacity-100">
                       {company.story_count}{" "}
                       {company.story_count === 1 ? "story" : "stories"}
                     </p>

@@ -52,13 +52,13 @@ export default function App() {
       isBlurred={false}
       className={`sticky top-0 z-40 transition-all duration-300 ${
         useGlass
-          ? "border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur-md"
+          ? "border-b border-amber-100/70 bg-white/60 shadow-sm backdrop-blur-xl backdrop-saturate-150"
           : "border-b border-transparent bg-transparent"
       }`}
       classNames={{ wrapper: "px-4 sm:px-6" }}
     >
       <NavbarBrand>
-        <Link href="/" className="text-lg font-black tracking-tight text-slate-900">
+        <Link href="/" className="text-lg font-black tracking-tight text-amber-700">
           Placement Tales
         </Link>
       </NavbarBrand>
@@ -68,7 +68,7 @@ export default function App() {
           <NavbarItem key={item.href} className="hidden md:flex">
             <Link
               href={item.href}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="rounded-xl px-3 py-1.5 text-sm font-medium text-amber-800 transition-colors hover:bg-amber-100"
             >
               {item.label}
             </Link>
@@ -80,8 +80,8 @@ export default function App() {
             <Button
               as={Link}
               href={SHARE_LINK.href}
-              radius="md"
-              className="bg-slate-900 font-medium text-white shadow-sm transition hover:bg-slate-800"
+              radius="lg"
+              className="bg-gradient-to-r from-amber-500 to-yellow-500 font-bold text-white shadow-md"
             >
               {SHARE_LINK.label}
             </Button>
@@ -91,13 +91,13 @@ export default function App() {
         <NavbarItem className="md:hidden">
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
-              <Button isIconOnly radius="md" variant="flat" className="bg-slate-100 text-slate-700">
+              <Button isIconOnly radius="lg" variant="flat" className="bg-amber-100 text-amber-700">
                 <PiListBold size={18} />
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Navigation menu">
               {(showCta ? [...links, SHARE_LINK] : links).map((item) => (
-                <DropdownItem key={item.href} href={item.href} className="text-slate-700">
+                <DropdownItem key={item.href} href={item.href} className="text-amber-800">
                   {item.label}
                 </DropdownItem>
               ))}

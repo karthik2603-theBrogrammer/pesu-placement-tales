@@ -61,7 +61,7 @@ const EMPTY_FORM = {
 };
 
 const input =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100";
+  "w-full rounded-lg border border-amber-200 bg-white/80 px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
 
 const NUMERIC_FIELDS = [
   ["year", "Year"],
@@ -187,7 +187,7 @@ const maintainerSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
       <span className="font-semibold text-slate-900">{item.full_name}</span>
-      <span className="rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-indigo-700">
+      <span className="rounded-full bg-amber-100/85 border border-amber-200 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-800">
         Batch {item.batch}
       </span>
     </div>
@@ -198,14 +198,14 @@ const maintainerSummary = (item) => (
       <p className="mt-1 text-sm text-slate-600">{truncate(item.reason)}</p>
     ) : null}
     <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
-      <a href={`mailto:${item.email}`} className="text-indigo-600 hover:underline">
+      <a href={`mailto:${item.email}`} className="text-amber-700 hover:underline">
         {item.email}
       </a>
       <a
         href={item.linkedin_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-indigo-600 hover:underline"
+        className="text-amber-700 hover:underline"
       >
         LinkedIn
       </a>
@@ -396,15 +396,15 @@ export default function AdminStatsPage() {
   };
 
   return (
-    <main className="relative min-h-screen bg-slate-50 px-4 py-10 text-slate-900 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-white px-4 py-10 text-slate-950 sm:px-6 lg:px-8">
       <Toaster position="top-center" richColors />
       <section className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <p className="mb-1 w-fit rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600 shadow-sm">
+            <p className="mb-1 w-fit rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 shadow-sm backdrop-blur">
               Admin
             </p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">
+            <h1 className="text-3xl font-black tracking-tight text-amber-950">
               Admin console
             </h1>
             <p className="mt-1 text-sm text-slate-500">
@@ -415,7 +415,7 @@ export default function AdminStatsPage() {
             <button
               type="button"
               onClick={logout}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition"
+              className="rounded-full border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-slate-50 shadow-sm transition"
             >
               Lock
             </button>
@@ -423,7 +423,7 @@ export default function AdminStatsPage() {
         </div>
 
         {!unlocked ? (
-          <div className="max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="max-w-sm rounded-[2rem] border border-amber-100 bg-white/75 p-6 shadow-sm backdrop-blur">
             <p className="mb-4 text-sm text-slate-600">
               Enter the admin token to manage stats, stories, and feedback.
             </p>
@@ -438,7 +438,7 @@ export default function AdminStatsPage() {
             <button
               type="button"
               onClick={() => loadData(tokenInput)}
-              className="mt-4 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-slate-800 transition"
+              className="mt-4 w-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
             >
               Unlock
             </button>
@@ -485,8 +485,8 @@ export default function AdminStatsPage() {
             </div>
 
             {/* company stats form */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-4 text-sm font-bold text-slate-900">
+            <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm backdrop-blur">
+              <h2 className="mb-4 text-sm font-bold text-amber-950">
                 {form.id ? "Update record" : "Add a record"}
               </h2>
 
@@ -601,15 +601,15 @@ export default function AdminStatsPage() {
                       key={str}
                       className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition ${
                         form.streams_allowed.includes(str)
-                          ? "border-indigo-400 bg-indigo-50 text-indigo-900"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                          ? "border-amber-400 bg-amber-100 text-amber-900"
+                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300"
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={form.streams_allowed.includes(str)}
                         onChange={() => toggleStream(str)}
-                        className="h-3.5 w-3.5 accent-indigo-600"
+                        className="h-3.5 w-3.5 accent-amber-500"
                       />
                       {str}
                     </label>
@@ -629,7 +629,7 @@ export default function AdminStatsPage() {
                         type="checkbox"
                         checked={form[k]}
                         onChange={(e) => setField(k, e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
+                        className="h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
                       />
                       {label}
                     </label>
@@ -642,7 +642,7 @@ export default function AdminStatsPage() {
                   type="button"
                   disabled={saving}
                   onClick={handleSave}
-                  className="rounded-xl bg-slate-900 px-6 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
+                  className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
                 >
                   {saving ? "Saving…" : form.id ? "Update record" : "Add record"}
                 </button>
@@ -650,7 +650,7 @@ export default function AdminStatsPage() {
                   <button
                     type="button"
                     onClick={() => setForm(EMPTY_FORM)}
-                    className="text-sm font-medium text-slate-600 hover:text-slate-800"
+                    className="text-sm font-medium text-amber-600 hover:text-amber-800"
                   >
                     Cancel update
                   </button>
@@ -659,11 +659,11 @@ export default function AdminStatsPage() {
             </div>
 
             {/* company stats table */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-[2rem] border border-amber-100 bg-white/75 shadow-sm backdrop-blur">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <tr className="border-b border-amber-100/80 bg-amber-50/50 text-xs font-semibold uppercase tracking-wide text-amber-700">
                       <th className="px-4 py-3">Company</th>
                       <th className="px-4 py-3">Year</th>
                       <th className="px-4 py-3">Role</th>
@@ -680,8 +680,8 @@ export default function AdminStatsPage() {
                     {rows.map((r, i) => (
                       <tr
                         key={r.id}
-                        className={`border-b border-slate-100 ${
-                          i % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                        className={`border-b border-amber-50/80 ${
+                          i % 2 === 0 ? "bg-white/40" : "bg-amber-50/20"
                         }`}
                       >
                         <td className="px-4 py-3 font-semibold text-slate-900">
@@ -698,9 +698,9 @@ export default function AdminStatsPage() {
                         <td className="px-4 py-3">
                           <div className="flex gap-2">
                             <button
-                              type="button"
-                              onClick={() => handleEdit(r)}
-                              className="text-xs font-semibold text-indigo-600 hover:underline"
+                               type="button"
+                               onClick={() => handleEdit(r)}
+                               className="text-xs font-semibold text-amber-700 hover:underline"
                             >
                               Edit
                             </button>
