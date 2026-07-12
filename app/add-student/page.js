@@ -249,7 +249,7 @@ export default function ContributePage() {
         },
         render: () => (
           <div className="grid gap-4">
-            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-amber-100 bg-amber-50/40 px-3 py-2 text-xs text-slate-600 transition hover:border-amber-200 hover:bg-amber-50/70">
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2 text-xs text-amber-700 transition hover:border-amber-300 hover:bg-amber-100">
               <input
                 type="checkbox"
                 checked={p.anonymous}
@@ -262,10 +262,10 @@ export default function ContributePage() {
               </span>
             </label>
 
-            <div className="space-y-2 rounded-xl border border-amber-100/80 bg-amber-50/30 px-4 py-3">
+            <div className="space-y-2 rounded-xl border border-amber-100 bg-white/80 px-4 py-3">
               <p className="text-xs text-slate-600">
                 <span className="text-red-500">*</span>{" "}
-                <span className="font-semibold text-amber-900">Required</span>
+                <span className="font-semibold text-slate-900">Required</span>
               </p>
               <p className="text-xs leading-relaxed text-slate-500">
                 Share contact details if you&apos;re comfortable — juniors appreciate
@@ -335,7 +335,7 @@ export default function ContributePage() {
                           ? opt.value === "selected"
                             ? "border-emerald-400 bg-emerald-50 text-emerald-800"
                             : "border-red-400 bg-red-50 text-red-800"
-                          : "border-amber-100 bg-white/70 text-slate-600 hover:border-amber-200"
+                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
                       }`}
                     >
                       <input
@@ -360,8 +360,8 @@ export default function ContributePage() {
                       key={opt.key}
                       className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
                         p[opt.key]
-                          ? "border-amber-400 bg-amber-50 text-amber-900"
-                          : "border-amber-100 bg-white/70 text-slate-700 hover:border-amber-200 hover:bg-amber-50/50"
+                          ? "border-amber-400 bg-amber-100 text-amber-900"
+                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300 hover:bg-amber-50"
                       }`}
                     >
                       <input

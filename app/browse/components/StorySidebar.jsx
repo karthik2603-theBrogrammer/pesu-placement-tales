@@ -6,6 +6,7 @@ import { displayStoryName } from "../../../utils/displayName";
 import { formatPlacementTypes } from "../../../utils/placementType";
 import { storyBrowsePath } from "../../../utils/browseRoutes";
 import StoryVoteButtons from "./StoryVoteButtons";
+import BookmarkButton from "./BookmarkButton";
 import VerdictChip from "../../components/VerdictChip";
 
 export default function StorySidebar({
@@ -53,13 +54,19 @@ export default function StorySidebar({
                 </span>
               </div>
             </Link>
-            <div className="border-t border-amber-100/80 px-3 py-2">
+            <div className="border-t border-amber-100/80 px-3 py-2 flex items-center justify-between">
               <StoryVoteButtons
                 storyId={storyId}
                 upvote={story.upvote ?? 0}
                 downvote={story.downvote ?? 0}
                 userVote={userVotes[storyId]}
                 onVote={onVote}
+                compact
+              />
+              <BookmarkButton
+                storyId={storyId}
+                companyId={companyId}
+                story={story}
                 compact
               />
             </div>
