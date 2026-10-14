@@ -19,7 +19,7 @@ const MarkdownReviewRenderer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <p className="py-4 text-center text-sm text-slate-500">Loading story…</p>
+      <p className="py-4 text-center text-sm text-amber-600">Loading story…</p>
     ),
   }
 );
@@ -28,7 +28,7 @@ const ENDPOINT = "/api/admin/contributions";
 const PAGE_SIZE = 5;
 
 const input =
-  "w-full rounded-lg border border-amber-200 bg-white/80 px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
+  "w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-300/50";
 
 const fullName = (item) =>
   [item.first_name, item.middle_name, item.last_name].filter(Boolean).join(" ");
@@ -199,7 +199,7 @@ export default function PlacementStoryLogs({ token, companies }) {
   };
 
   return (
-    <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm backdrop-blur">
+    <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold text-amber-950">Placement stories</h2>
         <span className="text-xs text-slate-500">{items.length} loaded</span>
@@ -213,10 +213,10 @@ export default function PlacementStoryLogs({ token, companies }) {
           return (
             <div
               key={item.id}
-              className={`overflow-hidden rounded-xl border transition-colors ${
+              className={`overflow-hidden rounded-lg border transition-colors ${
                 open
-                  ? "border-amber-300 bg-amber-50 shadow-sm"
-                  : "border-amber-100 bg-white hover:border-amber-200 hover:bg-amber-50/60"
+                  ? "border-amber-300 bg-amber-50/40 shadow-sm"
+                  : "border-amber-100 bg-white hover:border-amber-200 hover:bg-amber-50/30"
               }`}
             >
               {/* collapsed log row */}
@@ -225,33 +225,33 @@ export default function PlacementStoryLogs({ token, companies }) {
                 onClick={() => toggleExpand(item.id)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left"
               >
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-900">
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-amber-950">
                   {fullName(item)}
                   {item.job_title && (
                     <>
-                      <span className="mx-1.5 text-slate-300">·</span>
-                      <span className="text-slate-600">{item.job_title}</span>
+                      <span className="mx-1.5 text-amber-300">·</span>
+                      <span className="text-amber-700">{item.job_title}</span>
                     </>
                   )}
-                  <span className="mx-1.5 text-slate-300">·</span>
-                  <span className="font-semibold text-slate-700">
+                  <span className="mx-1.5 text-amber-300">·</span>
+                  <span className="font-semibold text-amber-700">
                     {item.company_name}
                   </span>
-                  <span className="mx-1.5 text-slate-300">·</span>
+                  <span className="mx-1.5 text-amber-300">·</span>
                   <span className="text-slate-500">Batch {item.batch_of}</span>
-                  <span className="mx-1.5 text-slate-300">·</span>
-                  <span className="text-xs text-slate-600">
+                  <span className="mx-1.5 text-amber-300">·</span>
+                  <span className="text-xs text-amber-700">
                     {formatPlacementTypes(item)}
                   </span>
-                  <span className="mx-1.5 text-slate-300">·</span>
+                  <span className="mx-1.5 text-amber-300">·</span>
                   <VerdictChip verdict={item.verdict} className="!text-[10px]" />
                 </span>
                 <span className="shrink-0 text-xs tabular-nums text-slate-400">
                   {fmtAdded(item.created_at)}
                 </span>
                 <span
-                  className={`shrink-0 text-slate-400 transition-transform ${
-                    open ? "rotate-180 text-amber-600" : ""
+                  className={`shrink-0 text-amber-500 transition-transform ${
+                    open ? "rotate-180" : ""
                   }`}
                   aria-hidden
                 >
@@ -270,13 +270,13 @@ export default function PlacementStoryLogs({ token, companies }) {
                     className="overflow-hidden"
                   >
                     <div
-                      className="border-t border-slate-100 px-4 py-4"
+                      className="border-t border-amber-100 px-4 py-4"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {editing ? (
                         <div className="space-y-3">
                           <div className="grid gap-3 sm:grid-cols-3">
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               First name
                               <input
                                 value={editForm.first_name}
@@ -289,7 +289,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 className={`${input} mt-1`}
                               />
                             </label>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Middle name
                               <input
                                 value={editForm.middle_name}
@@ -302,7 +302,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 className={`${input} mt-1`}
                               />
                             </label>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Last name
                               <input
                                 value={editForm.last_name}
@@ -316,7 +316,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                               />
                             </label>
                           </div>
-                          <label className="block text-xs font-semibold text-slate-700">
+                          <label className="block text-xs font-semibold text-amber-700">
                             Job title
                             <input
                               value={editForm.job_title}
@@ -330,7 +330,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                             />
                           </label>
                           <div className="grid gap-3 sm:grid-cols-3">
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Year of interview
                               <input
                                 type="number"
@@ -344,7 +344,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 className={`${input} mt-1`}
                               />
                             </label>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Batch
                               <input
                                 type="number"
@@ -358,7 +358,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 className={`${input} mt-1`}
                               />
                             </label>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Verdict
                               <select
                                 value={editForm.verdict}
@@ -380,7 +380,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                           </div>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <div>
-                              <p className="mb-2 text-xs font-semibold text-slate-700">
+                              <p className="mb-2 text-xs font-semibold text-amber-700">
                                 Placement type
                               </p>
                               <div className="grid gap-2">
@@ -389,8 +389,8 @@ export default function PlacementStoryLogs({ token, companies }) {
                                     key={opt.key}
                                     className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition ${
                                       editForm.placement_type === opt.key
-                                        ? "border-amber-400 bg-amber-100 text-amber-900"
-                                        : "border-amber-200 bg-white text-slate-700 hover:border-amber-300"
+                                        ? "border-amber-400 bg-amber-50 text-amber-900"
+                                        : "border-amber-100 bg-white text-slate-700 hover:border-amber-200"
                                     }`}
                                   >
                                     <input
@@ -409,7 +409,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 ))}
                               </div>
                             </div>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Degree
                               <select
                                 value={editForm.degree}
@@ -429,7 +429,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                               </select>
                             </label>
                           </div>
-                          <label className="text-xs font-semibold text-slate-700">
+                          <label className="text-xs font-semibold text-amber-700">
                             Company
                             <select
                               value={editForm.company_placed_id}
@@ -449,7 +449,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                             </select>
                           </label>
                           <div className="grid gap-3 sm:grid-cols-2">
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               LinkedIn URL
                               <input
                                 value={editForm.linkedin_url}
@@ -462,7 +462,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                                 className={`${input} mt-1`}
                               />
                             </label>
-                            <label className="text-xs font-semibold text-slate-700">
+                            <label className="text-xs font-semibold text-amber-700">
                               Phone number
                               <input
                                 value={editForm.phone_number}
@@ -476,7 +476,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                               />
                             </label>
                           </div>
-                          <label className="block text-xs font-semibold text-slate-700">
+                          <label className="block text-xs font-semibold text-amber-700">
                             Story (markdown)
                             <textarea
                               rows={8}
@@ -495,14 +495,14 @@ export default function PlacementStoryLogs({ token, companies }) {
                               type="button"
                               disabled={saving}
                               onClick={(e) => save(item.id, e)}
-                              className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-white shadow-md disabled:opacity-60 hover:from-amber-600 hover:to-yellow-600"
+                              className="rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-white shadow-sm disabled:opacity-60"
                             >
                               {saving ? "Saving…" : "Save"}
                             </button>
                             <button
                               type="button"
                               onClick={cancelEdit}
-                              className="text-xs font-medium text-amber-700 hover:text-amber-900"
+                              className="text-xs font-medium text-amber-600 hover:text-amber-800"
                             >
                               Cancel
                             </button>
@@ -524,7 +524,7 @@ export default function PlacementStoryLogs({ token, companies }) {
                               </a>
                             )}
                           </div>
-                          <div className="rounded-xl border border-amber-100 bg-amber-50/20 p-3">
+                          <div className="rounded-lg border border-amber-100 bg-white p-3">
                             <MarkdownReviewRenderer
                               remarks_markdown={item.remarks_markdown}
                               theme="light"
@@ -534,14 +534,14 @@ export default function PlacementStoryLogs({ token, companies }) {
                             <button
                               type="button"
                               onClick={(e) => startEdit(item, e)}
-                              className="rounded-full border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 shadow-sm"
+                              className="rounded-lg border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100"
                             >
                               Edit
                             </button>
                             <button
                               type="button"
                               onClick={(e) => remove(item.id, e)}
-                              className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                              className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
                             >
                               Delete
                             </button>
@@ -564,7 +564,7 @@ export default function PlacementStoryLogs({ token, companies }) {
 
         <div ref={sentinelRef} className="h-4" />
         {loading && (
-          <p className="py-2 text-center text-xs text-slate-500">Loading…</p>
+          <p className="py-2 text-center text-xs text-amber-600">Loading…</p>
         )}
         {!hasMore && items.length > 0 && (
           <p className="py-2 text-center text-xs text-slate-400">End of list</p>

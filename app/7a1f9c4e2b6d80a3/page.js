@@ -61,7 +61,7 @@ const EMPTY_FORM = {
 };
 
 const input =
-  "w-full rounded-lg border border-amber-200 bg-white/80 px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
+  "w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-300/50";
 
 const NUMERIC_FIELDS = [
   ["year", "Year"],
@@ -139,21 +139,16 @@ const MAINTAINER_FIELDS = [
   { key: "reason", label: "Reason", type: "textarea", rows: 3 },
 ];
 
-const COMPANY_FIELDS = [
-  { key: "company_name", label: "Company name", type: "text" },
-  { key: "company_description", label: "Description", type: "textarea", rows: 2 },
-];
-
 const featureSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
-      <span className="font-semibold text-slate-900">{item.title}</span>
+      <span className="font-semibold text-amber-950">{item.title}</span>
       <StatusChip status={item.status} feedbackType="feature" />
     </div>
     <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
     {item.admin_reply ? (
-      <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
-        <span className="font-semibold text-slate-800">Reply: </span>
+      <p className="mt-2 rounded-lg border border-amber-100 bg-amber-50/50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
+        <span className="font-semibold text-amber-700">Reply: </span>
         {truncate(item.admin_reply, 120)}
       </p>
     ) : null}
@@ -166,13 +161,13 @@ const featureSummary = (item) => (
 const bugSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
-      <span className="font-semibold text-slate-900">{item.title}</span>
+      <span className="font-semibold text-amber-950">{item.title}</span>
       <StatusChip status={item.status} feedbackType="bug" />
     </div>
     <p className="mt-1 text-sm text-slate-600">{truncate(item.description)}</p>
     {item.admin_reply ? (
-      <p className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
-        <span className="font-semibold text-slate-800">Reply: </span>
+      <p className="mt-2 rounded-lg border border-amber-100 bg-amber-50/50 px-2.5 py-2 text-xs leading-relaxed text-slate-600">
+        <span className="font-semibold text-amber-700">Reply: </span>
         {truncate(item.admin_reply, 120)}
       </p>
     ) : null}
@@ -186,8 +181,8 @@ const bugSummary = (item) => (
 const maintainerSummary = (item) => (
   <>
     <div className="flex flex-wrap items-center gap-2">
-      <span className="font-semibold text-slate-900">{item.full_name}</span>
-      <span className="rounded-full bg-amber-100/85 border border-amber-200 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-800">
+      <span className="font-semibold text-amber-950">{item.full_name}</span>
+      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
         Batch {item.batch}
       </span>
     </div>
@@ -211,15 +206,6 @@ const maintainerSummary = (item) => (
       </a>
       <span>{fmtDate(item.created_at)}</span>
     </p>
-  </>
-);
-
-const companySummary = (item) => (
-  <>
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="font-semibold text-slate-900">{item.company_name}</span>
-    </div>
-    <p className="mt-1 text-sm text-slate-600">{truncate(item.company_description)}</p>
   </>
 );
 
@@ -401,7 +387,7 @@ export default function AdminStatsPage() {
       <section className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <p className="mb-1 w-fit rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 shadow-sm backdrop-blur">
+            <p className="mb-1 w-fit rounded-full border border-amber-200 bg-amber-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
               Admin
             </p>
             <h1 className="text-3xl font-black tracking-tight text-amber-950">
@@ -415,7 +401,7 @@ export default function AdminStatsPage() {
             <button
               type="button"
               onClick={logout}
-              className="rounded-full border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-slate-50 shadow-sm transition"
+              className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm font-semibold text-amber-700 hover:bg-amber-100"
             >
               Lock
             </button>
@@ -423,8 +409,8 @@ export default function AdminStatsPage() {
         </div>
 
         {!unlocked ? (
-          <div className="max-w-sm rounded-[2rem] border border-amber-100 bg-white/75 p-6 shadow-sm backdrop-blur">
-            <p className="mb-4 text-sm text-slate-600">
+          <div className="max-w-sm rounded-2xl border border-white/70 bg-white/80 p-6 shadow-sm backdrop-blur">
+            <p className="mb-3 text-sm text-slate-600">
               Enter the admin token to manage stats, stories, and feedback.
             </p>
             <input
@@ -438,7 +424,7 @@ export default function AdminStatsPage() {
             <button
               type="button"
               onClick={() => loadData(tokenInput)}
-              className="mt-4 w-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
+              className="mt-3 w-full rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-2 text-sm font-bold text-white shadow-md"
             >
               Unlock
             </button>
@@ -467,31 +453,22 @@ export default function AdminStatsPage() {
               />
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <AdminCollection
-                title="Company Directory"
-                endpoint="/api/admin/companies"
-                token={token}
-                fields={COMPANY_FIELDS}
-                summary={companySummary}
-              />
-              <AdminCollection
-                title="Pass the torch requests"
-                endpoint="/api/admin/maintainer-requests"
-                token={token}
-                fields={MAINTAINER_FIELDS}
-                summary={maintainerSummary}
-              />
-            </div>
+            <AdminCollection
+              title="Pass the torch requests"
+              endpoint="/api/admin/maintainer-requests"
+              token={token}
+              fields={MAINTAINER_FIELDS}
+              summary={maintainerSummary}
+            />
 
             {/* company stats form */}
-            <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm backdrop-blur">
+            <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
               <h2 className="mb-4 text-sm font-bold text-amber-950">
                 {form.id ? "Update record" : "Add a record"}
               </h2>
 
               <div className="mb-4 flex flex-wrap items-end gap-3">
-                <label className="text-xs font-semibold text-slate-700">
+                <label className="text-xs font-semibold text-amber-700">
                   Company source
                   <select
                     value={form.mode}
@@ -504,7 +481,7 @@ export default function AdminStatsPage() {
                 </label>
 
                 {form.mode === "existing" ? (
-                  <label className="min-w-[220px] flex-1 text-xs font-semibold text-slate-700">
+                  <label className="min-w-[220px] flex-1 text-xs font-semibold text-amber-700">
                     Company
                     <select
                       value={form.company_id}
@@ -521,7 +498,7 @@ export default function AdminStatsPage() {
                   </label>
                 ) : (
                   <>
-                    <label className="min-w-[220px] flex-1 text-xs font-semibold text-slate-700">
+                    <label className="min-w-[180px] flex-1 text-xs font-semibold text-amber-700">
                       New company name
                       <input
                         value={form.new_company_name}
@@ -529,11 +506,13 @@ export default function AdminStatsPage() {
                         className={`${input} mt-1`}
                       />
                     </label>
-                    <label className="min-w-[220px] flex-1 text-xs font-semibold text-slate-700">
-                      Company description
+                    <label className="min-w-[180px] flex-1 text-xs font-semibold text-amber-700">
+                      Description
                       <input
                         value={form.new_company_description}
-                        onChange={(e) => setField("new_company_description", e.target.value)}
+                        onChange={(e) =>
+                          setField("new_company_description", e.target.value)
+                        }
                         className={`${input} mt-1`}
                       />
                     </label>
@@ -541,8 +520,8 @@ export default function AdminStatsPage() {
                 )}
               </div>
 
-              <div className="mb-6 grid gap-4 sm:grid-cols-2">
-                <label className="text-xs font-semibold text-slate-700">
+              <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <label className="text-xs font-semibold text-amber-700">
                   Job title
                   <input
                     value={form.job_title}
@@ -551,7 +530,7 @@ export default function AdminStatsPage() {
                     placeholder="e.g. Software Engineer"
                   />
                 </label>
-                <label className="text-xs font-semibold text-slate-700">
+                <label className="text-xs font-semibold text-amber-700">
                   Tier
                   <select
                     value={form.tier}
@@ -566,23 +545,45 @@ export default function AdminStatsPage() {
                     ))}
                   </select>
                 </label>
+                <div className="text-xs font-semibold text-amber-700">
+                  Streams allowed
+                  <div className="mt-1 flex flex-wrap gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2">
+                    {STREAM_OPTIONS.map((s) => {
+                      const active = form.streams_allowed.includes(s);
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => toggleStream(s)}
+                          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                            active
+                              ? "bg-amber-500 text-white"
+                              : "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
-              <div className="mb-6 grid gap-4 sm:grid-cols-4">
-                {NUMERIC_FIELDS.map(([k, label]) => (
-                  <label key={k} className="text-xs font-semibold text-slate-700">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {NUMERIC_FIELDS.map(([key, label]) => (
+                  <label key={key} className="text-xs font-semibold text-amber-700">
                     {label}
                     <input
                       type="number"
-                      value={form[k]}
-                      onChange={(e) => setField(k, e.target.value)}
+                      value={form[key]}
+                      onChange={(e) => setField(key, e.target.value)}
                       className={`${input} mt-1`}
                     />
                   </label>
                 ))}
               </div>
 
-              <label className="mb-6 block text-xs font-semibold text-slate-700">
+              <label className="mt-3 block text-xs font-semibold text-amber-700">
                 Remarks
                 <textarea
                   value={form.remarks}
@@ -593,136 +594,121 @@ export default function AdminStatsPage() {
                 />
               </label>
 
-              <div className="mb-6">
-                <p className="mb-2 text-xs font-semibold text-slate-700">Streams allowed</p>
-                <div className="flex flex-wrap gap-2">
-                  {STREAM_OPTIONS.map((str) => (
-                    <label
-                      key={str}
-                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition ${
-                        form.streams_allowed.includes(str)
-                          ? "border-amber-400 bg-amber-100 text-amber-900"
-                          : "border-amber-200 bg-white/70 text-amber-700 hover:border-amber-300"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={form.streams_allowed.includes(str)}
-                        onChange={() => toggleStream(str)}
-                        className="h-3.5 w-3.5 accent-amber-500"
-                      />
-                      {str}
-                    </label>
-                  ))}
-                </div>
+              <div className="mt-4 flex flex-wrap gap-4">
+                {BOOLEAN_FIELDS.map(([key, label]) => (
+                  <label
+                    key={key}
+                    className="flex items-center gap-2 text-sm font-medium text-amber-800"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={form[key]}
+                      onChange={(e) => setField(key, e.target.checked)}
+                      className="h-4 w-4 accent-amber-500"
+                    />
+                    {label}
+                  </label>
+                ))}
               </div>
 
-              <div className="mb-6">
-                <p className="mb-2 text-xs font-semibold text-slate-700">Flags</p>
-                <div className="flex flex-wrap gap-4">
-                  {BOOLEAN_FIELDS.map(([k, label]) => (
-                    <label
-                      key={k}
-                      className="flex cursor-pointer items-center gap-2 text-sm text-slate-700"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={form[k]}
-                        onChange={(e) => setField(k, e.target.checked)}
-                        className="h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="mt-5 flex items-center gap-3">
                 <button
                   type="button"
-                  disabled={saving}
                   onClick={handleSave}
-                  className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
+                  disabled={saving}
+                  className="rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-2 text-sm font-bold text-white shadow-md disabled:opacity-60"
                 >
                   {saving ? "Saving…" : form.id ? "Update record" : "Add record"}
                 </button>
-                {form.id && (
-                  <button
-                    type="button"
-                    onClick={() => setForm(EMPTY_FORM)}
-                    className="text-sm font-medium text-amber-600 hover:text-amber-800"
-                  >
-                    Cancel update
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setForm(EMPTY_FORM)}
+                  className="text-sm font-medium text-amber-600 hover:text-amber-800"
+                >
+                  Clear
+                </button>
+                <span className="text-xs text-slate-500">
+                  Enter absolute ₹ values (shown as L / k on the public page).
+                </span>
               </div>
             </div>
 
             {/* company stats table */}
-            <div className="overflow-hidden rounded-[2rem] border border-amber-100 bg-white/75 shadow-sm backdrop-blur">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-amber-100/80 bg-amber-50/50 text-xs font-semibold uppercase tracking-wide text-amber-700">
-                      <th className="px-4 py-3">Company</th>
-                      <th className="px-4 py-3">Year</th>
-                      <th className="px-4 py-3">Role</th>
-                      <th className="px-4 py-3">Tier</th>
-                      <th className="px-4 py-3">Cutoff</th>
-                      <th className="px-4 py-3">Base</th>
-                      <th className="px-4 py-3">CTC</th>
-                      <th className="px-4 py-3">Stipend</th>
-                      <th className="px-4 py-3">Hires</th>
-                      <th className="px-4 py-3">Actions</th>
+            <div className="rounded-2xl border border-white/70 bg-white/80 p-2 shadow-sm backdrop-blur sm:p-3">
+              <div className="max-h-[560px] overflow-auto rounded-xl">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="sticky top-0 z-10">
+                    <tr>
+                      {[
+                        "Company",
+                        "Role",
+                        "Tier",
+                        "Year",
+                        "Streams",
+                        "CGPA",
+                        "Hired",
+                        "Base",
+                        "CTC",
+                        "Stipend",
+                        "",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          className="whitespace-nowrap border-b border-amber-200 bg-amber-100/95 px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-amber-800"
+                        >
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r, i) => (
+                    {rows.map((row, i) => (
                       <tr
-                        key={r.id}
-                        className={`border-b border-amber-50/80 ${
-                          i % 2 === 0 ? "bg-white/40" : "bg-amber-50/20"
-                        }`}
+                        key={row.id}
+                        className={i % 2 === 0 ? "bg-white/60" : "bg-amber-50/40"}
                       >
-                        <td className="px-4 py-3 font-semibold text-slate-900">
-                          {r.company_name}
+                        <td className="whitespace-nowrap px-3 py-2 font-semibold text-amber-950">
+                          {row.company_name}
                         </td>
-                        <td className="px-4 py-3 text-slate-600">{r.year}</td>
-                        <td className="px-4 py-3">{r.job_title || "—"}</td>
-                        <td className="px-4 py-3">{r.tier ? `T${r.tier}` : "—"}</td>
-                        <td className="px-4 py-3">{r.cgpa_cutoff ?? "—"}</td>
-                        <td className="px-4 py-3">{lakh(r.base_salary)}</td>
-                        <td className="px-4 py-3">{lakh(r.ctc)}</td>
-                        <td className="px-4 py-3">{thousand(r.internship_stipend)}</td>
-                        <td className="px-4 py-3">{r.total_hired}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex gap-2">
-                            <button
-                               type="button"
-                               onClick={() => handleEdit(r)}
-                               className="text-xs font-semibold text-amber-700 hover:underline"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(r)}
-                              className="text-xs font-semibold text-red-500 hover:underline"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                        <td className="max-w-[180px] truncate px-3 py-2" title={row.job_title || ""}>
+                          {row.job_title || "—"}
+                        </td>
+                        <td className="px-3 py-2">{row.tier ? `T${row.tier}` : "—"}</td>
+                        <td className="px-3 py-2">{row.year}</td>
+                        <td className="px-3 py-2">{row.streams_allowed || "—"}</td>
+                        <td className="px-3 py-2">{row.cgpa_cutoff ?? "—"}</td>
+                        <td className="px-3 py-2">{row.total_hired}</td>
+                        <td className="px-3 py-2">{lakh(row.base_salary)}</td>
+                        <td className="px-3 py-2">{lakh(row.ctc)}</td>
+                        <td className="px-3 py-2">{thousand(row.internship_stipend)}</td>
+                        <td className="whitespace-nowrap px-3 py-2 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(row)}
+                            className="mr-2 text-xs font-semibold text-amber-700 hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(row)}
+                            className="text-xs font-semibold text-red-500 hover:underline"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}
+                    {rows.length === 0 && (
+                      <tr>
+                        <td colSpan={11} className="px-3 py-8 text-center text-sm text-slate-500">
+                          No records yet.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
-              {rows.length === 0 && (
-                <p className="p-6 text-center text-sm text-slate-500">
-                  No company stats yet.
-                </p>
-              )}
             </div>
           </div>
         )}
