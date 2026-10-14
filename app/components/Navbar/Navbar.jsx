@@ -18,8 +18,7 @@ import { PiListBold } from "react-icons/pi";
 
 const BROWSE_LINK = { href: "/browse", label: "Browse" };
 const SECONDARY_LINKS = [
-  { href: "/search", label: "Search" },
-  { href: "/saved", label: "Saved" },
+  // { href: "/stats", label: "Stats" },
   { href: "/feature-request", label: "Feature Request" },
   { href: "/bug-report", label: "Bug Report" },
   { href: "/pass-the-torch", label: "Take Over" },

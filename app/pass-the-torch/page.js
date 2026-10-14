@@ -84,7 +84,7 @@ export default function PassTheTorchPage() {
 
       <section className="relative z-10 mx-auto max-w-xl">
         <div className="mb-8 text-center">
-          <p className="mx-auto mb-4 w-fit rounded-full border border-amber-200 bg-amber-100/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700 shadow-sm backdrop-blur">
+          <p className="mx-auto mb-4 w-fit rounded-full border border-amber-200/70 bg-amber-100/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-amber-700 shadow-sm backdrop-blur">
             Pass the torch
           </p>
           <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
@@ -100,7 +100,7 @@ export default function PassTheTorchPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[2rem] border border-amber-100 bg-white/75 p-8 text-center shadow-sm backdrop-blur"
+            className="rounded-3xl border border-white/70 bg-white/80 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl"
           >
             <h2 className="text-2xl font-black text-amber-950">Request received</h2>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-600">
@@ -109,7 +109,7 @@ export default function PassTheTorchPage() {
             </p>
             <Link
               href="/"
-              className="mt-6 inline-block rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
+              className="mt-6 inline-block rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
             >
               Back home
             </Link>
@@ -117,7 +117,7 @@ export default function PassTheTorchPage() {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="rounded-[2rem] border border-amber-100 bg-white/75 p-6 shadow-sm backdrop-blur sm:p-8"
+            className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8"
           >
             <div className="grid gap-4">
               <TextField
@@ -184,7 +184,7 @@ export default function PassTheTorchPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-6 w-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
+              className="mt-6 w-full rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60"
             >
               {submitting ? "Sending…" : "Request maintainer access"}
             </button>

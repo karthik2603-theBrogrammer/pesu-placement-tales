@@ -11,7 +11,6 @@ import { companyBrowsePath } from "../../../../utils/browseRoutes";
 import { useCompanyBrowse } from "../../components/CompanyBrowseLayout";
 import ShareStoryButton from "../../components/ShareStoryButton";
 import StoryVoteButtons from "../../components/StoryVoteButtons";
-import BookmarkButton from "../../components/BookmarkButton";
 
 const MarkdownReviewRenderer = dynamic(
   () => import("../../../components/MarkdownReviewRenderer"),
@@ -91,14 +90,11 @@ export default function StoryPage() {
               : `${displayStoryName(story)}'s experience`}
           </h1>
         </div>
-        <div className="flex items-center gap-1">
-          <BookmarkButton storyId={story.student_id} companyId={companyId} story={story} companyName={companyName} />
-          <ShareStoryButton
-            companyId={companyId}
-            story={story}
-            companyName={companyName}
-          />
-        </div>
+        <ShareStoryButton
+          companyId={companyId}
+          story={story}
+          companyName={companyName}
+        />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-5 sm:py-4">

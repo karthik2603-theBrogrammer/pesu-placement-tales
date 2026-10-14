@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const input =
-  "w-full rounded-lg border border-amber-200 bg-white/80 px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100";
+  "w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-300/50";
 
 /**
  * Generic admin list with infinite scroll + inline edit/delete.
@@ -138,7 +138,7 @@ export default function AdminCollection({
   };
 
   return (
-    <div className="rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm backdrop-blur">
+    <div className="rounded-2xl border border-white/70 bg-white/80 p-5 shadow-sm backdrop-blur">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-bold text-amber-950">{title}</h2>
         <span className="text-xs text-slate-500">{items.length} loaded</span>
@@ -146,11 +146,11 @@ export default function AdminCollection({
 
       <div className="max-h-[460px] space-y-3 overflow-auto pr-1">
         {items.map((item) => (
-          <div key={item.id} className="rounded-2xl border border-amber-100 bg-amber-50/20 p-4">
+          <div key={item.id} className="rounded-xl border border-amber-100 bg-white/70 p-4">
             {editingId === item.id ? (
               <div className="space-y-3">
                 {fields.map((f) => (
-                  <label key={f.key} className="block text-xs font-semibold text-slate-700">
+                  <label key={f.key} className="block text-xs font-semibold text-amber-700">
                     {f.label}
                     {f.type === "textarea" ? (
                       <>
@@ -200,14 +200,14 @@ export default function AdminCollection({
                     type="button"
                     disabled={saving}
                     onClick={() => save(item.id)}
-                    className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-white shadow-md disabled:opacity-60 hover:from-amber-600 hover:to-yellow-600"
+                    className="rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-bold text-white shadow-sm disabled:opacity-60"
                   >
                     {saving ? "Saving…" : "Save"}
                   </button>
                   <button
                     type="button"
                     onClick={cancelEdit}
-                    className="text-xs font-medium text-amber-700 hover:text-amber-900"
+                    className="text-xs font-medium text-amber-600 hover:text-amber-800"
                   >
                     Cancel
                   </button>
@@ -242,7 +242,7 @@ export default function AdminCollection({
         )}
 
         <div ref={sentinelRef} className="h-4" />
-        {loading && <p className="py-2 text-center text-xs text-slate-500">Loading…</p>}
+        {loading && <p className="py-2 text-center text-xs text-amber-600">Loading…</p>}
         {!hasMore && items.length > 0 && (
           <p className="py-2 text-center text-xs text-slate-400">End of list</p>
         )}

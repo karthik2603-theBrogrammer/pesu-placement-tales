@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const CARDS = [
-  { key: "stories", label: "Stories", accent: "from-amber-500 to-amber-400" },
-  { key: "featureRequests", label: "Feature requests", accent: "from-yellow-500 to-yellow-400" },
-  { key: "companies", label: "Companies", accent: "from-amber-400 to-yellow-400" },
-  { key: "bugReports", label: "Bug reports", accent: "from-yellow-600 to-amber-500" },
+  { key: "stories", label: "Stories", accent: "from-amber-500 to-yellow-500" },
+  { key: "featureRequests", label: "Feature requests", accent: "from-orange-500 to-amber-500" },
+  { key: "companies", label: "Companies", accent: "from-yellow-500 to-lime-500" },
+  { key: "bugReports", label: "Bug reports", accent: "from-rose-500 to-orange-500" },
 ];
 
 export default function AdminKpiGrid({ token }) {
@@ -38,7 +38,7 @@ export default function AdminKpiGrid({ token }) {
         {CARDS.map((card) => (
           <div
             key={card.key}
-            className="h-28 animate-pulse rounded-[2rem] border border-amber-100 bg-amber-50/20"
+            className="h-28 animate-pulse rounded-2xl border border-amber-100 bg-white/60"
           />
         ))}
       </div>
@@ -55,15 +55,15 @@ export default function AdminKpiGrid({ token }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="group relative overflow-hidden rounded-[2rem] border border-amber-100 bg-white/75 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md backdrop-blur"
+          className="group relative overflow-hidden rounded-2xl border border-white/70 bg-white/75 p-5 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur transition hover:-translate-y-0.5 hover:shadow-lg"
         >
           <div
-            className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${card.accent} opacity-10 blur-2xl transition group-hover:opacity-20`}
+            className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${card.accent} opacity-20 blur-2xl transition group-hover:opacity-30`}
           />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
             {card.label}
           </p>
-          <p className="mt-2 text-4xl font-black tabular-nums tracking-tight text-slate-900">
+          <p className="mt-2 text-4xl font-black tabular-nums tracking-tight text-amber-950">
             {stats[card.key] ?? 0}
           </p>
           <p className="mt-1 text-xs text-slate-500">Total in database</p>

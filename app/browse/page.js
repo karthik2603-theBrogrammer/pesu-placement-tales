@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Spinner, Input, Select, SelectItem } from "@nextui-org/react";
+import { Spinner, Input } from "@nextui-org/react";
 import BrowseToaster from "./components/BrowseToaster";
 import { CiSearch } from "react-icons/ci";
-import { FiX } from "react-icons/fi";
 import H from "../components/Heading";
 import P from "../components/Paragraph";
 import BrowseShell from "./components/BrowseShell";
@@ -13,100 +12,33 @@ import {
   companyBrowsePath,
   markDirectoryCompanyNavigation,
 } from "../../utils/browseRoutes";
-import { DEGREE_OPTIONS } from "../../utils/degree";
 
 export default function BrowseDirectoryPage() {
   const router = useRouter();
   const [companies, setCompanies] = useState([]);
-  const [filterMeta, setFilterMeta] = useState([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [jobFilter, setJobFilter] = useState("all");
-  const [degreeFilter, setDegreeFilter] = useState("all");
-  const [batchFilter, setBatchFilter] = useState("all");
-  const [verdictFilter, setVerdictFilter] = useState("all");
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchCompanies() {
       try {
         setLoadingCompanies(true);
-        const [companiesRes, filtersRes] = await Promise.all([
-          fetch("/api/browse-companies"),
-          fetch("/api/browse-companies/filters"),
-        ]);
-        const companiesData = await companiesRes.json();
-        const filtersData = await filtersRes.json();
-        setCompanies(companiesData.result || []);
-        setFilterMeta(filtersData.result || []);
+        const response = await fetch("/api/browse-companies");
+        const data = await response.json();
+        setCompanies(data.result || []);
       } catch (error) {
         console.error("Error fetching companies:", error);
       } finally {
         setLoadingCompanies(false);
       }
     }
-    fetchData();
+    fetchCompanies();
   }, []);
 
-  // Build a lookup: companyId → filter metadata
-  const filterLookup = useMemo(() => {
-    const map = {};
-    for (const row of filterMeta) {
-      map[row.company_id] = row;
-    }
-    return map;
-  }, [filterMeta]);
-
-  // Compute distinct batch years across all companies for the batch dropdown
-  const allBatches = useMemo(() => {
-    const set = new Set();
-    for (const row of filterMeta) {
-      (row.batches || []).forEach((b) => set.add(String(b)));
-    }
-    return Array.from(set)
-      .sort()
-      .reverse();
-  }, [filterMeta]);
-
-  const hasActiveFilters =
-    jobFilter !== "all" ||
-    degreeFilter !== "all" ||
-    batchFilter !== "all" ||
-    verdictFilter !== "all";
-
-  const clearAllFilters = () => {
-    setJobFilter("all");
-    setDegreeFilter("all");
-    setBatchFilter("all");
-    setVerdictFilter("all");
-  };
-
-  const filterCompanies = (list, query, job, degree, batch, verdict) =>
-    list.filter((company) => {
-      // Name search
-      if (
-        query &&
-        !company.company_name.toLowerCase().includes(query.toLowerCase())
-      )
-        return false;
-
-      // Job type filter (uses the original browse-companies aggregates)
-      if (job === "intern" && !company.has_intern_stories) return false;
-      if (job === "fte" && !company.has_fte_stories) return false;
-      if (job === "intern_fte" && !company.has_intern_fte_stories) return false;
-
-      // Filters using the per-company metadata
-      const meta = filterLookup[company.id];
-      if (!meta) return job === "all" && degree === "all" && batch === "all" && verdict === "all";
-
-      if (degree !== "all" && !(meta.degrees || []).includes(degree))
-        return false;
-      if (batch !== "all" && !(meta.batches || []).map(String).includes(String(batch)))
-        return false;
-      if (verdict !== "all" && !(meta.verdicts || []).includes(verdict))
-        return false;
-
-      return true;
-    });
+  const filterByName = (list, query) =>
+    list.filter((company) =>
+      company.company_name.toLowerCase().includes(query.toLowerCase())
+    );
 
   const companiesWithStories = useMemo(
     () => companies.filter((c) => c.story_count > 0),
@@ -114,14 +46,9 @@ export default function BrowseDirectoryPage() {
   );
 
   const trimmedSearch = searchQuery.trim();
-  const visibleCompanies = filterCompanies(
-    companiesWithStories,
-    trimmedSearch,
-    jobFilter,
-    degreeFilter,
-    batchFilter,
-    verdictFilter
-  );
+  const visibleCompanies = trimmedSearch
+    ? filterByName(companiesWithStories, trimmedSearch)
+    : companiesWithStories;
 
   const companyGridClass =
     visibleCompanies.length <= 6
@@ -187,106 +114,26 @@ export default function BrowseDirectoryPage() {
                   Companies with stories
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {hasActiveFilters
-                    ? `${visibleCompanies.length} of ${companiesWithStories.length} companies`
-                    : `${visibleCompanies.length} ${visibleCompanies.length === 1 ? "company" : "companies"}`}
+                  {visibleCompanies.length}{" "}
+                  {visibleCompanies.length === 1 ? "company" : "companies"}
                 </p>
               </div>
               <Input
                 aria-label="Search companies"
-                className="w-full md:max-w-xs"
+                className="w-full md:max-w-sm"
                 placeholder="Search company..."
                 startContent={<CiSearch className="text-gray-400" />}
                 value={searchQuery}
                 onValueChange={setSearchQuery}
                 color="warning"
                 variant="bordered"
-                size="sm"
               />
-            </div>
-
-            {/* Filter bar */}
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <Select
-                aria-label="Filter by Job Type"
-                className="w-full sm:w-[150px]"
-                placeholder="Job Type"
-                selectedKeys={[jobFilter]}
-                onChange={(e) => setJobFilter(e.target.value)}
-                color="warning"
-                variant="bordered"
-                size="sm"
-              >
-                <SelectItem key="all" value="all">All Roles</SelectItem>
-                <SelectItem key="intern" value="intern">Internship</SelectItem>
-                <SelectItem key="fte" value="fte">FTE</SelectItem>
-                <SelectItem key="intern_fte" value="intern_fte">Intern + FTE</SelectItem>
-              </Select>
-              <Select
-                aria-label="Filter by Degree"
-                className="w-full sm:w-[150px]"
-                placeholder="Degree"
-                selectedKeys={[degreeFilter]}
-                onChange={(e) => setDegreeFilter(e.target.value)}
-                color="warning"
-                variant="bordered"
-                size="sm"
-              >
-                <SelectItem key="all" value="all">All Degrees</SelectItem>
-                {DEGREE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                aria-label="Filter by Batch"
-                className="w-full sm:w-[140px]"
-                placeholder="Batch"
-                selectedKeys={[batchFilter]}
-                onChange={(e) => setBatchFilter(e.target.value)}
-                color="warning"
-                variant="bordered"
-                size="sm"
-              >
-                <SelectItem key="all" value="all">All Batches</SelectItem>
-                {allBatches.map((b) => (
-                  <SelectItem key={b} value={b}>
-                    Batch {b}
-                  </SelectItem>
-                ))}
-              </Select>
-              <Select
-                aria-label="Filter by Verdict"
-                className="w-full sm:w-[140px]"
-                placeholder="Verdict"
-                selectedKeys={[verdictFilter]}
-                onChange={(e) => setVerdictFilter(e.target.value)}
-                color="warning"
-                variant="bordered"
-                size="sm"
-              >
-                <SelectItem key="all" value="all">All Verdicts</SelectItem>
-                <SelectItem key="selected" value="selected">Selected</SelectItem>
-                <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
-              </Select>
-
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={clearAllFilters}
-                  className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
-                >
-                  <FiX size={12} />
-                  Clear
-                </button>
-              )}
             </div>
 
             {visibleCompanies.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/40 p-6 text-center text-sm text-gray-500">
-                {trimmedSearch || hasActiveFilters
-                  ? "No companies match your filters."
+                {trimmedSearch
+                  ? "No companies with stories match your search."
                   : "No stories have been shared yet."}
               </div>
             ) : (
