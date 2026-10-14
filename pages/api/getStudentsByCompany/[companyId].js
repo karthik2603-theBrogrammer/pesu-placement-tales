@@ -30,7 +30,6 @@ export default async function handler(req, res) {
           sp.fte_only,
           sp.summer_internship,
           sp.linkedin_url,
-          sp.phone_number,
           sp.remarks_markdown,
           sp.upvote,
           sp.downvote,
