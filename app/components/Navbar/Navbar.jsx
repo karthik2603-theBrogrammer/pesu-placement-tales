@@ -30,13 +30,14 @@ const formatStars = (count) =>
   count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : String(count);
 
 function GitHubContribute({ stars }) {
-  const hasStars = Number.isFinite(stars);
+  // Falls back to 0 when GitHub can't report the count (e.g. while the repo is private).
+  const count = Number.isFinite(stars) ? stars : 0;
   return (
     <a
       href={REPO_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={hasStars ? `Contribute on GitHub, ${stars} stars` : "Contribute on GitHub"}
+      aria-label={`Contribute on GitHub, ${count} ${count === 1 ? "star" : "stars"}`}
       className="inline-flex items-center overflow-hidden rounded-xl border border-amber-200 bg-white/70 text-sm font-semibold text-amber-800 shadow-sm transition hover:border-amber-300 hover:bg-amber-50"
     >
       <span className="inline-flex items-center gap-1.5 px-3 py-1.5">
@@ -45,7 +46,7 @@ function GitHubContribute({ stars }) {
       </span>
       <span className="inline-flex items-center gap-1 border-l border-amber-200 bg-amber-50/80 px-2.5 py-1.5 text-xs font-bold tabular-nums text-amber-700">
         <FaStar size={11} aria-hidden="true" />
-        {hasStars ? formatStars(stars) : "Star"}
+        {formatStars(count)}
       </span>
     </a>
   );

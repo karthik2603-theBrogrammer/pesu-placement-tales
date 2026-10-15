@@ -12,13 +12,11 @@ import {
 import { FaGithub } from "react-icons/fa";
 import { REPO_URL } from "../../../utils/github";
 
-// Edit NOTE_PARAGRAPHS to write your note. Each string is one paragraph.
+// Edit NOTE_BODY to change the note.
 // Bump NOTE_VERSION whenever the note changes so returning visitors see it again.
-const NOTE_VERSION = "2";
-const NOTE_PARAGRAPHS = [
-  "Placement Tales started as a small side project with one goal: to help anyone sitting for placement interviews walk in a little more prepared. It's the resource I wish I'd had when I was preparing.",
-  "It's now open source. If there's a feature you'd love to see, you can build it yourself and contribute it on GitHub — every improvement helps the next batch.",
-];
+const NOTE_VERSION = "3";
+const NOTE_BODY =
+  "If there's a feature you'd love to see, you can build it yourself and contribute it on GitHub — every improvement helps the next batch.";
 
 const STORAGE_KEY = "pt_creator_note_seen";
 const OPEN_DELAY_MS = 600;
@@ -76,33 +74,45 @@ export default function CreatorNote() {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="pb-1 pt-6">
+              <ModalHeader className="justify-center pb-0 pt-7">
                 <span className="w-fit rounded-full border border-amber-200/70 bg-amber-100/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-700">
                   From the creator
                 </span>
               </ModalHeader>
-              <ModalBody className="space-y-3 text-sm leading-7 text-slate-600 sm:text-base">
-                {NOTE_PARAGRAPHS.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
+              <ModalBody className="pt-5">
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative mb-5">
+                    <div className="absolute inset-0 rounded-2xl bg-amber-300/50 blur-xl" aria-hidden="true" />
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-500 text-white shadow-lg">
+                      <FaGithub size={32} aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-black leading-tight tracking-tight text-amber-950 sm:text-3xl">
+                    PESU Placement Tales is now{" "}
+                    <span className="bg-gradient-to-r from-amber-500 to-yellow-500 bg-clip-text text-transparent">
+                      open source
+                    </span>
+                  </h2>
+                  <p className="mt-4 max-w-md text-sm leading-7 text-slate-600 sm:text-base">{NOTE_BODY}</p>
+                </div>
               </ModalBody>
-              <ModalFooter className="flex-wrap gap-3 pb-6">
+              <ModalFooter className="flex-col-reverse gap-3 pb-7 pt-6 sm:flex-row sm:justify-center">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="rounded-xl border border-amber-300 bg-white/70 px-6 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
+                >
+                  Let&apos;s go
+                </button>
                 <a
                   href={REPO_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-white/70 px-5 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
                 >
                   <FaGithub size={16} aria-hidden="true" />
-                  Contribute
+                  Contribute on GitHub
                 </a>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-amber-600 hover:to-yellow-600"
-                >
-                  Let&apos;s go
-                </button>
               </ModalFooter>
             </>
           )}
