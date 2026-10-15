@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Providers } from "./providers";
 import Navbar from './components/Navbar/Navbar'
+import { getRepoStars } from "../utils/github";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,13 +22,15 @@ export const metadata = {
   description: "✨🚀 A collective and supportive repository with placement experiences at PES University",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const stars = await getRepoStars();
+
   return (
     <html lang="en">
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar/>
+        <Navbar stars={stars} />
         <Providers>{children}</Providers>
         <Analytics />
       </body>

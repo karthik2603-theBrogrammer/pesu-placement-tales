@@ -1,6 +1,7 @@
 import Link from "next/link";
 import TrendingStories from "./components/home/TrendingStories";
 import RecentStories from "./components/home/RecentStories";
+import CreatorNote from "./components/home/CreatorNote";
 import { getDb, isDbConfigured } from "../utils/db";
 import { getTrendingStories } from "../utils/trendingStories";
 import { fetchRecentStories } from "../utils/recentStories";
@@ -10,7 +11,7 @@ export const revalidate = 300;
 const highlights = [
   "Company-specific insights",
   "Real interview patterns",
-  "Salary & hiring stats",
+  "Open source & community-built",
 ];
 
 async function loadHomeFeeds() {
@@ -61,9 +62,8 @@ export default async function Home() {
 
         <p className="mt-6 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
           Placement information is limited and scattered — yet interview patterns
-          often repeat within a company. Read seniors&apos; experiences, dig into
-          salary &amp; hiring stats, prepare sharper, and share what you know to
-          lift the next batch.
+          often repeat within a company. Read seniors&apos; experiences, prepare
+          sharper, and share what you know to lift the next batch.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -93,6 +93,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <CreatorNote />
 
       <TrendingStories stories={trending.result} sortBy={trending.sortBy} />
       <RecentStories stories={recent} />
