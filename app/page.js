@@ -92,9 +92,9 @@ export default async function Home() {
             </span>
           ))}
         </div>
-      </section>
 
-      <CreatorNote />
+        <CreatorNote />
+      </section>
 
       <TrendingStories stories={trending.result} sortBy={trending.sortBy} />
       <RecentStories stories={recent} />
