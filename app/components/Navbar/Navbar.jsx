@@ -15,17 +15,45 @@ import {
   DropdownItem,
 } from "@nextui-org/react";
 import { PiListBold } from "react-icons/pi";
+import { FaGithub, FaStar } from "react-icons/fa";
+import { REPO_URL } from "../../../utils/github";
 
 const BROWSE_LINK = { href: "/browse", label: "Browse" };
 const SECONDARY_LINKS = [
-  // { href: "/stats", label: "Stats" },
   { href: "/feature-request", label: "Feature Request" },
   { href: "/bug-report", label: "Bug Report" },
   { href: "/pass-the-torch", label: "Take Over" },
 ];
 const SHARE_LINK = { href: "/add-student", label: "Share your story" };
 
-export default function App() {
+const formatStars = (count) =>
+  count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : String(count);
+
+function GitHubContribute({ stars }) {
+  const hasStars = Number.isFinite(stars);
+  return (
+    <a
+      href={REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={hasStars ? `Contribute on GitHub, ${stars} stars` : "Contribute on GitHub"}
+      className="inline-flex items-center overflow-hidden rounded-xl border border-amber-200 bg-white/70 text-sm font-semibold text-amber-800 shadow-sm transition hover:border-amber-300 hover:bg-amber-50"
+    >
+      <span className="inline-flex items-center gap-1.5 px-3 py-1.5">
+        <FaGithub size={16} aria-hidden="true" />
+        Contribute
+      </span>
+      {hasStars && (
+        <span className="inline-flex items-center gap-1 border-l border-amber-200 bg-amber-50/80 px-2.5 py-1.5 text-xs font-bold text-amber-700">
+          <FaStar size={11} aria-hidden="true" />
+          {formatStars(stars)}
+        </span>
+      )}
+    </a>
+  );
+}
+
+export default function App({ stars = null }) {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -86,6 +114,10 @@ export default function App() {
             </Button>
           </NavbarItem>
         )}
+
+        <NavbarItem className="ml-1 flex">
+          <GitHubContribute stars={stars} />
+        </NavbarItem>
 
         <NavbarItem className="md:hidden">
           <Dropdown placement="bottom-end">
