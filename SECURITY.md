@@ -19,8 +19,7 @@ In scope: this repository and the live site at https://pesu-placement-tales.verc
 Things we especially care about:
 
 - Exposure of contributors' personal data (names of anonymous contributors, phone numbers, emails)
-- Bypassing the admin token on `/api/admin/*` routes
-- Writing to, or deleting from, the database without authorisation
+- Writing to, or deleting from, the database in ways the site doesn't intend
 
 Please don't run automated scanners or load tests against the live site, and never access or
 modify data that isn't yours.

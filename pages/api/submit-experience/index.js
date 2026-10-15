@@ -1,9 +1,14 @@
 import { DB_CONFIG_ERROR, getDb, isDbConfigured } from "../../../utils/db";
 import { isValidVerdict } from "../../../utils/verdict";
 import { isValidDegree } from "../../../utils/degree";
+import { ANONYMOUS_PLACEHOLDER } from "../../../utils/displayName";
 import { captureServerEvent } from "../../../lib/posthog-server";
 
 const trim = (value) => (typeof value === "string" ? value.trim() : "");
+
+const SHORT_TEXT_LIMIT = 255;
+const REMARKS_LIMIT = 20000;
+const MIN_YEAR = 1980;
 
 /**
  * Resolves the company for a submission:
@@ -85,13 +90,38 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Job title is required." });
   }
 
+  const tooLong = [
+    [first_name, "First name"],
+    [middle_name, "Middle name"],
+    [last_name, "Last name"],
+    [job_title, "Job title"],
+    [new_company_name, "Company name"],
+    [new_company_description, "Company description"],
+  ].find(([value]) => trim(value).length > SHORT_TEXT_LIMIT);
+  if (tooLong) {
+    return res
+      .status(400)
+      .json({ error: `${tooLong[1]} must be ${SHORT_TEXT_LIMIT} characters or fewer.` });
+  }
+
+  if (trim(remarks_markdown).length > REMARKS_LIMIT) {
+    return res
+      .status(400)
+      .json({ error: `Experience details must be ${REMARKS_LIMIT} characters or fewer.` });
+  }
+
+  if (company_id && !/^\d+$/.test(String(company_id))) {
+    return res.status(400).json({ error: "Selected company not found." });
+  }
+
+  const maxYear = new Date().getFullYear() + 5;
   const year = parseInt(year_placed, 10);
-  if (!year || Number.isNaN(year)) {
+  if (!year || Number.isNaN(year) || year < MIN_YEAR || year > maxYear) {
     return res.status(400).json({ error: "A valid interview year is required." });
   }
 
   const batch = parseInt(batch_of, 10);
-  if (!batch || Number.isNaN(batch)) {
+  if (!batch || Number.isNaN(batch) || batch < MIN_YEAR || batch > maxYear) {
     return res.status(400).json({ error: "A valid batch year is required." });
   }
 
@@ -125,6 +155,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Enter a valid phone number." });
   }
 
+  // Anonymous stories never store the contributor's identity, whatever the client sends.
+  const anonymous = !!is_anonymous;
+  const identity = anonymous
+    ? { ...ANONYMOUS_PLACEHOLDER, linkedin: "", phone: null }
+    : {
+        first_name: trim(first_name),
+        middle_name: trim(middle_name),
+        last_name: trim(last_name),
+        linkedin: linkedin || "",
+        phone: phone || null,
+      };
+
   try {
     const sql = getDb();
 
@@ -143,11 +185,11 @@ export default async function handler(req, res) {
         verdict, degree, is_anonymous
       )
       VALUES (
-        ${trim(first_name)}, ${trim(middle_name)}, ${trim(last_name)}, ${trim(job_title)},
-        ${company.id}, ${year}, ${batch}, ${linkedin || ""},
-        ${phone || null}, ${trim(remarks_markdown)},
+        ${identity.first_name}, ${identity.middle_name}, ${identity.last_name}, ${trim(job_title)},
+        ${company.id}, ${year}, ${batch}, ${identity.linkedin},
+        ${identity.phone}, ${trim(remarks_markdown)},
         ${!!internship_fte}, ${!!internship_only}, ${!!fte_only}, ${!!summer_internship},
-        ${verdict}, ${degree}, ${!!is_anonymous}
+        ${verdict}, ${degree}, ${anonymous}
       )
       RETURNING id;
     `;
