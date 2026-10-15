@@ -23,14 +23,16 @@ Thanks for helping the next batch prepare! This guide covers how to propose and 
 6. **Open a pull request** against `main`, fill in the template, and link the issue (`Closes #123`).
    Add screenshots for UI changes.
 
-A maintainer will review your PR. Merging to `main` deploys straight to the live site, so expect
-questions and change requests — that's normal.
+A maintainer will review your PR, and every outside contribution needs approval from
+[@karthik2603-theBrogrammer](https://github.com/karthik2603-theBrogrammer) before it's merged.
+Merging to `main` deploys straight to the live site, so expect questions and change requests —
+that's normal.
 
 ## Guidelines
 
 - **Personal data:** never return phone numbers, emails, or the real identity of anonymous
-  contributors from public API routes or pages. Admin-only data belongs under `pages/api/admin`
-  and must call `requireAdmin` from `utils/adminAuth.js`.
+  contributors from public API routes or pages. Every route in this repo is public — there are
+  no admin routes here, so don't add any.
 - **Database changes:** if your change needs a new table or column, update `db/setup.sql` (and
   `db/seed.sql` if useful) and describe the exact SQL in your PR. A maintainer will apply it to
   production before merging.

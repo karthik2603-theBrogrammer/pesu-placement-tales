@@ -8,14 +8,13 @@ Placement experiences from PESU seniors — browse company stories, share your i
 
 - **Browse** placement and internship stories by company (`/browse`)
 - **Contribute** your own interview experience, optionally anonymously (`/add-student`)
-- **Stats** on companies that visited campus — CTC, stipend, CGPA cut-offs, hires (`/stats`)
 - **Feedback** boards for feature requests and bug reports
 - **Pass the Torch** — apply to help maintain the project
 
 ## Tech stack
 
 - [Next.js 14](https://nextjs.org) (App Router for pages, `pages/api` for API routes), React 18
-- Tailwind CSS, NextUI, Framer Motion, BlockNote (markdown rendering)
+- Tailwind CSS, NextUI, Framer Motion
 - [Neon](https://neon.tech) serverless Postgres
 - PostHog analytics (optional), deployed on Vercel
 
@@ -41,8 +40,7 @@ You need **Node.js 24** and a free Postgres database from [Neon](https://neon.te
    cp .env.example .env
    ```
 
-   Set `DATABASE_URL` to your Neon connection string. To try the admin console, set `ADMIN_TOKEN` to any
-   random string and enter it on the admin page. The PostHog variables are optional; leave them empty.
+   Set `DATABASE_URL` to your Neon connection string. The PostHog variables are optional; leave them empty.
 
 4. **Start the dev server:**
 
@@ -56,12 +54,14 @@ You need **Node.js 24** and a free Postgres database from [Neon](https://neon.te
 
 ```
 app/          Pages and UI components (App Router)
-pages/api/    API routes — public routes and admin routes under pages/api/admin
-utils/        Shared helpers (DB client, admin auth, formatting)
+pages/api/    Public API routes
+utils/        Shared helpers (DB client, formatting)
 lib/          PostHog server helpers
 db/           setup.sql (local DB), seed.sql (fake data), schema.sql (production snapshot, reference only)
 scripts/      One-off production migration scripts (maintainers only)
 ```
+
+Moderation and admin tools live in a separate private repository and are not part of this codebase.
 
 ## Contributing
 
