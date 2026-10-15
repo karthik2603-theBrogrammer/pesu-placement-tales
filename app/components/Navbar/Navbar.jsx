@@ -43,12 +43,10 @@ function GitHubContribute({ stars }) {
         <FaGithub size={16} aria-hidden="true" />
         Contribute
       </span>
-      {hasStars && (
-        <span className="inline-flex items-center gap-1 border-l border-amber-200 bg-amber-50/80 px-2.5 py-1.5 text-xs font-bold text-amber-700">
-          <FaStar size={11} aria-hidden="true" />
-          {formatStars(stars)}
-        </span>
-      )}
+      <span className="inline-flex items-center gap-1 border-l border-amber-200 bg-amber-50/80 px-2.5 py-1.5 text-xs font-bold tabular-nums text-amber-700">
+        <FaStar size={11} aria-hidden="true" />
+        {hasStars ? formatStars(stars) : "Star"}
+      </span>
     </a>
   );
 }
