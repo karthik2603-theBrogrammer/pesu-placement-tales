@@ -17,7 +17,7 @@
     "@nextui-org/react": "^2.4.6",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^11.5.3",
-    "next": "14.2.35",
+    "next": "16.4.1",
     "posthog-js": "^1.396.8",
     "posthog-node": "^5.39.4",
     "react": "^18",
