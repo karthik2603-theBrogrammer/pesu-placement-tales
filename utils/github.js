@@ -15,9 +15,32 @@ export async function getRepoStars() {
       headers,
       next: { revalidate: 3600 },
     });
+    if (res.ok) {
+      const data = await res.json();
+      if (Number.isFinite(data.stargazers_count)) return data.stargazers_count;
+    }
+  } catch {
+    // Fall through to the shields.io fallback.
+  }
+
+  return getStarsFromShields();
+}
+
+const SUFFIX_MULTIPLIERS = { k: 1e3, m: 1e6 };
+
+// Unauthenticated GitHub API calls from shared build IPs can hit rate limits;
+// shields.io serves the same count without that limit.
+async function getStarsFromShields() {
+  try {
+    const res = await fetch(`https://img.shields.io/github/stars/${REPO_SLUG}.json`, {
+      next: { revalidate: 3600 },
+    });
     if (!res.ok) return null;
-    const data = await res.json();
-    return Number.isFinite(data.stargazers_count) ? data.stargazers_count : null;
+    const { value } = await res.json();
+    const match = /^([\d.]+)\s*([km])?$/i.exec(String(value ?? "").trim());
+    if (!match) return null;
+    const multiplier = match[2] ? SUFFIX_MULTIPLIERS[match[2].toLowerCase()] : 1;
+    return Math.round(Number(match[1]) * multiplier);
   } catch {
     return null;
   }
